@@ -1,0 +1,21 @@
+package Calculator;
+
+import javax.swing.*;
+import java.awt.event.*;
+
+public class CalculatorGUI {
+	JTextArea textBox1 = new JTextArea();
+	JButton button1 = new JButton();
+   
+   public CalculatorGUI(){
+
+		   
+   }
+	
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+
+}

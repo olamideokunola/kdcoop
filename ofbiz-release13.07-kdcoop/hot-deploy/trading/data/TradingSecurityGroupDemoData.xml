@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityGroupPermission groupId="FULLADMIN" permissionId="ORDERMGR_ADMIN"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="ORDERMGR_CREATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="ORDERMGR_DELETE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="ORDERMGR_UPDATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="ORDERMGR_VIEW"/>
+    <SecurityGroupPermission groupId="VIEWADMIN" permissionId="ORDERMGR_VIEW"/>
+    <SecurityGroupPermission groupId="BIZADMIN" permissionId="ORDERMGR_ADMIN"/>
+</entity-engine-xml>

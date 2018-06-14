@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-screen.xsd">
+
+	<screen name="CommonContributionBatchDecorator">
+        <section>
+            <actions>
+                <set field="headerItem" value="ContributionBatch"/>
+                <entity-one value-field="paymentGroup" entity-name="PaymentGroup"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <!-- >condition><not><if-empty field="paymentGroupId"/></not></condition-->
+                                    <widgets>
+                                        <include-menu name="ContributionMainTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    </widgets>
+                                    <fail-widgets>
+                                        <include-menu name="ContributionMainTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    </fail-widgets>
+                                </section>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/></not>
+                            </condition>
+                            <widgets>
+                            	<include-menu name="ContributionSubTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${contribution.description} [${contributionId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                                <label style="h3" text="${uiLabelMap.AccountingViewPermissionError}"/>
+                            </widgets>
+                            <fail-widgets>
+                                <include-menu name="ContributionSubTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${contribution.description} [${contributionId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                            </fail-widgets>
+                        </section>
+                        <decorator-section-include name="body"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="NewContributionPaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            	<set field="paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	<set field="statusId" value="PMTGRP_INCPL"/>
+            	<set field="paymentGroupTypeId" value="BATCH_PAYMENT"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+	                   	<screenlet title="${uiLabelMap.CooperativeContributionBatch}">
+	                       <include-form name="NewContributionPaymentGroupForm" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+	                   	</screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CompleteContributionPaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            	<set field="paymentGroupId" from-field="parameters.paymentGroupId"/>
+                <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                    <field-map field-name="paymentGroupId"/>
+                </entity-one>	
+            	<set field="statusId" from-field="paymentGroup.statusId"/>
+            	<set field="paymentGroupName" from-field="paymentGroup.paymentGroupName"/>
+            	<set field="paymentGroupTypeId" from-field="paymentGroup.paymentGroupTypeId"/>
+
+ 				<entity-one entity-name="PaymentGroupPaymentSummaryByGroupView" value-field="paymentGroupPaymentSummaryByGroupView">
+ 					<field-map field-name="paymentGroupId"/>
+                </entity-one>
+                            	
+                <entity-and entity-name="Payment" list="payment">
+                    <field-map field-name="paymentGroupId"/>
+                </entity-and>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<label style="h1">${uiLabelMap[titleProperty]} ${uiLabelMap.CommonFor} ${paymentGroup.paymentGroupName} [${paymentGroupId}]</label>
+                        <screenlet name="paymentBatch" title="${uiLabelMap.ContributionPaymentBatch}" 
+                        	collapsible="false" navigation-menu-name="PaymentBatchMenu">
+                            <include-form name="ContributionPaymentGroupForm" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                        	<include-menu
+                        		location="component://cooperativefunds/widget/cooperativefundsMenus.xml"
+                        		name="PaymentBatchMenu" />
+                        </screenlet> 
+                        <screenlet name="addPaymentToPaymentBatch" title="${uiLabelMap.ContributionPaymentToPaymentBatch}" collapsible="true">
+                            <include-form name="AddPaymentToPaymentBatch" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                        </screenlet>                    
+                        <screenlet name="listPaymentsInPaymentBatch"
+                        	title="${uiLabelMap.ContributionPaymentsInPaymentBatch}"
+                        	collapsible="true">
+                        	<include-form
+                        		name="ListPaymentsInPaymentBatch"
+                        		location="component://cooperativefunds/widget/ContributionForms.xml" />
+                        </screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="NewContributionPaymentInPaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+                <set field="titleProperty" value="ContributionNewPaymentInPaymentBatch"/>
+                <set field="tabButtonItem" value="EditPaymentGroupMember"/>
+                <set field="paymentGroupId" from-field="parameters.paymentGroupId"/>
+                
+				<property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+ 
+                <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                    <field-map field-name="paymentGroupId"/>
+                </entity-one>				
+ 				
+ 				<entity-one entity-name="PaymentGroupPaymentSummaryByGroupView" value-field="paymentGroupPaymentSummaryByGroupView">
+ 					<field-map field-name="paymentGroupId"/>
+                </entity-one>
+                
+                <entity-and entity-name="Payment" list="payment">
+                    <field-map field-name="paymentGroupId"/>
+                </entity-and>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">                  	
+	                    <label style="h1">${uiLabelMap[titleProperty]} ${uiLabelMap.CommonFor} ${paymentGroup.paymentGroupName} [${paymentGroupId}]</label>
+	                    <section>
+	                    	<condition>
+	                    		<if-compare field="paymentGroup.statusId" operator="equals"  value="PMTGRP_INCPL"/>
+	                    	</condition>
+	                    	<widgets>
+		                        <screenlet name="paymentBatch" title="${uiLabelMap.ContributionPaymentBatch}" 
+		                        	collapsible="false" navigation-menu-name="PaymentBatchMenu">
+		                            <include-form name="ContributionPaymentGroupForm" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+		                        	<include-menu
+		                        		location="component://cooperativefunds/widget/cooperativefundsMenus.xml"
+		                        		name="PaymentBatchMenu" />
+		                        </screenlet> 
+		                        <screenlet name="addPaymentToPaymentBatch" title="${uiLabelMap.ContributionPaymentToPaymentBatch}" collapsible="true">
+		                            <include-form name="AddPaymentToPaymentBatch" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+		                        </screenlet>                    
+		                        <screenlet name="listPaymentsInPaymentBatch"
+		                        	title="${uiLabelMap.ContributionPaymentsInPaymentBatch}"
+		                        	collapsible="true">
+		                        	<include-form
+		                        		name="ListPaymentsInPaymentBatch"
+		                        		location="component://cooperativefunds/widget/ContributionForms.xml" />
+		                        </screenlet>
+	                        </widgets>
+	                        <fail-widgets>
+		                        <screenlet name="paymentBatch" title="${uiLabelMap.ContributionPaymentBatch}" 
+		                        	collapsible="false" navigation-menu-name="PaymentBatchMenu">
+		                            <include-form name="ContributionPaymentGroupForm" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+		                        	<include-menu
+		                        		location="component://cooperativefunds/widget/cooperativefundsMenus.xml"
+		                        		name="PaymentBatchMenu" />
+		                        </screenlet>
+		                        <section>  
+			                        <condition>
+		                    			<if-compare field="paymentGroup.statusId" operator="equals"  value="PMTGRP_CPL"/>
+		                    		</condition>
+		                    		<widgets>               
+				                        <screenlet name="listPaymentsInPaymentBatch"
+				                        	title="${uiLabelMap.ContributionPaymentsInPaymentBatch}"
+				                        	collapsible="true">
+				                        	<include-form
+				                        		name="ListPaymentsInPaymentBatch"
+				                        		location="component://cooperativefunds/widget/ContributionForms.xml" />
+				                        </screenlet>
+			                        </widgets>
+		                        </section> 	                        
+	                        </fail-widgets>
+	               		</section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+     <screen name="CompletePaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<section>
+                           <widgets>
+                              
+                           </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+ 
+      <screen name="ConfirmPaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<section>
+                           <widgets>
+                              
+                           </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+ 
+       <screen name="PaymentsInPaymentBatch">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<section>
+                           <widgets>
+                              
+                           </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    <screen name="FindContributionBatchesScreen">
+       	<section>
+       		<actions></actions>
+       		<widgets>
+       			<decorator-screen
+       				name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+       				<decorator-section name="body">
+       					<section>
+       						<widgets>
+       							<decorator-screen name="FindScreenDecorator"
+       								location="component://common/widget/CommonScreens.xml">
+       								<decorator-section name="menu-bar">
+       									<container style="button-bar">
+       										<include-menu location="component://cooperativefunds/widget/cooperativefundsMenus.xml"
+       											name="ContributionBatchSubTabBar"/>
+       									</container>
+       								</decorator-section>
+       								<decorator-section name="search-options">
+       									<section>
+                                            <condition>
+                                                <if-compare field="displayAdvancedSearch" operator="equals" value="true"/>
+                                            </condition>
+                                            <widgets>
+                                                <include-form name="FindContributionBatches" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                            </widgets>
+                                            <fail-widgets>
+                                                <include-form name="QuickFindContributionBatches" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                            </fail-widgets>
+                                        </section>
+       								</decorator-section>
+       								<decorator-section name="search-results">
+       									<include-form location="component://cooperativefunds/widget/ContributionForms.xml"
+       										name="ListContributionBatches">
+       									</include-form>
+       								</decorator-section>
+       							</decorator-screen>
+       						</widgets>
+       					</section>
+       				</decorator-section>
+       			</decorator-screen></widgets></section>
+    </screen>
+    <screen name="EditContributionBatch">
+    	<section>
+    		<actions>
+    			<set field="paymentGroupId" from-field="parameters.paymentGroupId"></set>
+    			<entity-one entity-name="PaymentGroup" value-field="paymentGroup"/>
+    			<entity-and entity-name="Payment" list="payment">
+                    <field-map field-name="paymentGroupId"/>
+                </entity-and>
+    		</actions>
+    		<widgets>
+    			<decorator-screen
+    				name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+    				<decorator-section name="body">
+    					<section>
+    						<widgets>
+    							<screenlet title="Edit Contribution Batch">
+    								<include-form
+    									name="EditContributionBatchForm"
+    									location="component://cooperativefunds/widget/ContributionForms.xml">
+    								</include-form>
+    							</screenlet>
+    							<screenlet title="Contribution Payments">
+    								<include-form name="ListPaymentsInPaymentBatch" location="component://cooperativefunds/widget/ContributionForms.xml"></include-form></screenlet>
+    						</widgets>
+    					</section>
+    				</decorator-section>
+    			</decorator-screen></widgets>
+    	</section>
+    </screen>
+
+    <screen name="EditContributionPayment">
+    	<section>
+    		<actions>
+    			<set field="paymentId" from-field="parameters.paymentId"></set>
+    			<entity-one entity-name="Payment" value-field="payment"/>
+    		</actions>
+    		<widgets>
+    			<decorator-screen
+    				name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+    				<decorator-section name="body">
+    					<section>
+    						<widgets>
+    							<screenlet title="Edit Contribution Payment">
+    								<include-form
+    									name="EditContributionPaymentForm"
+    									location="component://cooperativefunds/widget/ContributionForms.xml">
+    								</include-form>
+    							</screenlet>
+    						</widgets>
+    					</section>
+    				</decorator-section>
+    			</decorator-screen></widgets>
+    	</section>
+    </screen>
+    
+	<screen name="FindPayments">
+        <section>
+            <actions>
+                <set field="titleProperty" value="PageTitleFindPayment"/>
+                <set field="headerItem" value="payments"/>
+                <set field="tabButtonItem" value="findPayment"/>
+                <set field="paymentTypeId" value="MEMBER_CONTRIBUTION"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <decorator-screen name="FindScreenDecorator" location="component://common/widget/CommonScreens.xml">
+                                    <decorator-section name="menu-bar">
+                                        <container style="button-bar">
+                                            <!-- >link target="newPayment" text="${uiLabelMap.CommonCreateNew} ${uiLabelMap.AccountingPayment}" style="buttontext create"/>
+                                            <link target="FindSalesInvoicesByDueDate" text="${uiLabelMap.AccountingFindSalesInvoicesByDueDate}" style="buttontext search"/>
+                                            <link target="FindPurchaseInvoicesByDueDate" text="${uiLabelMap.AccountingFindPurchaseInvoicesByDueDate}" style="buttontext search"/-->
+                                        </container>
+                                    </decorator-section>
+                                    <decorator-section name="search-options">
+                                        <include-form name="FindPayments" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                    </decorator-section>
+                                    <decorator-section name="search-results">
+                                        <include-form name="ListPayments"  location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                    </decorator-section>
+                                </decorator-screen>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+<!-- Contribution Version 2 -->
+
+    <screen name="FindContributions">
+       	<section>
+       		<actions>
+       		</actions>
+       		<widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+       				<decorator-section name="body">
+       					<section>
+       						<widgets>
+       							<decorator-screen name="FindScreenDecorator"
+       								location="component://common/widget/CommonScreens.xml">
+       								<decorator-section name="menu-bar">
+       									<container style="button-bar">
+       									</container>
+       								</decorator-section>
+       								<decorator-section name="search-options">
+       									<section>
+                                            <condition>
+                                                <if-compare field="displayAdvancedSearch" operator="equals" value="true"/>
+                                            </condition>
+                                            <widgets>
+                                                <include-form name="FindContributions" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                            </widgets>
+                                            <fail-widgets>
+                                                <include-form name="QuickFindContributions" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                            </fail-widgets>
+                                        </section>
+       								</decorator-section>
+       								<decorator-section name="search-results">
+       									<include-form location="component://cooperativefunds/widget/ContributionForms.xml"
+       										name="ListContributions"/>
+       								</decorator-section>
+       							</decorator-screen>
+       						</widgets>
+       					</section>
+       				</decorator-section>
+       			</decorator-screen>
+       		</widgets>
+       	</section>
+    </screen>
+
+	<screen name="ContributionOverview">
+        <section>
+            <actions>
+                <property-map resource="PartyUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="titleProperty" value="PageTitleContributionOverview"/>
+                <set field="tabButtonItem" value="contributionOverview"/>
+                <set field="contributionId" from-field="parameters.contributionId"/>
+                <entity-one entity-name="Contribution" value-field="contribution"/>
+                <entity-and entity-name="ContributionStatus" list="contributionStatus">
+                    <field-map from-field="parameters.contributionId" field-name="contributionId"/>
+                    <order-by field-name="statusDate"/>
+                </entity-and>
+                <entity-and entity-name="ContributionFinAccountTrans" list="contributionItems">
+                    <field-map from-field="parameters.contributionId" field-name="contributionId"/>
+                    <order-by field-name="entryDate"/>
+                </entity-and>
+                <service service-name="calculateContributionTotal" result-map="contributionTotalMap">
+                    <field-map field-name="contributionId" from-field="parameters.contributionId"/>
+                </service>
+                <set field="totalAmount" from-field="contributionTotalMap.totalAmount" type="BigDecimal"/>
+                <entity-condition entity-name="ContributionAcctgTransAndEntries" list="ContributionAcctgTransAndEntries">
+                    <condition-expr field-name="contributionId"  operator="equals" from-field="contributionId"/>
+                    <order-by field-name="acctgTransId"/>
+                    <order-by field-name="acctgTransEntrySeqId"/>
+                </entity-condition>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="contribution"/></not>
+                            </condition>
+                            <widgets>
+                                <section>
+                            <condition>
+                                <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CRTD"/>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.ContributionHeader}">
+                                    <link target="editContribution" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+                                        <parameter param-name="contributionId"/>
+                                    </link>
+                                    <include-form name="contributionHeader" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                                <container style="lefthalf">
+                                    <screenlet title="${uiLabelMap.CommonStatus}" navigation-form-name="ListInvoiceStatus">
+                                        <include-form name="ListContributionStatus" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                    </screenlet>
+                                </container>
+                                <container style="righthalf">
+                                </container>
+                                <container style="clear"/>
+                                <screenlet title="${uiLabelMap.ContributionItems}" navigation-form-name="contributionItems">
+                                    <link target="listContributionItems" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+                                        <parameter param-name="contributionId"/>
+                                    </link>
+                                    <include-form name="contributionItems" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.AccountingTransactions}" navigation-form-name="AcctgTransAndEntries">
+                                    <include-form name="AcctgTransAndEntries" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                            <fail-widgets>
+                                <screenlet title="${uiLabelMap.AccountingInvoiceHeader}">
+                                    <include-form name="contributionHeader" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                                <container style="lefthalf">
+                                    <screenlet title="${uiLabelMap.CommonStatus}" navigation-form-name="ListContributionStatus">
+                                        <include-form name="ListContributionStatus" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                    </screenlet>
+                                </container>
+                                <container style="righthalf">
+                                </container>
+                                <container style="clear"/>
+                                <screenlet title="${uiLabelMap.ContributionItems}" navigation-form-name="contributionItems">
+                                    <include-form name="contributionItems" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.AccountingTransactions}" navigation-form-name="ContributionAcctgTransAndEntries">
+                                    <include-form name="ContributionAcctgTransAndEntries" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                            </fail-widgets>
+                                </section>
+                            </widgets>
+                            <fail-widgets>
+                                <label text="${uiLabelMap.ContributionDoesNotExists}"></label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>    
+    
+    <screen name="NewContribution">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+	                   	<screenlet title="${uiLabelMap.CooperativeContribution}">
+	                       <include-form name="NewContribution" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+	                   	</screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    
+    <screen name="EditContribution">
+        <section>
+            <actions>
+            	<set field="titleProperty" value="PageTitleEditContribution"/>
+            	<set field="tabButtonItem" value="editContribution"/>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            	<set field="contributionId" from-field="parameters.contributionId"/>
+            	<entity-one entity-name="Contribution" value-field="contribution">
+            		<field-map field-name="contributionId"/>
+            	</entity-one>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<section>
+                            <condition>
+                                <if-compare field="contributionId.statusId" operator="equals" value="CONTRIB_CRTD"/>
+                            </condition>
+                            <widgets>
+		                   		<screenlet title="${uiLabelMap.CooperativeContribution}">
+		                       		<include-form name="EditContribution" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+		                   		</screenlet>
+	                   		</widgets>
+	                   		<fail-widgets>
+                                <screenlet title="${uiLabelMap.CooperativeEditContribution}">
+		                       		<include-form name="EditContribution" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                                </screenlet>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="EditContributionItems">
+        <section>
+            <actions>
+                <property-map resource="AccountingEntityLabels" map-name="uiLabelMap" global="true"/>
+                <set field="viewIndex" from-field="parameters.viewIndex"/>
+                <set field="viewSize" from-field="parameters.viewSize"/>
+                <set field="titleProperty" value="PageTitleListInvoices"/>
+                <set field="tabButtonItem" value="ListContributionItems"/>
+  				<set field="contributionId" from-field="parameters.contributionId"/>
+  				<entity-and entity-name="FinAccountTrans" list="finAccountTrans">
+                    <field-map field-name="contributionId"/>
+                </entity-and> 
+                <entity-one entity-name="Contribution" value-field="contribution">
+            		<field-map field-name="contributionId"/>
+            	</entity-one>
+            	<entity-one entity-name="FinAccount" value-field="finAccount">
+            		<field-map field-name="finAccountId"/>
+            	</entity-one> 
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<screenlet title="${uiLabelMap.CooperativeContributionLineItem}">
+	                       <include-form name="EditContributionItems" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+	                   	</screenlet>
+                        <screenlet title="${uiLabelMap.CooperativeContributionLineItem}">
+	                       <include-form name="EditContributionItem" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+                        </screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+
+    <screen name="ContributionConfirmation">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+            	<set field="titleProperty" value="PageTitleConfirmContribution"/>
+            	<set field="contributionId" from-field="parameters.contributionId"/>
+            	<entity-one entity-name="Contribution" value-field="contribution">
+            		<field-map field-name="contributionId"/>
+            	</entity-one>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+                    	<label style="h1">${uiLabelMap[titleProperty]} ${uiLabelMap.CommonFor} ${contribution.description} ${contribution.contributionId}</label>
+	                   	<screenlet title="${uiLabelMap.CooperativeContributionBatch}">
+	                       	<include-form name="NewContribution" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+	                   	</screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+	
+	<screen name="EditContributionItem">
+        <section>
+            <actions>
+                <set field="headerItem" value="main"/><!-- this highlights the selected menu-item with name "main" -->
+				<set field="finAccountTransId" from-field="parameters.finAccountTransId"></set>
+    			<entity-one entity-name="FinAccountTrans" value-field="finAccountTrans"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonContributionBatchDecorator" location="${parameters.contributionBatchDecoratorLocation}">
+                    <decorator-section name="body">
+	                   	<screenlet title="${uiLabelMap.CooperativeContributionItem}">
+	                       <include-form name="EditContributionItem" location="component://cooperativefunds/widget/ContributionForms.xml"/>
+	                   	</screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+</screens>

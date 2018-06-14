@@ -1,0 +1,447 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/services.xsd">
+    <description>cooperativefunds Loan Services</description>
+    <vendor></vendor>
+    <version>1.0</version>
+
+    <!-- Loan services -->
+    <service name="createLoanRequest" engine="simple" default-entity-name="LoanRequest"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" invoke="createLoanRequest" auth="true">
+        <description>Create a LoanRequest. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="partyId" optional="false"/>
+    </service>
+    
+    <service name="updateLoanRequest" engine="simple" default-entity-name="LoanRequest"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" invoke="updateLoanRequest" auth="true">
+        <description>Update Loan Request Record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+    
+    <service name="updateLoanRequestStatus" engine="simple" default-entity-name="LoanRequestStatus"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" invoke="updateLoanRequestStatus" auth="true">
+        <description>Update a LoanRequestStatus. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="loanRequestId" mode="INOUT" optional="false"/>
+    </service>
+
+    <service name="createLoan" engine="simple" default-entity-name="Loan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" invoke="createLoan" auth="true">
+        <description>Create a Loan. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRequestId" type="String" mode="IN" optional="false"/>
+        <attribute name="loanTypeId" type="String" mode="IN" optional="false"/>
+        <attribute name="agreementId" type="String" mode="OUT" optional="false"/>
+        <override name="partyId" optional="false"/>       
+    </service>            
+
+    <service name="updateLoan" engine="simple" default-entity-name="Loan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoan" auth="true">
+        <description>Update Loan Record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+    
+    <service name="createLoanAgreement" engine="simple" default-entity-name="Agreement"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanAgreement" auth="true">
+        <description>Create a Loan Agreement. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="partyId" type="String" mode="IN" optional="false"/>
+        <override name="loanId" optional="false"/>
+    </service> 
+    
+    <service name="createLoanAgreementTerms" engine="simple" default-entity-name="AgreementTerm"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanAgreementTerms" auth="true">
+        <description>Create a Loan Agreement Terms. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="initialPrincipalAmount" type="BigDecimal" mode="IN" optional="false"/>
+		<attribute name="interestRate" type="Double" mode="IN" optional="false"/>
+		<attribute name="noOfInstallments" type="Long" mode="IN" optional="false"/>
+    </service>    
+    
+    <service name="updateLoanStatus" engine="simple" default-entity-name="LoanStatus"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanStatus" auth="true">
+        <description>Update Loan Status. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="loanId" optional="false"/>
+    </service>  
+    
+    <service name="createLoanDisbursement" engine="simple" default-entity-name="LoanDisbursement"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanDisbursement" auth="true">
+        <description>Create a Loan Disbursement. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="loanId" optional="false"/>
+    </service> 
+    
+    <service name="updateLoanDisbursement" engine="simple" default-entity-name="LoanDisbursement"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanDisbursement" auth="true">
+        <description>Update Loan Record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+ 
+    <service name="updateTotalDisbursement" engine="simple" default-entity-name="Loan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateTotalDisbursement" auth="true">
+        <description>Update total Loan disbursements</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+       
+    <service name="calculateTotalDisbursement" engine="simple"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="calculateTotalDisbursement" auth="true">
+        <description>Calculate total Loan disbursements</description>
+        <attribute name="loanId" type="String" mode="IN" optional="false"/>  
+        <attribute name="totalDisbursed" type="BigDecimal" mode="OUT" optional="false"/> 
+        <attribute name="totalUndisbursed" type="BigDecimal" mode="OUT" optional="false"/>
+    </service>
+    
+    <service name="updateLoanDisbursementStatus" engine="simple" default-entity-name="LoanDisbursementStatus"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanDisbursementStatus" auth="true">
+        <description>Update Loan Disbursement Status. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="loanDisbursementId" optional="false"/>
+        <override name="statusId" optional="false"/>
+    </service>  
+    
+    <service name="createLoanDisbursementPayment" engine="simple" default-entity-name="Payment"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanDisbursementPayment" auth="true">
+        <description>Create a Loan Disbursement Payment. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanDisbursementId" type="String" mode="IN" optional="false"/> 
+        <override name="paymentMethodId" optional="false"/>
+        <override name="paymentId" mode="OUT" optional="true"/>
+    </service>
+    
+    <service name="createLoanPayoffPayment" engine="simple" default-entity-name="Payment"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanPayoffPayment" auth="true">
+        <description>Create a Loan Payoff Payment. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanPayoffId" type="String" mode="IN" optional="false"/> 
+        <override name="paymentMethodId" optional="false"/>
+        <override name="paymentId" mode="OUT" optional="true"/>
+    </service>
+    
+    <service name="calculateLoanPaymentPlan" engine="simple" default-entity-name="LoanPaymentPlan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="calculateLoanPaymentPlan" auth="true">
+        <description>Calculate a Loan Payment Plan. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        
+        <override name="loanInterestType" optional="false"/>
+        
+        <override name="monthlyPrincipalPaybackAmount" mode="OUT" optional="true"/>
+        <override name="monthlyInterestPaybackAmount" mode="OUT" optional="true"/>
+        
+        <override name="monthlyPaybackAmount" mode="OUT" optional="true"/>
+        <override name="totalInterestAmount" mode="OUT" optional="true"/>
+        <override name="noOfInstallments" mode="OUT" optional="true"/>
+        <override name="startDate" mode="INOUT" optional="true"/>
+        <override name="endDate" mode="OUT" optional="true"/>       
+    </service>
+
+	<service name="updateLoanPaymentPlan" engine="simple" default-entity-name="LoanPaymentPlan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanPaymentPlan" auth="true">
+        <description>Update Loan Payment Plan Record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+    
+    <service name="createLoanPaymentPlan" engine="simple" default-entity-name="LoanPaymentPlan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanPaymentPlan" auth="true">
+        <description>Calculate a Loan Payment Plan. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        
+        <override name="loanInterestType" optional="false"/>
+        
+        <override name="monthlyPrincipalPaybackAmount" mode="OUT" optional="true"/>
+        <override name="monthlyInterestPaybackAmount" mode="OUT" optional="true"/>
+        
+        <override name="monthlyPaybackAmount" mode="OUT" optional="true"/>
+        <override name="totalInterestAmount" mode="OUT" optional="true"/>
+        <override name="noOfInstallments" mode="OUT" optional="true"/>
+        <override name="startDate" mode="INOUT" optional="true"/>
+        <override name="endDate" mode="OUT" optional="true"/>       
+    </service>
+
+    <service name="changeLoanPaymentPlan" engine="simple" default-entity-name="LoanPaymentPlan"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="changeLoanPaymentPlan" auth="true">
+        <description>Change a Loan Payment Plan of a loan. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        
+        <override name="loanPaymentPlanId" optional="false"/>
+        <override name="loanInterestTypeId" optional="false"/>
+        
+        <override name="monthlyPrincipalPaybackAmount" mode="OUT" optional="true"/>
+        <override name="monthlyInterestPaybackAmount" mode="OUT" optional="true"/>
+        
+        <override name="monthlyPaybackAmount" mode="OUT" optional="true"/>
+        <override name="totalInterestAmount" mode="OUT" optional="true"/>
+        <override name="noOfInstallments" mode="OUT" optional="true"/>
+        <override name="startDate" mode="INOUT" optional="true"/>
+        <override name="endDate" mode="OUT" optional="true"/>       
+    </service>  
+    
+    <service name="updateLoanPaymentPlanStatus" engine="simple" default-entity-name="LoanPaymentPlanStatus"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanPaymentPlanStatus" auth="true">
+        <description>Update Loan Payment Plan Status. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service> 
+ 
+     <service name="calculateLoanPayoff" engine="simple" default-entity-name="LoanPayoff"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="calculateLoanPayoff" auth="true">
+        <description>Calculate loan payoff amount and charges if relevant. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>     
+    
+    <service name="createLoanPayoff" engine="simple" default-entity-name="LoanPayoff"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="createLoanPayoff" auth="true">
+        <description>Create loan payoff amount and charges if relevant. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service> 
+    
+    <service name="updateLoanPayoff" engine="simple" default-entity-name="LoanPayoff"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanPayoff" auth="true">
+        <description>Update Loan Payoff Record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+    
+    <service name="updateLoanPayoffStatus" engine="simple" default-entity-name="LoanPayoffStatus"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="updateLoanPayoffStatus" auth="true">
+        <description>Update loan payoff Status. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>
+    
+    <service name="calculateLoanRepayment_simple" engine="simple" default-entity-name="LoanRepayment"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+        invoke="calculateLoanRepayment" auth="true">
+        <description>Calculate loan repayment attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="partyId" type="String" mode="IN" optional="false"/> 
+        <attribute name="calculatedLoanRepaymentList" type="java.util.List" mode="OUT" optional="false"/>
+    </service>
+ 
+ <!-- may delete -->
+    <service name="calculateLoanRepayment" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="calculateLoanRepayment" auth="true">
+        <description>Calculate loan repayment attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="partyId" type="String" mode="IN" optional="true"/> 
+        <attribute name="principalAmount" type="BigDecimal" mode="OUT" optional="true"/>
+        <attribute name="interestAmount" type="BigDecimal" mode="OUT" optional="true"/>
+        <attribute name="repaymentAmount" type="BigDecimal" mode="INOUT" optional="true"/>
+        <attribute name="repaymentDate" type="Timestamp" mode="INOUT" optional="true"/>
+        <attribute name="calculatedLoanRepaymentList" type="java.util.List" mode="OUT" optional="false"/>
+    </service>
+
+<!-- may delete -->        
+    <service name="createLoanRepaymentAndLines" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepaymentAndLines" auth="true">
+        <description>Create loan repayment in LoanRepayment and lines in LoanRepaymentLines</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="INOUT" optional="false"/> 
+        <attribute name="loanRepayment" type="GenericValue" mode="INOUT" optional="false"/>
+    </service>
+    
+<!-- may delete -->    
+    <service name="createLoanRepaymentv1" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepayment" auth="true">
+        <description>Create loan repayment in LoanRepayment Entity</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="INOUT" optional="false"/> 
+        <attribute name="loanRepayment" type="GenericValue" mode="INOUT" optional="false"/>
+    </service>
+    
+    <service name="createLoanRepaymentv2" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepayment" auth="true">
+        <description>Create loan repayment in LoanRepayment Entity</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>        
+        <attribute name="loanRepaymentStatusId" type="String" mode="OUT" optional="false"/>
+    </service>
+
+    <service name="createLoanRepayment" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepayment" auth="true">
+        <description>Create loan repayment in LoanRepayment Entity and related lines in loanRepaymentLine entity</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>        
+        <attribute name="loanRepaymentStatusId" type="String" mode="OUT" optional="false"/>
+    </service>
+        
+    <service name="updateLoanRepayment" engine="java" default-entity-name="LoanRepayment"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="updateLoanRepayment" auth="true">
+        <description>Update loan repayment in LoanRepayment Entity</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/> 
+        <override name="loanRepaymentId" optional="false"/>        
+    </service>
+    
+    <service name="updateLoanRepaymentStatus" engine="java" default-entity-name="LoanRepaymentStatus"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="updateLoanRepaymentStatus" auth="true">
+        <description>Update loan repayment status</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/> 
+    </service>
+
+<!-- May delete -->    
+    <service name="createLoanRepaymentLinesv1" engine="java" default-entity-name="LoanRepaymentLine"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepayment" auth="true">
+        <description>Create loan repayment lines in LoanRepaymentLine </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="INOUT" optional="false"/> 
+        <attribute name="loanRepaymentId" type="String" mode="INOUT" optional="false"/>
+    </service>
+    
+	<service name="createLoanRepaymentLines" engine="java" default-entity-name="LoanRepaymentLine"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepaymentLines" auth="true">
+        <description>Create loan repayment lines in LoanRepaymentLine </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="activePartyLoansWithApprovedPaymentPlans" type="java.util.List" mode="IN" optional="false"/> 
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="OUT" optional="true"/> 
+        <attribute name="loanRepaymentId" type="String" mode="INOUT" optional="false"/>
+    </service>
+    
+    <service name="getActiveLoansByParty" engine="java" default-entity-name="Loan"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="getActiveLoansByParty" auth="true">
+        <description>Get active loan using partyId </description>
+        <attribute name="partyId" type="String" mode="INOUT" optional="true"/> 
+        <attribute name="activeLoans" type="java.util.List" mode="OUT" optional="false"/>
+    </service>
+    
+    <service name="calculateRepaymentFieldsPerLine" engine="java" default-entity-name="LoanRepaymentLine"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="calculateRepaymentFieldsPerLine" auth="true">
+        <description>Calculate Repayment Fields per Line in LoanRepaymentLine entity</description>
+        <attribute name="activeLoans" type="java.util.List" mode="IN" optional="true"/> 
+        <attribute name="repaymentAmount" type="BigDecimal" mode="IN" optional="true"/> 
+        <attribute name="loanRepayment" type="GenericValue" mode="OUT" optional="true"/>
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="OUT" optional="false"/>
+    </service>
+
+
+    <service name="createLoanRepaymentLines_v2" engine="java" default-entity-name="LoanRepaymentLine"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepaymentLines" auth="true">
+        <description>Create loan repayment lines in LoanRepaymentLines </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentLines" type="java.util.List" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentId" type="String" mode="INOUT" optional="true"/>
+    </service>
+    
+    <service name="createLoanRepaymentLine" engine="java" default-entity-name="LoanRepaymentLine"
+        location="org.ofbiz.cooperativefunds.loan.LoanServices" 
+        invoke="createLoanRepaymentLine" auth="true">
+        <description>Create loan repayment line in LoanRepaymentLine</description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentLine" type="GenericValue" mode="INOUT" optional="true"/>
+        <attribute name="loanRepaymentId" type="String" mode="INOUT" optional="true"/>
+    </service>
+        
+<!-- loanRequest content services -->
+    <service name="createLoanRequestContent" engine="simple"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanContentServices.xml"
+        invoke="createLoanRequestContent"
+        default-entity-name="LoanRequestContent" auth="true">
+        <description>Create a Loan Request Content</description>
+        <auto-attributes include="pk" mode="IN" optional="false"/>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <override name="fromDate" optional="true"/>
+    </service>
+
+    <service name="uploadLoanRequestContentFile" engine="group" transaction-timeout="300">
+        <description>Upload and attach a file to a loan request</description>
+        <group>
+            <invoke name="createContentFromUploadedFile" result-to-context="true"/>
+            <invoke name="createLoanRequestContent"/>
+        </group>
+    </service>
+
+    <service name="updateLoanRequestContent" engine="simple" default-entity-name="LoanRequestContent"
+            location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanContentServices.xml" 
+            invoke="updateLoanRequestContent" auth="true">
+        <description>Update a LoanRequestContent record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+        <auto-attributes mode="IN" include="nonpk" optional="true"/>
+    </service>
+
+    <service name="removeLoanRequestContent" engine="simple" default-entity-name="LoanRequestContent"
+            location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanContentServices.xml" 
+            invoke="removePartyContent" auth="true">
+        <description>Remove a LoanRequestContent record</description>
+        <auto-attributes mode="IN" include="pk" optional="false"/>
+    </service>
+
+    <service name="createLoanRequestTextContent" engine="group" transaction-timeout="300" auth="true">
+        <description>Creates a Text Document DataResource and Content Records</description>
+        <group>
+            <invoke name="createTextContent" result-to-context="true"/>
+            <invoke name="createLoanRequestContent"/>
+        </group>
+    </service>
+    
+    <service name="updateLoanBalancePrincipalAmount" engine="simple" default-entity-name="Loan"
+            location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanServices.xml" 
+            invoke="updateLoanBalancePrincipalAmount" auth="true">
+        <description>Update balancePrincipalAmount for Loan record</description>
+        <attribute name="initialPrincipalAmount" type="BigDecimal" mode="IN" optional="false"/>  
+        <attribute name="totalPrincipalPaid" type="BigDecimal" mode="IN" optional="false"/> 
+        <attribute name="balancePrincipalAmount" type="BigDecimal" mode="INOUT" optional="false"/> 
+    </service>
+  
+</services>

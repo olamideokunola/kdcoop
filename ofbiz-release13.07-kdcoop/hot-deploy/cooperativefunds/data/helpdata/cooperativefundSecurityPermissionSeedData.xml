@@ -1,0 +1,288 @@
+package Calculator;
+
+
+//OperandExpression is an expression surrounded by brackets
+public class OperandExpression extends Expression {
+	//fields
+	private int openingBracketPosition;
+	private int closingBracketPosition;
+	private int operatorPosition;
+	private String operandExpressionString;
+	private double var1;
+	private double var2;
+	private double expressionResult;
+	Operator operator;
+	private String inputString;
+	private boolean containsOperator;
+	
+	//constructor
+	public OperandExpression(String iInputString){
+		super(iInputString);
+		inputString=iInputString;
+	}
+	
+	
+	//methods
+	public int getOpeningBracketPosition(){
+		if(inputString.contains("(")){
+			openingBracketPosition = inputString.indexOf('(');
+		}	else {
+			openingBracketPosition = -1;
+		}
+		return openingBracketPosition;
+	}
+	
+	public int getClosingBracketPosition(){
+		if(inputString.contains(")")){
+			closingBracketPosition = inputString.indexOf(')');
+		}	else {
+			closingBracketPosition = -1;
+		}
+		return closingBracketPosition;
+	}
+	
+	public String getOperandExpressionString(){
+		if (this.getOpeningBracketPosition()!=-1 && this.getClosingBracketPosition()!=-1 ){
+			operandExpressionString = inputString.substring(this.getOpeningBracketPosition()+1, this.getClosingBracketPosition());
+			//operandExpressionString = null;
+		}
+		return operandExpressionString;
+	}
+	
+	
+	public int getOperatorPosition(){
+
+		if(this.getOperandExpressionString().contains(operator.ADDITION.symbol())){
+			operatorPosition = this.getOperandExpressionString().indexOf(operator.ADDITION.symbol());
+			operatorPosition = this.getOpeningBracketPosition() + operatorPosition + 1;
+		} else if(this.getOperandExpressionString().contains(operator.SUBTRACTION.symbol())) {
+			operatorPosition = this.getOperandExpressionString().indexOf(operator.SUBTRACTION.symbol());
+			operatorPosition = this.getOpeningBracketPosition() + operatorPosition + 1;			
+		}
+
+		return operatorPosition;
+	}
+	
+	public int getSpecificOperatorPosition(Operator op){
+
+		if(this.getOperandExpressionString().contains(op.symbol())){
+			System.out.println("symbol" + "= " + op.symbol());
+			System.out.println("expression" + "= " + this.getOperandExpressionString());
+			operatorPosition = this.getOperandExpressionString().indexOf(op.symbol());
+		}
+		
+		return operatorPosition;
+	}
+	
+	private void setVar1(){
+		var1=Double.valueOf(inputString.substring(this.getOpeningBracketPosition()+1, this.getOperatorPosition()));
+	}
+
+	public double getVar1(){
+		this.setVar1();
+		return var1;
+	}
+	
+	public double getVar2(){
+		this.setVar2();
+		return var2;
+	}
+
+	private void setVar2(){
+		var2=Double.valueOf(inputString.substring(this.getOperatorPosition()+1, this.getClosingBracketPosition()));
+	}
+	
+	private void setOperator(){
+		String opStr = inputString.substring(this.getOperatorPosition(),this.getOperatorPosition()+1 );
+
+		switch (opStr){
+			case "+": operator=Operator.ADDITION;
+				break;
+			case "-": operator=Operator.SUBTRACTION;
+				break;
+			case "*": operator=Operator.MULTIPLICATION;
+				break;
+			case "/": operator=Operator.DIVISION;
+				break;				
+		}
+	}
+	
+	public Operator getOperator(){
+		this.setOperator();
+		return operator;
+	}
+	
+	public double getResult(){
+		ComplexOperand resultOperand = new ComplexOperand(this.getVar1(),this.getVar2(),this.getOperator());
+		
+		result=resultOperand.getResult();
+		
+		return result;
+	}
+	
+	public String getOutputString(){
+		if (this.getClosingBracketPosition()<this.getInputStringLength() && this.getInputStringLength() !=0 ){
+			String leftOutputString=inputString.substring(0, this.getOpeningBracketPosition());
+			String middleOutputString=Double.toString(this.getResult());
+			String rightOutputString=inputString.substring(this.getClosingBracketPosition()+1);
+			outputString = leftOutputString+middleOutputString+rightOutputString;
+		}else{
+			outputString = null;
+		}
+		return outputString;
+	}
+
+	public void resolveBrackets(){
+		while(this.getOpeningBracketPosition() > 0){
+			this.getOpeningBracketPosition();
+			this.getClosingBracketPosition();
+			this.getOperatorPosition();
+			this.getResult();
+			System.out.println("Resolving Brackets:");
+			System.out.println("inputString" + "= " + this.inputString);
+			System.out.println("outputString" + "= " + this.getOutputString());
+			this.inputString = this.getOutputString();	
+		}
+	}
+	
+	public void resolveSelf(){
+		this.resolveBrackets();
+		this.resolveExpression();
+		//this.resolveAdditions();
+		//return this.getOutputString();
+	}
+	
+	public boolean expressionContainsOperator(String stringExpression){
+		for (Operator op : Operator.values()){
+			if(stringExpression.contains(op.symbol())){
+				containsOperator= true;
+				break;
+			} else  {	
+				containsOperator= false;
+			}			
+		}
+		return containsOperator;
+	}
+	
+	private int getFirstOperatorPosition(String stringExpression){
+		int index = 0;
+		operatorPosition =-1;
+		for (Operator op : Operator.values()){
+			if(stringExpression.contains(op.symbol())){				
+				index = index + 1;
+				//on first iteration, use the operator position as the reference for subsequent interations
+				if (stringExpression.indexOf(op.symbol()) < operatorPosition || index == 1){
+					if (stringExpression.indexOf(op.symbol()) > 0){
+						operatorPosition = stringExpression.indexOf(op.symbol());
+					}
+				}
+				
+			}
+		}
+		return operatorPosition;
+	}
+	
+	public Operator getOperatorFromSymbol(String s){
+		switch (s){
+			case "+": operator=Operator.ADDITION;
+				break;
+			case "-": operator=Operator.SUBTRACTION;
+				break;
+			case "*": operator=Operator.MULTIPLICATION;
+				break;
+			case "/": operator=Operator.DIVISION;
+				break;				
+		}
+		return operator;
+	}
+	
+	private int getNumberOfOperators(String strExpression){
+		int j=0;
+		for (int i=0; i<strExpression.length()-1;i++){	
+			//System.out.println("strExpression length: "+strExpression.length() );
+			//for(Operator op : Operator.values()){
+				//System.out.println("strExpression substring: "+strExpression.substring(i, i+1)+ " op: " +op.symbol() );
+			if(strExpression.substring(i, i+1).contains("+")||strExpression.substring(i, i+1).contains("-")||strExpression.substring(i, i+1).contains("*")||strExpression.substring(i, i+1).contains("/")){
+				if(i>0){
+					j++;
+				}
+				
+			}
+			
+			//}
+		}
+		System.out.println("j: " + j);
+		return j;
+	}
+	
+	public void resolveExpression(){
+		//Check if there are more than one operator
+		while(this.getNumberOfOperators(this.inputString) > 0){
+			if (this.getNumberOfOperators(this.inputString) > 1){
+					
+					System.out.println("Number of operators: "+this.getNumberOfOperators(this.inputString) );
+					System.out.println("inputString: "+this.inputString );
+					//1 Get first number
+					var1 = Double.valueOf(this.inputString.substring(0, this.getFirstOperatorPosition(this.inputString)));
+					String rExpressionStr = this.inputString.substring(this.getFirstOperatorPosition(this.inputString)+1);
+					System.out.println("First operator position: " + this.getFirstOperatorPosition(this.inputString));
+
+					//2 Get second number
+					if  (this.getNumberOfOperators(rExpressionStr) >0){
+						var2 = Double.valueOf(rExpressionStr.substring(0,this.getFirstOperatorPosition(rExpressionStr)));
+					}else if(this.getNumberOfOperators(rExpressionStr)==0){
+						var2 =Double.valueOf(rExpressionStr);
+					}
+					//System.out.println("No of operators in exression is: "+this.getNumberOfOperators(rExpressionStr) );
+					System.out.println("Variable 1: "+var1 + " Variable 2: "+var2 + " rExpressionStr " + rExpressionStr);
+					
+					//3 Get Operator
+					String operator = this.inputString.substring(this.getFirstOperatorPosition(this.inputString), this.getFirstOperatorPosition(this.inputString)+1);
+					Operator op = this.getOperatorFromSymbol(operator);
+					
+					//4 Carry out operation
+					ComplexOperand resultOperand = new ComplexOperand(var1,var2,op);		
+									
+					result=resultOperand.getResult();
+					
+					//5
+					String resultString = Double.toString(result) + rExpressionStr.substring(this.getFirstOperatorPosition(rExpressionStr));
+							
+					this.inputString=resultString;			
+					System.out.println("Variable 1: "+var1 + " Variable 2: "+var2 + " Operator: " + op.symbol() + " Result:" + result + " Rest of expression: " + rExpressionStr + " Rest of String:" + resultString);
+				
+	
+			} else if (this.getNumberOfOperators(this.inputString)==1){
+				//1
+				var1 = Double.valueOf(this.inputString.substring(0, this.getFirstOperatorPosition(this.inputString)));
+				String rExpressionStr = this.inputString.substring(this.getFirstOperatorPosition(this.inputString)+1, this.inputString.length());
+				//3
+				if  (this.getNumberOfOperators(rExpressionStr) >0){
+					var2 = Double.valueOf(rExpressionStr.substring(0,this.getFirstOperatorPosition(rExpressionStr)));
+				}else if(this.getNumberOfOperators(rExpressionStr)==0){
+					var2 =Double.valueOf(rExpressionStr);
+				}
+					//2
+				String operator = this.inputString.substring(this.getFirstOperatorPosition(this.inputString), this.getFirstOperatorPosition(this.inputString)+1);
+				Operator op = this.getOperatorFromSymbol(operator);
+				
+				//4
+				ComplexOperand resultOperand = new ComplexOperand(var1,var2,op);		
+								
+				result=resultOperand.getResult();					
+				String resultString = Double.toString(result);
+				this.inputString=resultString;
+				System.out.println("result: "+result);
+				expressionResult=result;
+			}
+		}
+	}
+	
+	public double getExpressionResult(){
+		this.resolveSelf();
+		System.out.println("inputString: "+this.inputString);
+		return this.expressionResult;
+		//return Double.valueOf(this.inputString);		
+	}
+
+}

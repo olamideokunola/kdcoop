@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/site-conf.xsd">
+    <!-- The controller elements that are common to all OFBiz components
+         can be found in the following xml file. A component can override the
+         elements found in the common-controller.xml file. -->
+    <include location="component://common/webcommon/WEB-INF/common-controller.xml"/>
+	<include location="component://cooperativefunds/webapp/contributions/WEB-INF/controller.xml"/>
+	<include location="component://accounting/webapp/accounting/WEB-INF/controller.xml"/>
+    <include location="component://commonext/webapp/WEB-INF/controller.xml"/>
+    <description>cooperativefunds Component Site Configuration File</description>
+   
+    <handler name="service-multi" type="request" class="org.ofbiz.webapp.event.ServiceMultiEventHandler"/>
+    <handler name="simplecontent" type="view" class="org.ofbiz.content.view.SimpleContentViewHandler"/>
+
+    <!-- Events to run on every request before security (chains exempt) -->
+    <!--
+    <preprocessor>
+    </preprocessor>
+    -->
+    <!-- Events to run on every request after all other processing (chains exempt) -->
+    <!--
+    <postprocessor>
+        <event name="test" type="java" path="org.ofbiz.webapp.event.TestEvent" invoke="test"/>
+    </postprocessor>
+    -->
+
+
+    
+<!-- Loan Request Mappings -->    
+	<request-map uri="main">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="main"/>
+    </request-map>
+
+	<request-map uri="findLoanRequests">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindLoanRequests"/>
+    </request-map>
+        
+	<request-map uri="findLoans">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindLoans"/>
+    </request-map>
+			
+	<request-map uri="newLoanRequest">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanRequest"/>
+    </request-map>
+
+	<request-map uri="editLoanRequest">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanRequest"/>
+    </request-map>
+    	
+	<request-map uri="createLoanRequest">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoanRequest"></event>   	
+    	<response name="success" type="view" value="CreatePayslipContent"/>
+    	<response name="error" type="view" value="NewLoanRequest"/>
+    </request-map>
+
+	<request-map uri="createPayslipContent">
+    	<security https="true" auth="true"/>
+    	<event type="simple" path="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanSimpleEvents.xml" invoke="createLoanRequestContent"></event>
+    	<response name="success" type="view" value="CreatePensionStmtContent"/>
+    	<response name="error" type="view" value="CreatePayslipContent"/>
+    </request-map> 
+
+	<request-map uri="createPensionStmtContent">
+    	<security https="true" auth="true"/>
+    	<event type="simple" path="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/LoanSimpleEvents.xml" invoke="createLoanRequestContent"></event>
+    	<response name="success" type="view" value="EditLoanRequest"/>
+    	<response name="error" type="view" value="CreatePensionStmtContent"/>
+    </request-map> 
+    
+    <request-map uri="editLoanRequestContents">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanRequestContents"/>
+    </request-map> 
+        	
+	<request-map uri="updateLoanRequestStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanRequestStatus"></event>
+    	<response name="success" type="view" value="EditLoanRequest"/>
+    </request-map>
+	
+	<request-map uri="updateLoanRequest">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanRequest"></event>
+    	<response name="success" type="view" value="EditLoanRequest"/>
+    </request-map>	
+    
+    <request-map uri="createLoan">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoan"></event>
+    	<response name="success" type="view" value="EditLoan"/>
+    </request-map>
+    
+    <request-map uri="updateLoanStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanStatus"></event>
+    	<response name="success" type="view" value="EditLoan"/>
+    </request-map>   
+        
+    <request-map uri="updateLoan">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoan"></event>
+    	<response name="success" type="view" value="EditLoan"/>
+    </request-map>    
+	
+	<request-map uri="findLoanDisbursement">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindLoanDisbursement"/>
+    </request-map> 
+    
+    <request-map uri="newLoanDisbursement">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanDisbursement"/>
+    </request-map>
+ 
+    <request-map uri="editLoanDisbursement">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanDisbursement"/>
+    </request-map>
+       
+    <request-map uri="createLoanDisbursement">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoanDisbursement"></event>
+    	<response name="success" type="view" value="NewLoanDisbursement"/>
+    </request-map>
+
+    <request-map uri="updateLoanDisbursement">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanDisbursement"></event>
+    	<response name="success" type="view" value="EditLoanDisbursement"/>
+    </request-map>
+
+    <request-map uri="updateLoanDisbursementStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanDisbursementStatus"></event>
+    	<response name="success" type="view" value="EditLoanDisbursement"/>
+    </request-map>  
+
+    <request-map uri="newLoanPaymentPlan">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanPaymentPlan"/>
+    </request-map>
+    
+    <request-map uri="editLoanPaymentPlan">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanPaymentPlan"/>
+    </request-map>
+        
+    <request-map uri="calculateLoanPaymentPlan">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="calculateLoanPaymentPlan"></event>
+    	<response name="success" type="view" value="EditLoanPaymentPlan"/>
+    </request-map>
+        
+    <request-map uri="createLoanPaymentPlan">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoanPaymentPlan"></event>
+    	<response name="success" type="view" value="EditLoanPaymentPlan"/>
+    </request-map>
+        
+    <request-map uri="updateLoanPaymentPlan">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanPaymentPlan"></event>
+    	<response name="success" type="view" value="EditLoanPaymentPlan"/>
+    </request-map>
+        
+    <request-map uri="updateLoanPaymentPlanStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanPaymentPlanStatus"></event>
+    	<response name="success" type="view" value="EditLoanPaymentPlan"/>
+    </request-map>    
+    
+    <request-map uri="newLoanPayoff">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanPayoff"/>
+    </request-map>
+    
+    <request-map uri="editLoanPayoff">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanPayoff"/>
+    </request-map> 
+    
+    <request-map uri="calculateLoanPayoff">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="calculateLoanPayoff"></event>
+    	<response name="success" type="view" value="EditLoanPayoff"/>
+    </request-map>
+    
+    <request-map uri="createLoanPayoff">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoanPayoff"></event>
+    	<response name="success" type="view" value="NewLoanPayoff"/>
+    </request-map>    
+
+    <request-map uri="updateLoanPayoff">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanPayoff"></event>
+    	<response name="success" type="view" value="EditLoanPayoff"/>
+    </request-map>  
+
+    <request-map uri="updateLoanPayoffStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanPayoffStatus"></event>
+    	<response name="success" type="view" value="EditLoanPayoff"/>
+    </request-map>         
+    
+    <request-map uri="newLoanRepayment">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanRepayment"/>
+    </request-map>
+    
+    <request-map uri="editLoanRepayment">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    </request-map>
+    
+    <request-map uri="createLoanRepayment">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoanRepayment"></event>
+    	<response name="success" type="view" value="EditLoanRepaymentAndLines"/>
+    	<response name="error" type="view" value="NewLoanRepayment"/>
+    </request-map>
+    
+    <request-map uri="updateLoanRepayment">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanRepayment"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    	<response name="error" type="view" value="EditLoanRepayment"/>
+    </request-map>
+    
+    <request-map uri="calculateLoanRepaymentLines">
+    	<security https="true" auth="true"/>
+    	<event type="java" path="org.ofbiz.cooperativefunds.loan.LoanEvents" invoke="calculateLoanRepaymentLines"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    	<response name="error" type="view" value="EditLoanRepayment"/>
+    </request-map>
+
+    <request-map uri="createLoanRepaymentLines">
+    	<security https="true" auth="true"/>
+    	<event type="java" path="org.ofbiz.cooperativefunds.loan.LoanEvents" invoke="createLoanRepaymentLines"></event>
+    	<response name="success" type="view" value="EditLoanRepaymentAndLines"/>
+    	<response name="error" type="view" value="EditLoanRepayment"/>
+    </request-map>
+
+<!-- May Delete -->    
+    <request-map uri="calculateLoanRepayment">
+    	<security https="true" auth="true"/>
+    	<event type="java" path="org.ofbiz.cooperativefunds.loan.LoanEvents" invoke="calculateLoanRepayment"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    	<response name="error" type="view" value="NewLoanRepayment"/>
+    </request-map>
+
+<!-- May Delete -->     
+    <request-map uri="createLoanRepaymentAndLines">
+    	<security https="true" auth="true"/>
+    	<event type="java" path="org.ofbiz.cooperativefunds.loan.LoanEvents" invoke="createLoanRepaymentAndLines"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    	<response name="error" type="view" value="NewLoanRepayment"/>
+    </request-map>
+
+<!-- May Delete -->     
+    <request-map uri="updateLoanRepaymentAndLines">
+    	<security https="true" auth="true"/>
+    	<event type="java" path="org.ofbiz.cooperativefunds.loan.LoanEvents" invoke="updateLoanRepaymentAndLines"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    	<response name="error" type="view" value="NewLoanRepayment"/>
+    </request-map>
+
+<!-- May Delete -->     
+    <request-map uri="calculateLoanRepayments_bkp">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="calculateLoanRepayment"></event>
+    	<response name="success" type="view" value="EditLoanRepayment"/>
+    </request-map>
+
+    <request-map uri="updateLoanRepaymentStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateLoanRepaymentStatus"></event>
+    	<response name="success" type="view" value="EditLoanRepaymentAndLines"/>
+    </request-map> 
+
+    <request-map uri="viewLocreateLoanRequestanTerms">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="ViewLoanTerms"/>
+    </request-map>     
+    
+    <!-- Loans Requests -->
+    <request-map uri="createLoanFromRequest">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createLoan"></event>
+    	<response name="success"  type="view" value="EditLoan"/>
+    </request-map>
+    
+    <request-map uri="editLoan">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoan"/>
+    </request-map>
+    
+    <request-map uri="loanOverview">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="LoanOverview"/>
+    </request-map>
+    
+    <request-map uri="editLoanAgreement">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditLoanAgreement"/>
+    </request-map>
+        
+    <request-map uri="updateLoanRepaymentEntry">
+        <security https="true" auth="true"/>
+        <event type="service" invoke="updateLoanRepaymentEntry"/>
+        <response name="success" type="view" value="EditLoanRepayment"/>
+        <response name="error" type="view" value="EditLoanRepayment"/>
+    </request-map>
+    
+    <!-- View Mappings -->
+	
+	<view-map name="main" type="screen" page="component://cooperativefunds/widget/MembersScreens.xml#findparty"/>
+	<view-map name="FindLoanRequests" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#FindLoanRequests"/>
+	<view-map name="FindLoans" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#FindLoans"/>
+	
+	<view-map name="NewLoanRequest" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanRequest"/>
+	<view-map name="EditLoanRequest" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanRequest"/>
+	<view-map name="EditLoan" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoan"/>
+	<view-map name="FindLoanDisbursement" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#FindLoanDisbursement"/>
+	<view-map name="NewLoanDisbursement" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanDisbursement"/>
+	<view-map name="EditLoanDisbursement" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanDisbursement"/>
+	<view-map name="NewLoanPaymentPlan" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanPaymentPlan"/>
+	<view-map name="EditLoanPaymentPlan" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanPaymentPlan"/>
+	<view-map name="NewLoanPayoff" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanPayoff"/>
+	<view-map name="EditLoanPayoff" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanPayoff"/>
+	<view-map name="NewLoanRepayment" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanRepayment"/>
+	<view-map name="EditLoanRepayment" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanRepayment"/>
+	<view-map name="EditLoanRepaymentAndLines" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanRepaymentAndLines"/>
+	<view-map name="ViewLoanTerms" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#ViewLoanTerms"/>
+	<view-map name="CreatePayslipContent" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#CreatePayslipContent"/>
+	<view-map name="CreatePensionStmtContent" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#CreatePensionStmtContent"/>
+	<view-map name="EditLoanRequestContents" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoanRequestContents"/>
+	
+	<!-- Loan View Mappings -->
+	<view-map name="EditLoan" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#EditLoan"/>
+	<view-map name="LoanOverview" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#LoanOverview"/>
+	<view-map name="EditLoanAgreement" type="screen" page="component://accounting/widget/AgreementScreens.xml#EditAgreement"/>
+	<view-map name="UpdateLoanRepaymentEntry" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#UpdateLoanRepaymentEntry"/>
+	
+</site-conf>

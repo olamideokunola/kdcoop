@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityPermission description="View operations in the TestUserManagement Component." permissionId="OFBIZ_VIEW"/>
+    <SecurityPermission description="Create operations in the TestUserManagement Component." permissionId="OFBIZ_CREATE"/>
+    <SecurityPermission description="Update operations in the TestUserManagement Component." permissionId="OFBIZ_UPDATE"/>
+    <SecurityPermission description="Delete operations in the TestUserManagement Component." permissionId="OFBIZ_DELETE"/>
+    <SecurityPermission description="ALL operations in the TestUserManagement Component." permissionId="OFBIZ_ADMIN"/>
+
+    <SecurityGroupPermission groupId="SUPER" permissionId="OFBIZ_ADMIN"/>
+
+</entity-engine-xml>

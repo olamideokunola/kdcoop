@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/site-conf.xsd">
+    <!-- The controller elements that are common to all OFBiz components
+         can be found in the following xml file. A component can override the
+         elements found in the common-controller.xml file. -->
+    <include location="component://common/webcommon/WEB-INF/common-controller.xml"/>
+
+    <description>cooperativefunds Component Site Configuration File</description>
+
+    <!-- Events to run on every request before security (chains exempt) -->
+    <!--
+    <preprocessor>
+    </preprocessor>
+    -->
+    <!-- Events to run on every request after all other processing (chains exempt) -->
+    <!--
+    <postprocessor>
+        <event name="test" type="java" path="org.ofbiz.webapp.event.TestEvent" invoke="test"/>
+    </postprocessor>
+    -->
+
+    <!-- Request Mappings --><!--Contribution Payment Batch Request Mappings-->
+    <request-map uri="main">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindContributions"/>
+    </request-map>
+    
+    <request-map uri="newContributionPaymentBatch">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewContributionPaymentBatch"/>
+    </request-map>
+
+    <request-map uri="createContributionPaymentBatch">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createContributionPaymentBatch"/>
+		<response name="success" type="view" value="NewContributionPaymentInPaymentBatch"/>       
+    </request-map>
+    
+    <request-map uri="confirmPaymentBatch">
+    	<security https="true" auth="true" />
+    	<response name="success" type="request-redirect" value="updatePaymentBatchStatus" />
+    </request-map>
+    
+    <request-map uri="reopenPaymentBatch">
+    	<security https="true" auth="true" />
+    	<response name="success" type="request-redirect" value="updatePaymentBatchStatus" />
+    </request-map>
+    
+    <request-map uri="completePaymentBatch">
+    	<security https="true" auth="true" />
+		<response name="success" type="request-redirect" value="updatePaymentBatchStatus" />
+    </request-map>
+
+    <request-map uri="updatePaymentBatchStatusToComplete">
+    	<event type="service" invoke="updatePaymentBatchStatus"></event>
+    	<response name="success" type="view" value="CompleteContributionPaymentBatch"></response>
+    </request-map>
+
+    <request-map uri="updatePaymentBatchStatus">
+    	<event type="service" invoke="updatePaymentBatchStatus"></event>
+    	<response name="success" type="view" value="NewContributionPaymentInPaymentBatch"></response>
+    </request-map>
+
+	<request-map uri="FindContributionBatches">
+		<security auth="true" https="true"/>
+		<response name="success" type="view" value="FindContributionBatches"></response>
+	</request-map>
+
+	<request-map uri="EditContributionBatch">
+		<security https="true" auth="true"/>
+		<response name="success" type="view" value="EditContributionBatch"></response>
+	</request-map>
+
+	<request-map uri="updateContributionBatch">
+		<security https="true" auth="true"/>
+		<event type="service" invoke="updateContributionBatch"></event>
+		<response name="success" type="view" value="NewContributionPaymentInPaymentBatch"></response>
+	</request-map>
+				
+	<!--Contribution Payments Request Mappings-->
+
+    <request-map uri="newContributionPaymentInPaymentBatch">
+    	<security https="true" auth="true"></security>
+    	<response name="success" type="view" value="NewContributionPaymentInPaymentBatch"/>
+    </request-map>
+       
+    <request-map uri="createContributionPaymentInPaymentBatch">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createContributionPaymentInPaymentBatch"/>
+    	<response name="success" type="request-redirect" value="newContributionPaymentInPaymentBatch">
+    		<redirect-parameter name="paymentGroupId" />
+    	</response>
+    	<response name="error" type="request-redirect" value="newContributionPaymentInPaymentBatch">
+    		<redirect-parameter name="paymentGroupId" />
+    	</response>
+    </request-map> 
+    
+    <request-map uri="paymentsInPaymentBatch">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="paymentsInPaymentBatch"/>
+    </request-map>
+    
+	<request-map uri="EditContributionPayment">
+		<security https="true" auth="true"/>
+		<response name="success" type="view" value="EditContributionPayment"></response>
+	</request-map>
+
+	<request-map uri="updateContributionPayment">
+		<security https="true" auth="true"/>
+		<event type="service" invoke="updateContributionPayment"></event>
+		<response name="success" type="view" value="NewContributionPaymentInPaymentBatch">
+			<redirect-parameter name="paymentGroupId"/>
+		</response>
+	</request-map>
+
+    <request-map uri="FindMemberContributions">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="request-redirect" value="findPayments"/>
+    </request-map> 
+    
+    <request-map uri="findPayments">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="findPayments"/>
+    </request-map>
+            
+	<!--Cooperative Membership Request Mappings-->    
+	
+ 	<request-map uri="newCoopMember">
+		<security https="true" auth="true"/>
+		<response name="success" type="view" value="NewCoopMember"></response>
+	</request-map>
+  
+    <request-map uri="createNewCoopMember">
+        <security https="true" auth="true"/>
+        <event type="simple" path="component://cooperativefunds/script/org/ofbiz/cooperativefunds/membership/MembershipEvents.xml" invoke="createCooperativeMember"/>
+        <response name="success" type="request-redirect" value="viewprofile">
+        	<redirect-parameter name="partyId"/>
+       </response> 
+        <response name="error" type="view" value="NewCoopMember"/>
+    </request-map>
+
+	<request-map uri="viewprofile">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="viewprofile" save-home-view="true"/>
+    </request-map>
+    
+    <request-map uri="FindMembers">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindMembers"/>
+    </request-map>
+
+	    
+    <!-- Lookup Requests -->
+	<request-map uri="LookupPerson">
+		<security auth="true" https="true"/>
+		<response name="success" type="view" value="LookupPerson"/>
+	</request-map>
+    
+    <request-map uri="LookupPartyName">
+    	<security auth="true" https="true"/>
+    	<response name="success" type="view" value="LookupPartyName"/>
+    </request-map>
+    
+	<request-map uri="LookupFinAccount">
+    	<security auth="true" https="true"/>
+    	<response name="success" type="view" value="LookupFinAccount"/>
+    </request-map>
+ 
+<!-- Contribution version 2 -->
+	<request-map uri="findContributions">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="FindContributions"/>
+    </request-map>
+    
+    <request-map uri="listContributionItems">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="ListContributionItems"/>
+    </request-map>
+    
+    <request-map uri="contributionOverview">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="ContributionOverview"/>
+    </request-map>
+    
+    <request-map uri="newContribution">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewContribution"/>
+    </request-map>
+
+    <request-map uri="editContribution">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditContribution"/>
+    </request-map>
+ 
+     <request-map uri="updateContribution">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateContribution"></event>
+    	<response name="success" type="view" value="EditContribution"/>
+    </request-map>
+       
+    <request-map uri="setContributionStatus">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateContribution"></event>
+    	<response name="success" type="view" value="EditContribution"/>
+    </request-map>
+        
+    <request-map uri="createContribution">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createContribution"></event>
+    	<response name="success" type="view" value="EditContribution"/>
+    </request-map>
+    
+    <request-map uri="newContributionItem">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="ContributionLineItems"/>
+    </request-map>
+    
+    <request-map uri="createContributionItem">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="createContributionItem"></event>
+    	<response name="success" type="view" value="ListContributionItems"/>
+    </request-map>
+    
+    <request-map uri="endContribution">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="endContribution"></event>
+    	<response name="success" type="view" value="ContributionConfirmation"/>
+    </request-map>
+    
+    <request-map uri="completeContribution">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="completeContribution"></event>
+    	<response name="success" type="view" value="ContributionOverview"/>
+    </request-map>
+    
+    <request-map uri="updateContributionItem">
+    	<security https="true" auth="true"/>
+    	<event type="service" invoke="updateContributionItem"></event>
+    	<response name="success" type="view" value="ListContributionItems"/>
+    </request-map>
+    
+    <request-map uri="editContributionItem">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="EditContributionItem"/>
+    </request-map>
+    
+    
+    <!-- PDF Generation Requests -->
+    <request-map uri="contribution.pdf">
+        <security https="true" auth="true"/>
+        <response name="success" type="view" value="ContributionPDF"/>
+    </request-map>
+    
+
+<!-- Contribution version 2 -->
+    
+	<!-- Loan requests -->
+	<request-map uri="newLoanRequest">
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="NewLoanRequest"/>
+    </request-map>     
+          	
+    <!-- View Mappings -->
+    <view-map name="main" type="screen" page="component://cooperativefunds/widget/cooperativefundsScreens.xml#main"/>
+	<view-map name="NewContributionPaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#NewContributionPaymentBatch"/>
+	<view-map name="CompleteContributionPaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#CompleteContributionPaymentBatch"/>
+	<view-map name="NewContributionPaymentInPaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#NewContributionPaymentInPaymentBatch"/>
+	<view-map name="completePaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#CompletePaymentBatch"/>
+	<view-map name="confirmPaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#ConfirmPaymentBatch"/>
+	<view-map name="paymentsInPaymentBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#PaymentsInPaymentBatch"/>
+	<view-map name="FindContributionBatches" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#FindContributionBatchesScreen"/>
+	<view-map name="EditContributionBatch" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#EditContributionBatch"/>
+	<view-map name="EditContributionPayment" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#EditContributionPayment"/>
+	<view-map name="findPayments" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#FindPayments"/>
+		
+	<!-- Membership View Mappings -->
+	<view-map name="NewCoopMember" type="screen" page="component://cooperativefunds/widget/MembersScreens.xml#NewCoopMember"/>
+	<view-map name="viewprofile" type="screen" page="component://cooperativefunds/widget/MembersScreens.xml#viewprofile"/>
+	<view-map name="FindMembers" type="screen" page="component://cooperativefunds/widget/MembersScreens.xml#findparty"/>
+	
+	<!-- Lookup View Mappings -->
+	<view-map name="LookupPerson" type="screen" page="component://cooperativefunds/widget/LookupScreens.xml#LookupPerson"/>
+	<view-map name="LookupPartyName" type="screen" page="component://party/widget/partymgr/LookupScreens.xml#LookupPartyName"/>
+	<view-map name="LookupFinAccount" type="screen" page="component://cooperativefunds/widget/LookupScreens.xml#LookupFinAccount"/>
+	
+
+<!-- Contribution version 2 -->    
+    <view-map name="NewContribution" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#NewContribution"/>
+	<view-map name="EditContribution" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#EditContribution"/>
+	<view-map name="FindContributions" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#FindContributions"/>
+    <view-map name="ListContributionItems" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#EditContributionItems"/>
+    <view-map name="ContributionOverview" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#ContributionOverview"/>
+
+	<view-map name="ContributionLineItems" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#ContributionLineItems"/>
+	<view-map name="ContributionConfirmation" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#ContributionConfirmation"/>
+	<view-map name="EditContributionItem" type="screen" page="component://cooperativefunds/widget/ContributionScreens.xml#EditContributionItem"/>
+	
+	<!-- PDF -->
+	
+	<view-map name="ContributionPDF" type="screenfop" page="component://cooperativefunds/widget/ContributionPrintScreens.xml#ContributionPDF" content-type="application/pdf" encoding="none"/>
+	
+<!-- Contribution version 2 -->
+	
+	<!-- Loans view-map -->
+	<view-map name="NewLoanRequest" type="screen" page="component://cooperativefunds/widget/loans/LoansScreens.xml#NewLoanRequest"/>
+	
+</site-conf>

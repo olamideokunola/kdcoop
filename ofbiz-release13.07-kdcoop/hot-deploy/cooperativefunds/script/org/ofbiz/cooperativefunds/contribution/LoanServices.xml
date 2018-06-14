@@ -1,0 +1,1757 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<simple-methods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/simple-methods-v2.xsd">
+        
+    <simple-method method-name="createLoanRequest" short-description="Create a Loan Request">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>
+        <if>
+             <condition>
+				<if-compare field="parameters.isLoanTermsAccepted" operator="equals" value="Y"/>
+				
+			 </condition>
+			 <then>
+			 	<log level="info" message="parameters.isLoanTermsAccepted: ${parameters.isLoanTermsAccepted}"/>
+			 
+		        <make-value entity-name="LoanRequest" value-field="loanRequest"/>
+		        <if-empty field="parameters.loanRequestId">
+		            <sequenced-id sequence-name="LoanRequest" field="loanRequest.loanRequestId"/>
+		            <else>
+		                <set field="loanRequest.loanRequestId" from-field="parameters.loanRequestId"/>
+		            </else>
+		        </if-empty>
+		        <field-to-result field="loanRequest.loanRequestId" result-name="loanRequestId"/>
+		
+				<if-not-empty field="parameters.partyId">
+		            <set field="loanRequest.partyId" from-field="parameters.partyId"/>
+		        </if-not-empty>
+		        
+				<if-not-empty field="parameters.loanTypeId">
+		            <set field="loanRequest.loanTypeId" from-field="parameters.loanTypeId"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.loanTermsAccepted">
+		            <set field="loanRequest.loanTermsAccepted" from-field="parameters.loanTermsAccepted"/>
+		        </if-not-empty>
+		                        
+		        <if-not-empty field="parameters.amount">
+		            <set field="loanRequest.amount" from-field="parameters.amount"/>
+		        </if-not-empty>
+		        
+		        <if-not-empty field="parameters.currencyUomId">
+		            <set field="loanRequest.currencyUomId" from-field="parameters.currencyUomId"/>
+		        </if-not-empty>
+			
+				<if-not-empty field="parameters.purpose">
+		            <set field="loanRequest.purpose" from-field="parameters.purpose"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.noOfInstallments">
+		            <set field="loanRequest.noOfInstallments" from-field="parameters.noOfInstallments"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.interestRate">
+		            <set field="loanRequest.interestRate" from-field="parameters.interestRate"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.startDate">
+		            <set field="loanRequest.startDate" from-field="parameters.startDate"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.bankId">
+		            <set field="loanRequest.bankId" from-field="parameters.bankId"/>
+		        </if-not-empty>
+		
+				<if-not-empty field="parameters.accountNumber">
+		            <set field="loanRequest.accountNumber" from-field="parameters.accountNumber"/>
+		        </if-not-empty>
+		 
+				<if-not-empty field="parameters.sortCode">
+		            <set field="loanRequest.sortCode" from-field="parameters.sortCode"/>
+		        </if-not-empty>
+		 
+				<if-not-empty field="parameters.guarantorPartyId">
+		            <set field="loanRequest.guarantorPartyId" from-field="parameters.guarantorPartyId"/>
+		        </if-not-empty>
+		        
+		        <if-not-empty field="parameters.finAccountId">
+		            <set field="loanRequest.finAccountId" from-field="parameters.finAccountId"/>
+		        </if-not-empty>
+		 
+				<if-empty field="parameters.statusId">
+		            <set field="loanRequest.statusId" value="LOAN_REQ_CRTD"/>
+		        </if-empty>
+		                                                                      
+		        <create-value value-field="loanRequest"/>
+		    </then>
+		    <else>
+		    	<add-error>
+                    <fail-property resource="cooperativefundsUiLabels" property="CooperativefundsLoanRequestLoanPolicyError"/>
+                </add-error>
+                <check-errors/>
+		    </else>
+		</if>
+		
+    </simple-method>
+
+	<simple-method method-name="updateLoanRequest" short-description="Update an existing Loan Request">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="LoanRequest"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <find-by-primary-key entity-name="LoanRequest" map="lookupPKMap" value-field="lookedUpValue"/>
+
+        <!-- only try to update content if the status is in process.... -->
+        <if-compare field="lookedUpValue.statusId" operator="not-equals" value="LOAN_REQ_APPRVD">
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+            <else>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingInvoiceUpdateOnlyWithInProcessStatus"/>
+                </add-error>
+                <log level="error" message="Can only update LoanRequest, when status is not approved...current Status: ${lookedUpValue.statusId}"/>
+                <check-errors/>
+            </else>
+        </if-compare>
+
+        <!-- check if there is a requested status change if yes call invoice status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanRequestId" field="inputMap.loanRequestId"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanRequestStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>
+
+	<simple-method method-name="updateLoanRequestStatus" short-description="Update LoanRequestStatus statusId attribute in LoanRequest Entity and create new instance of LoanRequestStatus">
+		<!--1. Get current loanRequest record in LoanRequest Entity  -->
+	        <if-not-empty field="parameters.loanRequestId">
+	            <entity-one entity-name="LoanRequest" value-field="loanRequest">
+                	<field-map field-name="loanRequestId" from-field="parameters.loanRequestId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of LoanRequest Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanRequest.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+        <!--3. Create new record of LoanRequestStatus Entity -->
+        		<make-value entity-name="LoanRequestStatus" value-field="loanRequestStatus"/>
+        		<if-empty field="parameters.loanRequestStatusId">
+		            <sequenced-id sequence-name="LoanRequestStatus" field="loanRequestStatus.loanRequestStatusId"/>
+		            <else>
+		                <set field="loanRequestStatus.loanRequestStatusId" from-field="parameters.loanRequestStatusId"/>
+		            </else>
+		        </if-empty>
+		        <field-to-result field="loanRequest.loanRequestId" result-name="loanRequestId"/>
+       	<!--4. Modify attributes of LoanRequestStatus and associate with LoanRequest Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanRequestStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanRequestStatus.loanRequestId" from-field="parameters.loanRequestId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanRequestStatus.statusDate" from-field="nowTimestamp"/>
+            	</if-not-empty>
+        
+	        </if-not-empty>
+	        <store-value value-field="loanRequest"/>
+	        <create-value value-field="loanRequestStatus"/>
+	</simple-method>    
+
+<!-- Create/Delete  LoanRequest Content -->
+    
+    <simple-method method-name="createLoanRequestContent" 
+    	short-description="Create Member Loan request Content"
+    	login-required="false">
+        <call-class-method class-name="org.ofbiz.content.layout.LayoutWorker"
+            method-name="uploadImageAndParameters"
+            ret-field="formInput">
+        <field field="request" type="javax.servlet.http.HttpServletRequest"/>
+        <string value="dataResourceName"/>
+        </call-class-method>
+
+        <call-class-method class-name="org.ofbiz.content.layout.LayoutWorker"
+              method-name="returnByteBuffer"
+              ret-field="byteWrap">
+             <field field="formInput" type="java.util.Map"/>
+        </call-class-method>
+
+        <set-service-fields service-name="uploadLoanRequestContentFile" map="formInput.formInput" to-map="loanRequestContentMap"/>
+        <set field="loanRequestContentMap._uploadedFile_fileName" from-field="formInput.imageFileName"/>
+        <set field="loanRequestContentMap.uploadedFile" from-field="byteWrap"/>
+        <set field="loanRequestContentMap._uploadedFile_contentType" from-field="formInput.formInput.mimeTypeId"/>
+        <call-service service-name="uploadLoanRequestContentFile" in-map-name="loanRequestContentMap" break-on-error="false">
+            <result-to-field result-name="contentId" field="contentId"/>
+        </call-service>
+        <!-- set the partyId in the request -->
+        <field-to-request field="formInput.formInput.loanRequestId" request-name="loanRequestId"/>
+        <field-to-request field="contentId" request-name="contentId"/>
+    </simple-method>
+    
+    <simple-method method-name="updateLoanRequestContent" 
+    	short-description="Update Loan Request Associated Content" 
+    	login-required="false">
+        <call-class-method class-name="org.ofbiz.content.layout.LayoutWorker"
+            method-name="uploadImageAndParameters"
+            ret-field="formInput">
+        <field field="request" type="javax.servlet.http.HttpServletRequest"/>
+        <string value="dataResourceName"/>
+        </call-class-method>
+
+        <call-class-method class-name="org.ofbiz.content.layout.LayoutWorker"
+              method-name="returnByteBuffer"
+              ret-field="byteWrap">
+             <field field="formInput" type="java.util.Map"/>
+         </call-class-method >
+         <set-service-fields service-name="updateContentAndUploadedFile" map="formInput.formInput" to-map="loanRequestContentMap"/>
+         <call-service service-name="updateContentAndUploadedFile" in-map-name="loanRequestContentMap" break-on-error="false">
+            <result-to-field result-name="contentId" field="contentId"/>
+         </call-service>
+        <!-- set the partyId in the request -->
+        <field-to-request field="formInput.formInput.loanRequestId" request-name="loanRequestId"/>
+        <field-to-request field="contentId" request-name="contentId"/>
+    </simple-method>
+    
+    <simple-method method-name="deleteLoanRequestContent" short-description="Remove a Loan Request Content">
+        <entity-one entity-name="LoanRequestContent" value-field="lookedUpValue"/>
+        <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+        <if-empty field="lookedUpValue.thruDate">
+            <now-timestamp field="lookedUpValue.thruDate"/>
+        </if-empty>
+        <store-value value-field="lookedUpValue"/>
+        <call-simple-method method-name="updateLoanRequestLastModifiedDate"/>
+    </simple-method>
+    
+    <simple-method method-name="updateLoanRequestLastModifiedDate" short-description="update the modified date field in a loan request">
+        <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+        <now-timestamp field="loanRequest.lastModifiedDate"/>
+        <store-value value-field="loanRequest"/>
+    </simple-method>
+       
+    <simple-method method-name="createLoan" short-description="Create a Loan">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>
+		
+	<!-- 1. A new record of Loan loan was created -->
+	<if-not-empty field="parameters.loanRequestId">
+        <make-value entity-name="Loan" value-field="loan"/>
+        <if-empty field="parameters.loanId">
+            <sequenced-id sequence-name="Loan" field="loan.loanId"/>
+            <else>
+                <set field="loan.loanId" from-field="parameters.loanId"/>
+            </else>
+        </if-empty>
+        
+        <field-to-result field="loan.loanId" result-name="loanId"/>
+        
+		<entity-one entity-name="LoanRequest" value-field="loanRequest">
+			<field-map field-name="loanRequestId" value="${parameters.loanRequestId}"/>
+        </entity-one>
+        
+        <log level="info" message="Create Loan, current loanId: ${loan.loanId}"/>
+        <log level="info" message="Create Loan, current loanRequestId: ${loanRequestId}"/>
+        <log level="info" message="Create Loan, current parameters.loanRequestId: ${parameters.loanRequestId}"/>        
+		<log level="info" message="Create Loan, current loanRequest.loanRequestId: ${loanRequest.loanRequestId}"/>
+        
+        
+    <!-- 2. Loan loan was associated with Party using partyId  -->
+		<if-not-empty field="parameters.partyId">
+            <set field="loan.partyId" from-field="parameters.partyId"/>
+        </if-not-empty>
+        
+    <!-- 3. Other attributes of loan were initialized -->
+        <if-not-empty field="parameters.initialPrincipalAmount">
+            <set field="loan.initialPrincipalAmount" from-field="parameters.initialPrincipalAmount"/>
+            <set field="loan.balancePrincipalAmount" value="0" type="BigDecimal"/>
+            <set field="loan.totalDisbursed" from-field="parameters.initialPrincipalAmount"/>
+            <set field="loan.totalUndisbursed" value="0" type="BigDecimal"/>
+            <else>
+            <!-- if a loanRequest was passed use it -->
+            	<if-not-empty field="loanRequest.amount">
+            		<set field="loan.initialPrincipalAmount" from-field="loanRequest.amount"/>
+            		<set field="loan.balancePrincipalAmount" value="0" type="BigDecimal"/>
+            		<set field="loan.totalUndisbursed" from-field="loanRequest.amount"/>
+            		<set field="loan.totalDisbursed" value="0" type="BigDecimal"/>
+            	</if-not-empty>
+            </else>
+        </if-not-empty>
+        
+        <if-not-empty field="parameters.currencyUomId">
+            <set field="loan.currencyUomId" from-field="parameters.currencyUomId" default-value="${defaultOrganizationPartyCurrencyUomId}"/>
+        	<else>
+	        	<if-not-empty field="loanRequest.currencyUomId">
+	           		<set field="loan.currencyUomId" from-field="loanRequest.currencyUomId" default-value="${defaultOrganizationPartyCurrencyUomId}"/>
+	           	</if-not-empty>
+           	</else>
+        </if-not-empty>
+		
+		
+		<if-not-empty field="parameters.purpose">
+            <set field="loan.purpose" from-field="parameters.purpose"/>
+            <else>
+	            <if-not-empty field="loanRequest.purpose">
+	            	<set field="loan.purpose" from-field="loanRequest.purpose"/>
+	           	</if-not-empty>
+           	</else>
+        </if-not-empty>
+
+		<if-not-empty field="parameters.noOfInstallments">
+            <set field="loan.noOfInstallments" from-field="parameters.noOfInstallments"/>
+            <set field="loan.noOfUnpaidInstallments" from-field="parameters.noOfInstallments"/>
+        <else>
+        	<if-not-empty field="parameters.loanTypeId">
+        		<entity-one entity-name="LoanType" value-field="loanType">
+        			<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+        		</entity-one>
+        		<set field="loan.noOfInstallments" from-field="loanType.noOfInstallments"/>
+        		<set field="loan.noOfUnpaidInstallments" from-field="loanType.noOfInstallments"/>
+       		<else>
+       			<entity-one entity-name="LoanType" value-field="loanType">
+       				<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+       			</entity-one>
+       			<set field="loan.noOfInstallments" from-field="loanType.noOfInstallments"/>
+       			<set field="loan.noOfUnpaidInstallments" from-field="loanType.noOfInstallments"/>
+       		</else>          		            		
+        	</if-not-empty>
+        	        	
+        </else>
+        </if-not-empty>
+		<log level="info" message="Create Loan, current loanType.noOfInstallments: ${loanType.noOfInstallments}"/>
+        <log level="info" message="Create Loan, current loan.noOfInstallments: ${loan.noOfInstallments}"/>
+		<log level="info" message="Create Loan, current parameters.loanTypeId: ${parameters.loanTypeId}"/>
+		
+		<if-not-empty field="parameters.interestRate">
+            <set field="loan.interestRate" from-field="parameters.interestRate"/>
+            <else>
+            	<if-not-empty field="parameters.loanTypeId">
+            		<set field="loan.loanTypeId" from-field="loanType.loanTypeId"/>
+            		<entity-one entity-name="LoanType" value-field="loanType">
+           				<field-map field-name="loanTypeId" value="${loanRequest.loanTypeId}"/>
+           			</entity-one>
+            		<set field="loan.interestRate" from-field="loanType.interestRate"/>
+            		<else>
+            			<entity-one entity-name="LoanType" value-field="loanType">
+            				<field-map field-name="loanTypeId" value="${loanRequest.loanTypeId}"/>
+            			</entity-one>
+            			<set field="loan.interestRate" from-field="loanType.interestRate"/>
+            		</else>
+            		
+            	</if-not-empty>
+            </else>
+        </if-not-empty>
+		
+		<if-not-empty field="parameters.startDate">
+            <set field="loan.startDate" from-field="parameters.startDate"/>
+            <else>
+	        	<if-not-empty field="loanRequest.startDate">
+					<set field="loan.startDate" from-field="loanRequest.startDate"/>	
+	           	</if-not-empty>
+           	</else>
+        </if-not-empty>
+		
+ 		<if-not-empty field="parameters.totalPrincipalPaid">
+            <set field="loan.totalPrincipalPaid" from-field="parameters.totalPrincipalPaid"/>
+	        <else>
+	     		<set field="loan.totalPrincipalPaid" type="BigDecimal" value="0"/>
+	       	</else>
+        </if-not-empty>
+        
+		<if-not-empty field="parameters.statusId">
+            <set field="loan.statusId" value="LOAN_CRTD"/>
+            <else>
+	        	<if-not-empty field="loanRequest.statusId">
+					<set field="loan.statusId" value="LOAN_CRTD"/>	           	
+				</if-not-empty>
+           	</else>
+        </if-not-empty>
+        
+        <!-- <if-not-empty field="parameters.finAccountId">
+            <set field="loan.finAccountId" from-field="parameters.finAccountId"/>
+            <else>
+	        	<if-not-empty field="loanRequest.finAccountId">
+					<set field="loan.finAccountId" from-field="loanRequest.finAccountId"/>	           	
+				</if-not-empty>
+           	</else>
+        </if-not-empty> -->
+                                                                      
+        <create-value value-field="loan"/>
+    <!-- 3b. Loan is associated with loanRequest using loanId -->
+    	<set field="loanRequest.loanId" from-field="loan.loanId"/>
+    	<store-value value-field="loanRequest"/>
+    <!-- 4. A new record of Agreement agreement is created -->    
+        
+            <set-service-fields service-name="createAgreement" map="parameters" to-map="createLoanAgreementMap"/>
+	<!-- 5. loan is associated with agreement using loanId -->
+			<set field="createLoanAgreementMap.loanId" from-field="loan.loanId"/>
+			<set field="createLoanAgreementMap.partyId" from-field="loan.partyId"/>
+			<call-service service-name="createLoanAgreement" in-map-name="createLoanAgreementMap">
+	    		<result-to-field result-name="agreementId"/>
+	    		<result-to-result result-name="agreementId"/>
+	    	</call-service>
+
+    		<log level="info" message="Create Loan, current agreementId: ${agreementId}"/>
+    		
+    		
+    		
+    <!-- 6. New instances of LoanAgreementTerm loanAgreementTerm is created for each loan term (principal, interestRate, noOfInstallments, interestType) -->	
+    	<if-not-empty field="agreementId">
+    		<set-service-fields service-name="createLoanAgreementTerms" map="parameters" to-map="createLoanAgreementTermsMap"/>
+			<set field="createLoanAgreementTermsMap.agreementId" from-field="agreementId"/>
+			<set field="createLoanAgreementTermsMap.initialPrincipalAmount" from-field="loan.initialPrincipalAmount"/>
+			<set field="createLoanAgreementTermsMap.interestRate" from-field="loan.interestRate"/>
+    		<set field="createLoanAgreementTermsMap.noOfInstallments" from-field="loan.noOfInstallments"/>
+    		<call-service service-name="createLoanAgreementTerms" in-map-name="createLoanAgreementTermsMap">
+	    	</call-service>
+
+
+      	</if-not-empty>
+    </if-not-empty>  
+    </simple-method>
+
+	<simple-method method-name="updateLoan" short-description="Update an existing Loan">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="Loan"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <log level="info" message="updateLoan starts!"/>
+        <find-by-primary-key entity-name="Loan" map="lookupPKMap" value-field="lookedUpValue"/>
+
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+            <log level="info" message="About to store!"/>
+          
+            <if-empty field="parameters.totalPrincipalPaid">
+            	<log level="info" message="parameters.totalPrincipalPaid is empty"/>
+            
+            	<set field="lookedUpValue.totalPrincipalPaid" type="BigDecimal" value="0"/>
+			</if-empty>
+
+			<call-simple-method method-name="updateLoanBalancePrincipalAmount"/>
+			<set from-field="balancePrincipalAmount" field="lookedUpValue.balancePrincipalAmount"/>
+          
+          	<if-not-empty field="parameters.interestRate">
+	            <set field="lookedUpValue.interestRate" from-field="parameters.interestRate"/>
+	            <else>
+	            	<if-not-empty field="parameters.loanTypeId">
+	            		<set field="lookedUpValue.loanTypeId" from-field="parameters.loanTypeId"/>
+	            		<entity-one entity-name="LoanType" value-field="loanType">
+	           				<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+	           			</entity-one>
+	            		<set field="lookedUpValue.interestRate" from-field="loanType.interestRate"/>
+	            		<else>
+	            			<entity-one entity-name="LoanType" value-field="loanType">
+	            				<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+	            			</entity-one>
+	            			<set field="lookedUpValue.interestRate" from-field="loanType.interestRate"/>
+	            		</else>
+	            		
+	            	</if-not-empty>
+	            </else>
+	        </if-not-empty>
+
+          	<if-not-empty field="parameters.noOfInstallments">
+	            <set field="lookedUpValue.noOfInstallments" from-field="parameters.noOfInstallments"/>
+	            <else>
+	            	<if-not-empty field="parameters.loanTypeId">
+	            		<set field="lookedUpValue.loanTypeId" from-field="parameters.loanTypeId"/>
+	            		<entity-one entity-name="LoanType" value-field="loanType">
+	           				<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+	           			</entity-one>
+	            		<set field="lookedUpValue.noOfInstallments" from-field="loanType.noOfInstallments"/>
+	            		<else>
+	            			<entity-one entity-name="LoanType" value-field="loanType">
+	            				<field-map field-name="loanTypeId" value="${parameters.loanTypeId}"/>
+	            			</entity-one>
+	            			<set field="lookedUpValue.noOfInstallments" from-field="loanType.noOfInstallments"/>
+	            		</else>
+	            		
+	            	</if-not-empty>
+	            </else>
+	        </if-not-empty>
+	                  
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <log level="info" message="Difference in field Value!"/>
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+			
+        <!-- check if there is a requested status change if yes call invoice status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanId" field="inputMap.loanId"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>
+    
+    <simple-method method-name="updateLoanBalancePrincipalAmount" 
+    	short-description="Calculate and Update balanceOfPrincipal for an existing Loan">
+
+   		<set field="totalPrincipalPaid" from-field="parameters.totalPrincipalPaid"/>
+   		<set field="totalDisbursed" from-field="parameters.totalDisbursed"/>
+		<log level="info" message="loanId: ${loanId}"/>
+		<log level="info" message="totalPrincipalPaid ${totalPrincipalPaid}"/>
+		<log level="info" message="initialPrincipalAmount ${initialPrincipalAmount}"/>
+		<log level="info" message="balancePrincipalAmount: ${balancePrincipalAmount}"/>
+		<!-- Calculate balance of principal -->
+		<log level="info" message="before calculation!"/>
+
+        <calculate field="balancePrincipalAmount" type="currency-amount">
+            <calcop operator="add" field="totalDisbursed">
+                <calcop operator="negative" field="totalPrincipalPaid"/>
+            </calcop>
+        </calculate>
+        
+        <log level="info" message="balancePrincipalAmount: ${balancePrincipalAmount}"/>
+        
+		<!-- field-to-result field="loan.balancePrincipalAmount" result-name="balancePrincipalAmount"/-->
+		
+		<!-- store-value value-field="loan"/-->
+    </simple-method>
+   
+    <simple-method method-name="createLoanAgreement" short-description="Create a Loan Agreement">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>		
+    
+    <!-- 1. A new record of Agreement agreement is created -->    
+        <if-not-empty field="parameters.loanId">
+            <set-service-fields service-name="createAgreement" map="parameters" to-map="createAgreementMap"/>
+			<set-service-fields service-name="getPerson" map="parameters" to-map="getPersonMap"/>
+			<call-service service-name="getPerson" in-map-name="getPersonMap">
+	    		<result-to-field result-name="lookupPerson"/>
+	    	</call-service>
+	    	<property-to-field resource="cooperativefundsUiLabels" property="CooperativefundsLoanAgreementDescPrefix" field="LoanAgreementDescPrefix"/>
+			
+			<now-timestamp field="nowTimestamp"/>
+			<set field="createAgreementMap.agreementDate" from-field="parameters.agreementDate"/>
+			<set field="createAgreementMap.agreementTypeId" value="LOAN_AGREEMENT"/>
+			<set field="createAgreementMap.description" value="${LoanAgreementDescPrefix} ${lookupPerson.firstName} ${lookupPerson.middleName} ${lookupPerson.lastName}"/>
+			<set field="createAgreementMap.fromDate" from-field="parameters.startDate"/>
+			<set field="createAgreementMap.loanId" from-field="parameters.loanId"/>
+			<set field="createAgreementMap.partyIdFrom" value="Company"/>
+			<set field="createAgreementMap.partyIdTo" from-field="parameters.partyId"/>
+            <set field="createAgreementMap.textData" from-field="parameters.textData"/>    
+
+        </if-not-empty>
+        
+        <call-service service-name="createAgreement" in-map-name="createAgreementMap">
+	    	<result-to-field result-name="agreementId"/>
+	    	<result-to-result result-name="agreementId"/>
+	    </call-service>
+        
+    </simple-method>
+    
+    <simple-method method-name="createLoanAgreementTerms" short-description="Create a Loan Agreement">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>	
+        
+        <log level="info" message="createLoanAgreementTerms Method starts"/>
+        <log level="info" message="parameters.agreementId: ${parameters.agreementId}"/>
+        <log level="info" message="parameters.initialPrincipalAmount: ${parameters.initialPrincipalAmount}"/>
+        <log level="info" message="parameters.interestRate: ${parameters.interestRate}"/>
+        <log level="info" message="parameters.noOfInstallments: ${parameters.noOfInstallments}"/>
+        
+        <!-- Create principalAmount agreement term -->
+        <if-not-empty field="parameters.initialPrincipalAmount">
+    		<set-service-fields service-name="createAgreementTerm" map="parameters" to-map="createLoanPrincipalAgreementTermMap"/>
+    		<set field="createLoanPrincipalAgreementTermMap.agreementId" from-field="parameters.agreementId"/>
+    		<set field="createLoanPrincipalAgreementTermMap.termTypeId" value="LOAN_PRINCIPAL"/>
+    		<set field="createLoanPrincipalAgreementTermMap.termValue" from-field="parameters.initialPrincipalAmount"/>
+        	<call-service service-name="createAgreementTerm" in-map-name="createLoanPrincipalAgreementTermMap">
+	    		<result-to-field result-name="agreementTermId" field="principalAgreementTermId"/>
+	    	</call-service>
+	    </if-not-empty>
+        	
+        <!-- Create interestRate agreement term -->
+        <if-not-empty field="parameters.interestRate">
+    		<set-service-fields service-name="createAgreementTerm" map="parameters" to-map="createLoanInterestAgreementTermMap"/>
+    		<set field="createLoanInterestAgreementTermMap.agreementId" from-field="parameters.agreementId"/>
+    		<set field="createLoanInterestAgreementTermMap.termTypeId" value="LOAN_INTEREST_RATE"/>
+    		<set field="createLoanInterestAgreementTermMap.termValue" from-field="parameters.interestRate"/>
+    		<call-service service-name="createAgreementTerm" in-map-name="createLoanInterestAgreementTermMap">
+	    		<result-to-field result-name="agreementTermId" field="interestRateAgreementTermId"/>
+	    	</call-service>
+	    </if-not-empty>
+        	
+        <!-- Create noOfInstallments agreement term -->
+       <if-not-empty field="parameters.noOfInstallments">
+    		<set-service-fields service-name="createAgreementTerm" map="parameters" to-map="createLoanInstallmentsAgreementTermMap"/>
+    		<set field="createLoanInstallmentsAgreementTermMap.agreementId" from-field="parameters.agreementId"/>
+    		<set field="createLoanInstallmentsAgreementTermMap.termTypeId" value="LOAN_INSTALLMENTS"/>
+    		<set field="createLoanInstallmentsAgreementTermMap.termValue" from-field="parameters.noOfInstallments"/>
+    		<call-service service-name="createAgreementTerm" in-map-name="createLoanInstallmentsAgreementTermMap">
+	    		<result-to-field result-name="agreementTermId" field="noOfInstallmentsAgreementTermId"/>
+	    	</call-service>	 
+	    </if-not-empty>  
+	    	 	
+    </simple-method> 
+    
+    <simple-method method-name="updateLoanStatus" short-description="Update LoanStatus statusId attribute in Loan Entity and create new instance of LoanStatus">
+		<!--1. Get current loan record in Loan Entity  -->
+	        <if-not-empty field="parameters.loanId">
+	            <entity-one entity-name="Loan" value-field="loan">
+                	<field-map field-name="loanId" from-field="parameters.loanId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of Loan Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loan.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+        <!--3. Create new record of LoanStatus Entity -->
+        		<make-value entity-name="LoanStatus" value-field="loanStatus"/>
+       			<if-empty field="parameters.loanStatusId">
+		            <sequenced-id sequence-name="LoanStatus" field="loanStatus.loanStatusId"/>
+		            <else>
+		                <set field="loanStatus.loanStatusId" from-field="parameters.loanStatusId"/>
+		            </else>
+		        </if-empty>
+
+       	<!--4. Modify attributes of LoanStatus and associate with Loan Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanStatus.loanId" from-field="parameters.loanId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanStatus.statusDate" from-field="nowTimestamp"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	   
+	   
+	        <store-value value-field="loan"/>
+	        <create-value value-field="loanStatus"/>
+	        
+    		<!-- 5. If Loan is approved, create new instance of FinAccount as Loan Account for partyId -->   
+			<if>
+		         <condition>
+		             <and>
+		              	<if-compare-field field="loan.statusId" value="LOAN_APPRVD" operator="equals"/>		
+		             </and>
+		         </condition>
+		         <then>
+					<set-service-fields service-name="getPerson" map="parameters" to-map="getPersonMap"/>
+					<set field="getPersonMap.partyId" from-field="loan.partyId"/>
+					
+					<call-service service-name="getPerson" in-map-name="getPersonMap">
+						<result-to-field result-name="lookupPerson"/>
+			    	</call-service>
+					
+					<log level="info" message="Create Loan, finAccountName: Loan - ${loan.loanId} - ${lookupPerson.firstName} ${lookupPerson.lastName}"/>
+					
+					<set-service-fields service-name="createFinAccount" map="parameters" to-map="createFinAccountMap"/>
+					<set field="createFinAccountMap.finAccountName" value="Loan - ${loan.loanId} - ${lookupPerson.firstName} ${lookupPerson.lastName}"/>
+					<set field="createFinAccountMap.organizationPartyId" value="Company"/>
+					<set field="createFinAccountMap.ownerPartyId" from-field="partyId"/>
+		    		<set field="createFinAccountMap.currencyUomId" value="NGN"/>
+		    		<set field="createFinAccountMap.finAccountTypeId" value="LOAN_ACCOUNT"/>
+		    		<set field="createFinAccountMap.postToGlAccountId" value="124400"/>
+		    		<set field="createFinAccountMap.isRefundable" value="Y"/>
+		    		<set field="createFinAccountMap.fromDate" from-field="nowTimestamp"/>
+		    		<set field="createFinAccountMap.statusId" value="FNACT_ACTIVE"/>
+		    		
+		    		<call-service service-name="createFinAccount" in-map-name="createFinAccountMap">
+		    			<result-to-field result-name="finAccountId"/>
+			    	</call-service>
+			    	
+			    	<set-service-fields service-name="updateLoan" map="parameters" to-map="updateLoanMap"/>
+					<set field="updateLoanMap.loanId" from-field="loan.loanId"/>
+					<set field="updateLoanMap.finAccountId" from-field="finAccountId"/>
+					
+					<call-service service-name="updateLoan" in-map-name="updateLoanMap"/>
+					
+			    </then>
+	    	</if>
+	</simple-method>
+	
+    <simple-method method-name="createLoanDisbursement" short-description="Create a loan disbursement record in LoanDisbursement Entity and associate with Loan using loanId">
+       <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>
+		
+		<if-not-empty field="parameters.loanId">
+	        <entity-one entity-name="Loan" value-field="loan">
+	          	<field-map field-name="loanId" from-field="parameters.loanId"/>
+	        </entity-one>
+	    	   
+		     <if>
+		         <condition>
+		             <and>
+		                <if-compare-field field="parameters.disbursementAmount" to-field="loan.totalUndisbursed" operator="less-equals"/>
+						<if-compare-field field="loan.statusId" value="LOAN_APPRVD" operator="equals"/>		
+		             </and>
+		         </condition>
+		         <then>
+				
+					<!-- 1. A new instance of LoanDisbursement loanDisbursement is created -->
+				        <make-value entity-name="LoanDisbursement" value-field="loanDisbursement"/>
+				        <if-empty field="parameters.loanDisbursementId">
+				            <sequenced-id sequence-name="LoanDisbursement" field="loanDisbursement.loanDisbursementId"/>
+				            <else>
+				                <set field="loanDisbursement.loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+				            </else>
+				        </if-empty>
+				        <field-to-result field="loanDisbursement.loanDisbursementId" result-name="loanDisbursementId"/>
+						
+						<if-not-empty field="parameters.loanId">
+				            <set field="loanDisbursement.loanId" from-field="parameters.loanId"/>
+				        </if-not-empty>
+				
+						<if-not-empty field="parameters.disbursementAmount">
+				            <set field="loanDisbursement.disbursementAmount" from-field="parameters.disbursementAmount"/>
+				        </if-not-empty>
+				
+						<if-not-empty field="parameters.currencyUomId">
+				            <set field="loanDisbursement.currencyUomId" from-field="parameters.currencyUomId"/>
+				        </if-not-empty>
+				        
+				        <if-not-empty field="parameters.paymentMethodId">
+				            <set field="loanDisbursement.paymentMethodId" from-field="parameters.paymentMethodId"/>
+				        </if-not-empty>
+				        
+				        <if-not-empty field="parameters.disbursementDate">
+				            <set field="loanDisbursement.disbursementDate" from-field="parameters.disbursementDate"/>
+				            <else>
+				            	<now-timestamp field="nowTimestamp"/>
+				                <set field="loanDisbursement.loanDisbursementId" from-field="nowTimestamp"/>
+				            </else>
+				        </if-not-empty>
+				
+						<if-not-empty field="parameters.statusId">
+				            <set field="loanDisbursement.statusId" from-field="parameters.statusId"/>
+				            <else>
+				                <set field="loanDisbursement.statusId" value="LOAN_DISBMT_CRTD"/>
+				            </else>
+				        </if-not-empty>
+				                                                                            
+				        <create-value value-field="loanDisbursement"/>
+				        <set-service-fields service-name="updateLoanDisbursementStatus" map="parameters" to-map="updateLoanDisbursementStatusMap"/>
+			    		<set field="updateLoanDisbursementStatusMap.loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+						<set field="updateLoanDisbursementStatusMap.statusId" value="LOAN_DISBMT_CRTD"/>
+			       		<call-service service-name="updateLoanDisbursementStatus" in-map-name="updateLoanDisbursementStatusMap"/>
+				    		
+				        
+				    </then>    
+			        <else>
+			            <add-error>
+			                 
+			            </add-error>
+			        </else>
+				</if>
+		   </if-not-empty>
+	</simple-method>
+
+	<simple-method method-name="updateLoanDisbursement" short-description="Update an existing Loan Disbursement">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="LoanDisbursement"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <find-by-primary-key entity-name="LoanDisbursement" map="lookupPKMap" value-field="lookedUpValue"/>
+
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+
+            <!-- Calculate new totalDisbursement if loan disbursement is approved-->
+            <if-compare-field field="lookedUpValue.statusId" value="LOAN_DISBMT_APPRVD" operator="equals">
+	    		<set-service-fields service-name="updateTotalDisbursement" map="parameters" to-map="updateTotalDisbursementMap"/>
+	    		<set field="updateTotalDisbursementMap.loanId" from-field="parameters.loanId"/>
+	       		<call-service service-name="updateTotalDisbursement" in-map-name="updateTotalDisbursementMap">
+		    	</call-service>	
+	    	</if-compare-field>
+	    		    	            
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+
+        <!-- check if there is a requested status change if yes call status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanDisbursementId" field="inputMap.loanDisbursementId"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanDisbursementStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>
+	
+	<simple-method method-name="updateTotalDisbursement" short-description="Update Total Disbursement for LoanDisbursement Entity and create new instance of LoanDisbursement">
+		<!-- Calculate new totalDisbursement -->
+    		<set-service-fields service-name="calculateTotalDisbursement" map="parameters" to-map="calculateTotalDisbursementMap"/>
+    		<set field="calculateTotalDisbursementMap.loanId" from-field="parameters.loanId"/>
+       		<call-service service-name="calculateTotalDisbursement" in-map-name="calculateTotalDisbursementMap">
+	    		<result-to-field result-name="totalDisbursed"/>
+	    		<result-to-field result-name="totalUndisbursed"/>
+	    	</call-service>	
+	    	
+	    	<entity-one entity-name="Loan" value-field="loan">
+              	<field-map field-name="loanId" from-field="parameters.loanId"/>
+            </entity-one>
+            <entity-one entity-name="LoanDisbursement" value-field="loanDisbursement">
+              	<field-map field-name="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+            </entity-one>
+            
+	    	<!-- Update new totalDisbursement if loan is approved-->                     
+    		<set-service-fields service-name="updateLoan" map="loan" to-map="updateLoanMap"/>
+    		<set field="updateLoanMap.totalDisbursed" from-field="totalDisbursed"/>
+    		<set field="updateLoanMap.totalUndisbursed" from-field="totalUndisbursed"/>
+    		
+    		<calculate field="balancePrincipalAmount" decimal-scale="6">
+            	<calcop operator="add">
+	            	<calcop operator="get" field="loan.balancePrincipalAmount"/>
+	    			<calcop operator="get" field="loanDisbursement.disbursementAmount"/>       
+	    		</calcop>      
+	        </calculate>
+	        
+	        <set field="updateLoanMap.balancePrincipalAmount" from-field="balancePrincipalAmount"/>
+	        
+    		<log level="info" message="totalDisbursed: ${totalDisbursed}"/>
+    		<log level="info" message="totalUndisbursed: ${totalUndisbursed}"/>
+    		
+       		<call-service service-name="updateLoan" in-map-name="updateLoanMap"/>
+	</simple-method>
+	
+	<simple-method method-name="calculateTotalDisbursement" short-description="Calculate Total Disbursement for LoanDisbursement Entity and create new instance of LoanDisbursement">
+		<!-- 1. Get all disbursements for the loan -->
+			<entity-and entity-name="LoanDisbursement" list="loanDisbursements">
+	            <field-map from-field="parameters.loanId" field-name="loanId"/>
+	            <field-map value="LOAN_DISBMT_APPRVD" field-name="statusId"/>
+	        </entity-and>
+
+	    <!-- 2. Add up the disbursements -->	
+	    	<set field="totalDisbursed" value="0" type="BigDecimal"/>	
+			<iterate entry="loanDisbursement" list="loanDisbursements">
+      			<calculate field="totalDisbursed" decimal-scale="6">
+      				<calcop operator="add" field="totalDisbursed">
+	    				<calcop operator="get" field="loanDisbursement.disbursementAmount"/>   
+	    			</calcop>          
+		        </calculate>
+            </iterate> 
+            
+                    
+        <!-- 3. Calculate undisbursed amount -->
+        	<!-- 3b. Get loan principal -->
+      	    <entity-one entity-name="Loan" value-field="loan">
+              	<field-map field-name="loanId" from-field="parameters.loanId"/>
+            </entity-one>
+            <set field="totalUndisbursed" value="0"/>
+            <calculate field="totalUndisbursed" decimal-scale="6">
+            	<calcop operator="subtract">
+	            	<calcop operator="get" field="loan.initialPrincipalAmount"/>
+	    			<calcop operator="get" field="totalDisbursed"/>       
+	    		</calcop>      
+	        </calculate>
+
+            <field-to-result field="totalUndisbursed"/>
+            <field-to-result field="totalDisbursed"/> 
+            
+	</simple-method>
+	
+    <simple-method method-name="updateLoanDisbursementStatus" short-description="Update LoanDisbursementStatus statusId attribute in LoanDIsbursement Entity and create new instance of LoanDisbursementStatus">
+		
+		<!--1. Get current loanDisbursement record in LoanDisbursement Entity  -->
+	        <if-not-empty field="parameters.loanDisbursementId">
+	            <entity-one entity-name="LoanDisbursement" value-field="loanDisbursement">
+                	<field-map field-name="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+            	</entity-one>
+            	<clone-value value-field="loanDisbursement" new-value-field="lookupLoanDisbursement"/>
+        <!--2. Update statusId for record of LoanDisbursement Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanDisbursement.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+        <!--3. Create new record of LoanDisbursementStatus Entity -->
+        		<make-value entity-name="LoanDisbursementStatus" value-field="loanDisbursementStatus"/>
+       			<if-empty field="parameters.loanDisbursementStatusId">
+		            <sequenced-id sequence-name="LoanDisbursementStatus" field="loanDisbursementStatus.loanDisbursementStatusId"/>
+		            <else>
+		                <set field="loanDisbursementStatus.loanDisbursementStatusId" from-field="parameters.loanDisbursementStatusId"/>
+		            </else>
+		        </if-empty>
+       	<!--4. Modify attributes of LoanDisbursementStatus and associate with LoanDisbursement Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanDisbursementStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanDisbursementStatus.loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanDisbursementStatus.statusDate" from-field="nowTimestamp"/>
+					<!-- set field="loanDisbursementStatus.statusUserLogin" from-field="parameters.userLogin"/-->
+					<if-not-empty field="parameters.changeReason">
+						<set field="loanDisbursementStatus.changeReason" from-field="parameters.changeReason"/>
+					</if-not-empty>
+            	</if-not-empty>
+	        </if-not-empty>
+	       	    	
+	        <store-value value-field="loanDisbursement"/>
+	        <create-value value-field="loanDisbursementStatus"/>
+	        
+	    <!-- 5. If loanDisbursement is approved, then create corresponding Payment Record, totalDisbursement updated and finAccount Transactions -->    
+	    <if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_APPRVD">
+			<set-service-fields service-name="createLoanDisbursementPayment" map="parameters" to-map="createLoanDisbursementPaymentMap"/>
+			
+			<if-not-empty field="loanDisbursement.loanDisbursementId">
+				<set field="createLoanDisbursementPaymentMap.loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+			</if-not-empty>
+		
+			
+			<if-not-empty field="loanDisbursement.paymentMethodId">
+				<set field="createLoanDisbursementPaymentMap.paymentMethodId" from-field="loanDisbursement.paymentMethodId"/>
+			</if-not-empty>
+			
+			<if-not-empty field="loanDisbursement.disbursementAmount">
+	    			<set field="createLoanDisbursementPaymentMap.amount" from-field="loanDisbursement.disbursementAmount"/>
+	    	</if-not-empty>
+			
+		    	
+			<call-service service-name="createLoanDisbursementPayment" in-map-name="createLoanDisbursementPaymentMap">
+		    	<result-to-field result-name="paymentId"/>
+		    </call-service>
+		    
+			<!-- Calculate new totalDisbursement if loan disbursement is approved-->
+			<set-service-fields service-name="updateTotalDisbursement" map="parameters" to-map="updateTotalDisbursementMap"/>
+    		<set field="updateTotalDisbursementMap.loanId" from-field="loanDisbursement.loanId"/>
+       		<call-service service-name="updateTotalDisbursement" in-map-name="updateTotalDisbursementMap"/>
+			
+			<!-- To Update member's contribution account Create new finAccountTrans -->
+			<if-not-empty field="loanDisbursement.loanId">
+				<entity-one entity-name="Loan" value-field="loan">
+               		<field-map field-name="loanId" from-field="loanDisbursement.loanId"/>
+           		</entity-one>
+  			</if-not-empty>
+			
+			<set-service-fields service-name="createFinAccountTrans" map="parameters" to-map="createFinAccountTransMap"/>
+
+       		<log level="info" message="OLAMIDE:-In Get partyId ${parameters.partyId} from finAccountId ${loan.finAccountId}"></log>
+       		
+       		<set field="createFinAccountTransMap.amount" from-field="loanDisbursement.disbursementAmount"/>
+			<set field="createFinAccountTransMap.comments" value="Loan Disbursement"/>	
+			<set field="createFinAccountTransMap.paymentId" from-field="paymentId"/>			
+       		<set field="createFinAccountTransMap.finAccountId" from-field="loan.finAccountId"/>
+       		<set field="createFinAccountTransMap.partyId" from-field="loan.partyId"/>
+       		<set field="createFinAccountTransMap.finAccountTransTypeId" value="DEPOSIT"/>
+        	
+	        
+	        <call-service service-name="createFinAccountTrans" in-map-name="createFinAccountTransMap">
+	            <!--result-to-field result-name="contributionId"/-->
+	            <result-to-field result-name="finAccountTransId"/>
+	        </call-service>
+	        <log level="info" message="OLAMIDE:-finAccountTransId:${finAccountTransId}"></log>
+	        
+		<!-- 2. FinAccountTrans finAccountTrans associated with LoanDisbursement using loanDisbursementId-->
+			<if-not-empty field="loanDisbursement.loanDisbursementId">
+           		<set field="loanDisbursement.finAccountTransId" from-field="finAccountTransId"/>
+            </if-not-empty>
+            <store-value value-field="loanDisbursement"/>
+            
+			<!-- LoanPaymentPlan is created if it does not exist, if it exists, its fields are updated-->
+			
+			<get-related-one value-field="loanDisbursement" relation-name="LoanPaymentPlan" to-value-field="loanPaymentPlan"/>
+            <log level="info" message="OLAMIDE:-loanPaymentPlan: ${loanPaymentPlan.loanPaymentPlanId}"></log>
+            <if-empty field="loanPaymentPlan">
+		    	<set-service-fields service-name="createLoanPaymentPlan" map="parameters" to-map="createLoanPaymentPlanMap"/>
+		    	<set field="createLoanPaymentPlanMap.loanId" from-field="loanDisbursement.loanId"/>
+		    	<call-service service-name="createLoanPaymentPlan" in-map-name="createLoanPaymentPlanMap">
+		    		<result-to-field result-name="loanPaymentPlanId"/>
+		    	</call-service>
+		    	
+		    	<!-- loanPaymentPlan is associated with loanDisbursement using loanPaymentPlanId -->
+	           	<set field="loanDisbursement.loanPaymentPlanId" from-field="loanPaymentPlanId"/>	
+	           	<store-value value-field="loanDisbursement"/>
+	           	
+           	<else>
+           		<set-service-fields service-name="updateLoanPaymentPlan" map="parameters" to-map="updateLoanPaymentPlanMap"/>
+		    	<set field="updateLoanPaymentPlanMap.loanPaymentPlanId" from-field="loanDisbursement.loanPaymentPlanId"/>
+		    	<call-service service-name="updateLoanPaymentPlan" in-map-name="updateLoanPaymentPlanMap"/>
+           	
+           	</else>
+           	
+           	</if-empty>
+		</if-compare>
+		
+		 <!-- 6. If loanDisbursement is cancelled or approval reversed, then reverse corresponding Payment Record, totalDisbursement updated and reverse finAccount Transactions -->    
+	    <if>
+	    	<condition>
+		    	<or>
+			    	<if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_CANCLD"/>
+			    	<and>
+			    		<if-compare field="lookupLoanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_APPRVD"/>
+			    		<if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_CRTD"/>
+			    	</and>
+			    </or>
+		    </condition>
+		    <then>
+		    	<!-- Reverse FinAccountTrans records -->
+		    	
+		    </then>
+		</if>
+	</simple-method>
+	
+	<simple-method method-name="createLoanDisbursementPayment" short-description="Create LoanDisbursementPayment in Payment Entity and associate with loanDisbursement">
+		<!-- 1. Get current loanDisbursement record in LoanDisbursement Entity  -->
+	        <if-not-empty field="parameters.loanDisbursementId">
+	            <entity-one entity-name="LoanDisbursement" value-field="loanDisbursement">
+                	<field-map field-name="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+            	</entity-one>
+            	<entity-one entity-name="Loan" value-field="loan">
+                	<field-map field-name="loanId" from-field="loanDisbursement.loanId"/>
+            	</entity-one>
+        <!-- 2. New Payment payment is created -->
+				<set-service-fields service-name="createPayment" map="parameters" to-map="createPaymentMap"/>
+			    		
+	    		<set field="createPaymentMap.partyIdFrom" value="Company"/>
+	    		
+	    		<if-not-empty field="loan.partyId">
+	    			<set field="createPaymentMap.partyIdTo" from-field="loan.partyId"/>
+	    		</if-not-empty>
+	    		<set field="createPaymentMap.paymentMethodId" from-field="loanDisbursement.paymentMethodId"/>
+	    		<set field="createPaymentMap.paymentTypeId" value="LOAN_DISBURSEMENT"/>
+	    		<set field="createPaymentMap.statusId" value="PMNT_NOT_PAID"/>
+	    		<call-service service-name="createPayment" in-map-name="createPaymentMap">
+		    		<result-to-field result-name="paymentId"/>
+		    	</call-service>
+		 <!-- 3. payment is associated with loanDisbursement using paymentId-->
+		 		<set field="loanDisbursement.paymentId" from-field="paymentId"/>
+		 		<store-value value-field="loanDisbursement"/>
+	    	</if-not-empty>
+	</simple-method>
+
+	<simple-method method-name="calculateLoanPaymentPlan" short-description="Calculate LoanPaymentPlan attributes for evaluation">
+		<!-- 1. Get current loan record in Loan Entity  -->
+	        <if-not-empty field="parameters.loanId">
+	            <entity-one entity-name="Loan" value-field="loan">
+                	<field-map field-name="loanId" from-field="parameters.loanId"/>
+            	</entity-one>
+		<!-- 2. Get inputs into the calculation -->		
+	    		<if-not-empty field="loan.loanTypeId">
+	    			<entity-one entity-name="LoanType" value-field="loanType">
+                		<field-map field-name="loanTypeId" from-field="loan.loanTypeId"/>
+            		</entity-one>
+            		<if-not-empty field="loanType.noOfInstallments">
+	            		<set field="noOfInstallments" from-field="loanType.noOfInstallments"/>
+	            		<set field="noOfUnpaidInstallments" from-field="loan.noOfUnpaidInstallments"/>
+		    		</if-not-empty>
+	    			<if-not-empty field="loanType.interestRate">
+	            		<set field="interestRate" from-field="loanType.interestRate"/>
+		    		</if-not-empty>
+		    		<if-not-empty field="loan.balancePrincipalAmount">
+	            		<set field="principalAmount" from-field="loan.balancePrincipalAmount"/>
+		    		</if-not-empty>
+	    		</if-not-empty>
+	    <!-- 3. Calculate outputs -->		
+	    		<calculate field="totalInterestAmount" decimal-scale="6">
+	    			<calcop operator="multiply">
+			            <calcop operator="divide">
+		                     <calcop operator="get" field="interestRate"/>
+		                     <number value="100"/>
+		                </calcop>
+		                <calcop operator="get" field="principalAmount"/>
+	                </calcop>	                
+		        </calculate>
+		        <log level="info" message="totalInterestAmount= ${totalInterestAmount}"/>
+		        
+		        <calculate field="monthlyInterestPaybackAmount" decimal-scale="6">
+	    			<calcop operator="divide">
+		            	<calcop operator="get" field="totalInterestAmount"/>
+						<calcop operator="get" field="noOfUnpaidInstallments"/>
+	                </calcop>
+		        </calculate>
+		        
+		        <calculate field="monthlyPrincipalPaybackAmount" decimal-scale="6">
+	    			<calcop operator="divide">
+		            	<calcop operator="get" field="principalAmount"/>
+						<calcop operator="get" field="noOfUnpaidInstallments"/>
+	                </calcop>
+		        </calculate>
+		        
+		        <calculate field="monthlyPaybackAmount" decimal-scale="6">
+	    			<calcop operator="add">
+		            	<calcop operator="get" field="monthlyInterestPaybackAmount"/>
+						<calcop operator="get" field="monthlyPrincipalPaybackAmount"/>
+	                </calcop>
+		        </calculate>
+		        
+		        <if-not-empty field="parameters.startDate">
+		        	<set field="startDate" from="parameters.startDate"/>
+		        	<set-calendar field="endDate" from="startDate" months="+${noOfUnpaidInstallments}"/>
+		        </if-not-empty>	
+		        <field-to-result field="totalInterestAmount"/> 
+		        <field-to-result field="monthlyInterestPaybackAmount"/>
+		        <field-to-result field="monthlyPrincipalPaybackAmount"/>
+		        <field-to-result field="monthlyPaybackAmount"/>
+		        <field-to-result field="startDate"/>
+		        <field-to-result field="endDate"/>
+		        
+	    	</if-not-empty>
+	</simple-method>
+
+	<simple-method method-name="createLoanPaymentPlan" short-description="Create LoanPaymentPlan">
+		<make-value entity-name="LoanPaymentPlan" value-field="loanPaymentPlan"/>
+        <if-empty field="parameters.loanPaymentPlanId">
+            <sequenced-id sequence-name="LoanPaymentPlan" field="loanPaymentPlan.loanPaymentPlanId"/>
+            <else>
+                <set field="loanPaymentPlan.loanPaymentPlanId" from-field="parameters.loanPaymentPlanId"/>
+            </else>
+        </if-empty>
+        
+        <if-not-empty field="parameters.loanId">
+       		<set field="loanPaymentPlan.loanId" from-field="parameters.loanId"/>
+       		<entity-one entity-name="Loan" value-field="loan">
+               	<field-map field-name="loanId" from-field="parameters.loanId"/>
+           	</entity-one>
+   		</if-not-empty>
+        <if-not-empty field="loan.noOfInstallments">
+       		<set field="loanPaymentPlan.noOfInstallments" from-field="loan.noOfInstallments"/>
+   		</if-not-empty>
+   		<if-not-empty field="loan.noOfUnpaidInstallments">
+       		<set field="loanPaymentPlan.noOfUnpaidInstallments" from-field="loan.noOfUnpaidInstallments"/>
+   		</if-not-empty>
+		<if-not-empty field="loan.interestRate">
+       		<set field="loanPaymentPlan.interestRate" from-field="loan.interestRate"/>
+   		</if-not-empty>
+   		<if-not-empty field="loan.balancePrincipalAmount">
+       		<set field="loanPaymentPlan.principalAmount" from-field="loan.balancePrincipalAmount"/>
+   		</if-not-empty>
+        
+		<set-service-fields service-name="calculateLoanPaymentPlan" map="loan" to-map="calculateLoanPaymentPlanMap"/>
+		<set field="calculateLoanPaymentPlanMap.loanPaymentPlanId" from-field="parameters.loanPaymentPlanId"/>
+		
+		<call-service service-name="calculateLoanPaymentPlan" in-map-name="calculateLoanPaymentPlanMap">
+	    	<result-to-field result-name="principalPaybackAmount" field="loanPaymentPlan.principalPaybackAmount"/>
+	    	<result-to-field result-name="monthlyInterestPaybackAmount" field="loanPaymentPlan.monthlyInterestPaybackAmount"/>
+	    	<result-to-field result-name="monthlyPrincipalPaybackAmount" field="loanPaymentPlan.monthlyPrincipalPaybackAmount"/>
+	    	<result-to-field result-name="monthlyPaybackAmount" field="loanPaymentPlan.monthlyPaybackAmount"/>	    	
+	    	<result-to-field result-name="totalInterestAmount" field="loanPaymentPlan.totalInterestAmount"/>
+	    	<result-to-field result-name="startDate" field="loanPaymentPlan.startDate"/>
+	    	<result-to-field result-name="endDate" field="loanPaymentPlan.endDate"/>
+	    </call-service>
+	    <log level="info" message="monthlyPrincipalPaybackAmount ${monthlyPrincipalPaybackAmount}"/>
+	    <log level="info" message="monthlyInterestPaybackAmount ${monthlyInterestPaybackAmount}"/>
+	    <set field="loanPaymentPlan.statusId" value="LOAN_PMTPLAN_CRTD"/>
+	    
+	    <create-value value-field="loanPaymentPlan"/>
+	</simple-method>
+	
+	<simple-method method-name="updateLoanPaymentPlan" short-description="Update an existing Loan Payment Plan">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="LoanPaymentPlan"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <find-by-primary-key entity-name="LoanPaymentPlan" map="lookupPKMap" value-field="lookedUpValue"/>
+
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+
+        <!-- check if there is a requested status change if yes call status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanPaymentPlanId" field="inputMap.loanPaymentPlanId"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanPaymentPlanStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>
+		
+	<simple-method method-name="updateLoanPaymentPlanStatus" short-description="Update LoanPaymentPlanStatus statusId attribute in LoanPaymentPlan Entity and create new instance of LoanPaymentPlanStatus">	
+		
+		<!-- 1. Get current loanPaymentPlan record in LoanPaymentPlan Entity  -->
+	        <if-not-empty field="parameters.loanPaymentPlanId">
+	            <entity-one entity-name="LoanPaymentPlan" value-field="loanPaymentPlan">
+                	<field-map field-name="loanPaymentPlanId" from-field="parameters.loanPaymentPlanId"/>
+            	</entity-one>
+        <!-- 2. Update validity date for record of LoanPaymentPlan Entity if payment plan is approved  -->
+        		<if-not-empty field="parameters.statusId">
+        			
+        			<if-compare field="loanPaymentPlan.statusId" operator="not-equals" value="LOAN_PMTPLAN_APPRVD">
+	            		<if-compare field="parameters.statusId" operator="equals" value="LOAN_PMTPLAN_APPRVD">
+	            			<now-timestamp field="nowTimestamp"/>  
+		    				<set field="loanPaymentPlan.startDate" from-field="nowTimestamp"/>
+	        <!-- 2b. Get previous loanPaymentPlans and deactivate by setting the endDate -->
+				        	<entity-condition entity-name="LoanPaymentPlan" list="previousLoanPaymentPlans">
+				        		<condition-expr field-name="loanId" operator="equals" from-field="loanPaymentPlan.loanId"/>
+								<condition-expr field-name="statusId" operator="equals" value="LOAN_PMTPLAN_APPRVD"/>
+				            	<order-by field-name="loanPaymentPlanId"/>
+				        	</entity-condition>
+				            
+				            <if-not-empty field="previousLoanPaymentPlans">
+					            <iterate entry="previousLoanPaymentPlan" list="previousLoanPaymentPlans">
+					            	<set field="previousLoanPaymentPlan.endDate" from-field="nowTimestamp"/>
+					            	<store-value value-field="previousLoanPaymentPlan"/>
+					            </iterate>	
+							</if-not-empty>
+						</if-compare>
+            		</if-compare>  
+            		<set field="loanPaymentPlan.statusId" from-field="parameters.statusId"/>          		
+            	</if-not-empty>
+            	
+
+		<!-- 3. Create new record of LoanPaymentPlanStatus Entity -->
+        		<make-value entity-name="LoanPaymentPlanStatus" value-field="loanPaymentPlanStatus"/>
+       	
+     			<if-empty field="parameters.loanPaymentPlanStatusId">
+		            <sequenced-id sequence-name="LoanPaymentPlanStatus" field="loanPaymentPlanStatus.loanPaymentPlanStatusId"/>
+		            <else>
+		                <set field="loanPaymentPlanStatus.loanPaymentPlanStatusId" from-field="parameters.loanPaymentPlanStatusId"/>
+		            </else>
+		        </if-empty>
+		        
+       	<!-- 4. Modify attributes of LoanPaymentPlanStatus and associate with LoanPaymentPlan Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanPaymentPlanStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanPaymentPlanStatus.loanId" from-field="parameters.loanloanPaymentPlanId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanPaymentPlanStatus.statusDate" from-field="nowTimestamp"/>
+					<!-- set field="loanPaymentPlanStatus..statusUserLogin" from-field="parameters.userLogin"/-->
+					<if-not-empty field="parameters.changeReason">
+						<set field="loanPaymentPlanStatus.changeReason" from-field="parameters.changeReason"/>
+					</if-not-empty>
+            	</if-not-empty>
+            <store-value value-field="loanPaymentPlan"/>
+            
+	        <create-value value-field="loanPaymentPlanStatus"/>
+	        
+	    
+	        </if-not-empty>        
+	</simple-method>
+
+	<simple-method method-name="changeLoanPaymentPlan" short-description="Change LoanPaymentPlan">
+	   	<!-- 1. Get current loanPaymentPlan record in LoanPaymentPlan Entity  -->
+	        <if-not-empty field="parameters.loanPaymentPlanId">
+	            <entity-one entity-name="LoanPaymentPlan" value-field="loanPaymentPlan">
+	               	<field-map field-name="loanPaymentPlanId" from-field="parameters.loanPaymentPlanId"/>
+	           	</entity-one>
+	    <!-- 2. Deactivate currentLoanPaymentPlan by setting the toDate attribute to now --> 
+	    		<now-timestamp field="nowTimestamp"/>  
+	    		<set field="loanPaymentPlan.toDate" from-field="nowTimestamp"/>   	
+	        </if-not-empty>
+	    <!-- 3. Create new LoanPaymentPlan -->    
+			<set-service-fields service-name="createLoanPaymentPlan" map="parameters" to-map="createLoanPaymentPlanMap"/>
+			
+			<call-service service-name="createLoanPaymentPlan" in-map-name="createLoanPaymentPlanMap">
+		    	<result-to-field result-name="principalPaybackAmount"/>
+		    	<result-to-field result-name="interestPaybackAmount"/>
+		    	<result-to-field result-name="monthlyPaybackAmount"/>
+		    	<result-to-field result-name="totalInterestAmount"/>
+		    	<result-to-field result-name="noOfInstallments"/>
+		    	<result-to-field result-name="startDate"/>
+		    	<result-to-field result-name="endDate"/>
+		    </call-service>
+	</simple-method>
+
+	<simple-method method-name="calculateLoanPayoff" short-description="Calculate LoanPayoff">
+	   	<!-- 1. Get current loan record in Loan Entity  -->
+	        <if-not-empty field="parameters.loanId">
+	            <entity-one entity-name="Loan" value-field="loan">
+	               	<field-map field-name="loanId" from-field="parameters.loanId"/>
+	           	</entity-one>
+	    <!-- 2. Get principal balance -->
+	    		<set field="payoffAmount" from-field="loan.balancePrincipalAmount"/> 
+	        </if-not-empty>        			
+	</simple-method>		
+	
+	<simple-method method-name="createLoanPayoff" short-description="Calculate LoanPayoff">
+	   	<!-- 1. createLoanPayoff only if there is a principal balance and there has been disbursement of any principal  -->
+	   	<entity-one entity-name="Loan" value-field="loan"/>
+	   	<if-compare field="loan.balancePrincipalAmount" value="0" operator="not-equals">
+	   	  <if-compare field="loan.totalDisbursed" value="0" operator="not-equals">
+	        <set-service-fields service-name="calculateLoanPayoff" map="parameters" to-map="calculateLoanPayoffMap"/>
+			<log level="info" message="parameters.loanId: ${parameters.loanId}"/> 
+			
+			<!-- call-service service-name="calculateLoanPayoff" in-map-name="calculateLoanPayoffMap">
+		    	<result-to-field result-name="payoffAmount"/>
+		    	<result-to-field result-name="loanId"/>
+		    </call-service-->
+		    
+		<!-- 2. Create new LoanPayoff record -->    
+			<make-value entity-name="LoanPayoff" value-field="loanPayoff"/>
+			<if-empty field="parameters.loanPayoffId">
+	            <sequenced-id sequence-name="LoanPayoff" field="loanPayoff.loanPayoffId"/>
+	            <else>
+	                <set field="loanPayoff.loanPayoffId" from-field="parameters.loanPayoffId"/>
+	            </else>
+	        </if-empty>	
+	        <set field="loanPayoff.payoffAmount" from-field="parameters.payoffAmount"/> 
+	        <set field="loanPayoff.paymentMethodId" from-field="parameters.paymentMethodId"/>
+	        <log level="info" message="loanPayoff.paymentMethodId: ${loanPayoff.paymentMethodId}"/> 
+	        
+	        <set field="loanPayoff.loanId" from-field="parameters.loanId"/>
+	        <set field="loanPayoff.currencyUomId" value="NGN"/>
+	        <if-not-empty field="parameters.payoffDate">
+	        	<set field="loanPayoff.payoffDate" from-field="parameters.payoffDate"/>
+	        	<else>
+	        		<now field="now"/>
+	        		<set field="loanPayoff.payoffDate" from-field="now"/>
+	        	</else>
+	        </if-not-empty>	
+	        <create-value value-field="loanPayoff"/> 
+	        
+	        <!-- Update statusId -->
+	        <set-service-fields service-name="updateLoanPayoffStatus" map="loanPayoff" to-map="updateLoanPayoffStatusMap"/>
+			<set field="updateLoanPayoffStatusMap.statusId" value="LOAN_PAYOFF_CRTD"/>
+			<!-- set field="updateLoanPayoffStatusMap.loanId" from-field="loanPayoff.loanId"/>
+			<set field="updateLoanPayoffStatusMap.loanPayoffId" from-field="loanPayoff.loanPayoffId"/-->
+			<call-service service-name="updateLoanPayoffStatus" in-map-name="updateLoanPayoffStatusMap"/>       			
+		  	
+		  	<else>
+		  	
+		  	</else>
+		  </if-compare>
+		</if-compare>
+	</simple-method>
+	
+	<simple-method method-name="updateLoanPayoff" short-description="Update an existing Loan Payoff">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="LoanPayoff"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <find-by-primary-key entity-name="LoanPayoff" map="lookupPKMap" value-field="lookedUpValue"/>
+
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+
+        <!-- check if there is a requested status change if yes call invoice status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanPayoffId" field="inputMap.loanPayoffId"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanPayoffStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>
+    
+	<simple-method method-name="updateLoanPayoffStatus" short-description="Update LoanPayoffStatus statusId attribute in LoanPayoff Entity and create new instance of LoanPayoffStatus">
+		<!--1. Get current loan record in LoanPayoff Entity  -->
+	        <if-not-empty field="parameters.loanPayoffId">
+	            <entity-one entity-name="LoanPayoff" value-field="loanPayoff">
+                	<field-map field-name="loanPayoffId" from-field="parameters.loanPayoffId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of Loan Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanPayoff.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+        <!--3. Create new record of LoanStatus Entity -->
+        		<make-value entity-name="LoanPayoffStatus" value-field="loanPayoffStatus"/>
+        		
+        		<if-empty field="parameters.loanPayoffStatusId">
+		            <sequenced-id sequence-name="LoanPayoffStatus" field="loanPayoffStatus.loanPayoffStatusId"/>
+		            <else>
+		                <set field="loanPayoffStatus.loanPayoffStatusId" from-field="parameters.loanPayoffStatusId"/>
+		            </else>
+		        </if-empty>
+       	<!--4. Modify attributes of LoanStatus and associate with Loan Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanPayoffStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanPayoffStatus.loanId" from-field="parameters.loanId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanPayoffStatus.statusDate" from-field="nowTimestamp"/>
+            	</if-not-empty>
+            	<store-value value-field="loanPayoff"/>
+	        	<create-value value-field="loanPayoffStatus"/>
+	        </if-not-empty>
+	               
+	    <!-- 5. If payoff is approved, then ... -->
+	    	<!-- update loan.statusId -->
+	    	<log level="info" message="loanPayoff.loanId: ${loanPayoff.loanId}"/>
+	    	<log level="info" message="loanPayoff.loanPayoffId: ${loanPayoff.loanPayoffId}"/>
+	    	<log level="info" message="loanPayoff.statusId: ${loanPayoff.statusId}"/>
+	    	
+	        <if-compare field="parameters.statusId" value="LOAN_PAYOFF_APPRVD" operator="equals">
+				<entity-one entity-name="Loan" value-field="loan">
+                	<field-map field-name="loanId" from-field="loanPayoff.loanId"/>
+            	</entity-one>   
+            	<log level="info" message="parameters.statusId: ${parameters.statusId}"/> 
+            	<log level="info" message="loanPayoff.loanId: ${loanPayoff.loanId}"/> 
+            	
+            	<!-- Update Loan attributes -->
+            	<set-service-fields service-name="updateLoan" map="parameters" to-map="updateLoanMap"/>
+				<set field="updateLoanMap.loanId" from-field="loanPayoff.loanId"/>
+				
+				<calculate field="totalPrincipalPaid" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="totalPrincipalPaid"/>
+		                    <calcop operator="get" field="loanPayoff.payoffAmount"/>
+		                </calcop>	                
+			    </calculate>
+			    <set field="updateLoanMap.totalPrincipalPaid" from-field="totalPrincipalPaid"/>
+				<call-service service-name="updateLoan" in-map-name="updateLoanMap"/>       			
+            	
+            	<set-service-fields service-name="updateLoanStatus" map="parameters" to-map="updateLoanStatusMap"/>
+				<set field="updateLoanStatusMap.statusId" value="LOAN_PAIDOFF"/>
+				<set field="updateLoanStatusMap.loanId" from-field="loanPayoff.loanId"/>
+				<call-service service-name="updateLoanStatus" in-map-name="updateLoanStatusMap"/> 
+				
+            <!-- Create new Payment -->
+	            <set-service-fields service-name="createLoanPayoffPayment" map="parameters" to-map="createLoanPayoffPaymentMap"/>
+				
+				<if-not-empty field="loanPayoff.loanPayoffId">
+					<set field="createLoanPayoffPaymentMap.loanPayoffId" from-field="loanPayoff.loanPayoffId"/>
+				</if-not-empty>
+			
+				<if-not-empty field="loanPayoff.paymentMethodId">
+					<set field="createLoanPayoffPaymentMap.paymentMethodId" from-field="loanPayoff.paymentMethodId"/>
+				</if-not-empty>
+				<log level="info" message="loanPayoff.paymentMethodId: ${loanPayoff.paymentMethodId}"/>
+				
+				<if-not-empty field="loanPayoff.payoffAmount">
+		    			<set field="createLoanPayoffPaymentMap.amount" from-field="loanPayoff.payoffAmount"/>
+		    	</if-not-empty>
+			    	
+				<call-service service-name="createLoanPayoffPayment" in-map-name="createLoanPayoffPaymentMap">
+			    	<result-to-field result-name="paymentId"/>
+			    </call-service>
+            
+            </if-compare>     
+	</simple-method>
+	
+	<simple-method method-name="createLoanPayoffPayment" short-description="Create LoanPayoffPayment in Payment Entity and associate with loanPayment">
+		<!-- 1. Get current loanDisbursement record in LoanDisbursement Entity  -->
+	        <if-not-empty field="parameters.loanPayoffId">
+	            <entity-one entity-name="LoanPayoff" value-field="loanPayoff">
+                	<field-map field-name="loanPayoffId" from-field="parameters.loanPayoffId"/>
+            	</entity-one>
+            	<entity-one entity-name="Loan" value-field="loan">
+                	<field-map field-name="loanId" from-field="loanPayoff.loanId"/>
+            	</entity-one>
+        <!-- 2. New Payment payment is created -->
+				<set-service-fields service-name="createPayment" map="parameters" to-map="createPaymentMap"/>
+			    		
+	    		<set field="createPaymentMap.partyIdFrom" from-field="loan.partyId"/>
+	    		
+	    		<if-not-empty field="loan.partyId">
+	    			<set field="createPaymentMap.partyIdTo" value="Company"/>
+	    		</if-not-empty>
+	    		<set field="createPaymentMap.paymentMethodId" from-field="loanPayoff.paymentMethodId"/>
+	    		<set field="createPaymentMap.paymentTypeId" value="LOAN_PAYOFF"/>
+	    		<set field="createPaymentMap.statusId" value="PMNT_NOT_PAID"/>
+	    		<call-service service-name="createPayment" in-map-name="createPaymentMap">
+		    		<result-to-field result-name="paymentId"/>
+		    	</call-service>
+		 <!-- 3. payment is associated with loanPayoff using paymentId-->
+		 		<set field="loanPayoff.paymentId" from-field="paymentId"/>
+		 		<store-value value-field="loanPayoff"/>
+	    	</if-not-empty>
+	</simple-method>
+	
+	<simple-method method-name="calculateLoanRepayment" short-description="Calculate LoanRepayment attributes for Loan Repayment Entity">
+		
+		<!-- 1. Get list of existing loans for partyId  -->
+			<if-not-empty field="parameters.partyId">
+				<entity-condition entity-name="Loan" list="loans">
+	        		<condition-expr field-name="partyId" operator="equals" from-field="parameters.partyId"/>
+	            	<order-by field-name="loanId"/>
+	        	</entity-condition>
+	        	
+	        	<set field="calculatedLoanRepaymentList"  from="calculatedLoanRepaymentList" type="NewList"/>
+
+		    
+		    <!-- 2. Get current payment plan per loan-->
+	    		<iterate entry="loan" list="loans">
+	            	<entity-condition list="loanPaymentPlans" entity-name="LoanPaymentPlan" filter-by-date="true">
+			            <condition-list>
+			                <condition-expr field-name="loanId" operator="equals" from-field="loan.loanId"/>
+			                <condition-expr field-name="statusId" operator="equals" from-field="LOAN_PMTPLAN_APPRVD"/>
+			            </condition-list>
+       			 	</entity-condition>
+       			 	<first-from-list list="loanPaymentPlans" entry="loanPaymentPlan"/>
+       		 	
+       		 	<!-- 2a. Get totalPrincipal and totalInterest -->
+	       		 	<set field="totalPrincipalAmount" value="0"/>
+		    		<set field="totalInterestAmount" value="0"/>
+       			 	<calculate field="totalPrincipalAmount" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="totalPrincipalAmount"/>
+		                    <calcop operator="get" field="loanPaymentPlan.principalPaybackAmount"/>
+		                </calcop>	                
+			        </calculate>
+       			 	<calculate field="totalInterestAmount" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="totalInterestAmount"/>
+		                    <calcop operator="get" field="loanPaymentPlan.interestPaybackAmount"/>
+		                </calcop>	                
+			        </calculate>
+	            </iterate>
+	       		
+	       		<!-- 2b. Calculate repayment ratio per loan -->  
+	       		<set field="principalRepaymentRatio" value="0"/>
+	    		<set field="interestRepaymentRatio" value="0"/>
+	       		<iterate entry="loan" list="loans">
+	            	<entity-condition list="loanPaymentPlans" entity-name="LoanPaymentPlan" filter-by-date="true">
+			            <condition-list>
+			                <condition-expr field-name="loanId" operator="equals" from-field="loan.loanId"/>
+			                <condition-expr field-name="statusId" operator="equals" from-field="LOAN_PMTPLAN_APPRVD"/>
+			            </condition-list>
+       			 	</entity-condition>
+       			 	<first-from-list list="loanPaymentPlans" entry="loanPaymentPlan"/>
+       			 	<calculate field="principalRepaymentRatio" decimal-scale="6">
+		    			<calcop operator="divide">
+							<calcop operator="get" field="loanPaymentPlan.principalPaybackAmount"/>
+		                    <calcop operator="get" field="totalPrincipalAmount"/>
+		                </calcop>	                
+			        </calculate>
+       			 	<calculate field="interestRepaymentRatio" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="loanPaymentPlan.interestPaybackAmount"/>
+		                    <calcop operator="get" field="totalInterestAmount"/>
+		                </calcop>	                
+			        </calculate>	        
+       			 	<calculate field="principalRepaymentAmount" decimal-scale="6">
+		    			<calcop operator="multiply">
+							<calcop operator="get" field="principalRepaymentRatio"/>
+		                    <calcop operator="get" field="totalPrincipalAmount"/>
+		                </calcop>	                
+			        </calculate>
+       			 	<calculate field="interestRepaymentAmount" decimal-scale="6">
+		    			<calcop operator="multiply">
+							<calcop operator="get" field="interestRepaymentRatio"/>
+		                    <calcop operator="get" field="totalInterestAmount"/>
+		                </calcop>	                
+			        </calculate>			           
+			        
+			        <calculate field="monthlyRepaymentAmount" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="principalRepaymentAmount"/>
+		                    <calcop operator="get" field="interestRepaymentAmount"/>
+		                </calcop>	                
+			        </calculate>
+			        
+			        <set field="calculatedLoanRepayment.principalRepaymentRatio" from-field="principalRepaymentRatio"/>
+			        <set field="calculatedLoanRepayment.interestRepaymentRatio" from-field="interestRepaymentRatio"/>
+					<set field="calculatedLoanRepayment.principalRepaymentAmount" from-field="principalRepaymentAmount"/>
+					<set field="calculatedLoanRepayment.interestRepaymentAmount" from-field="interestRepaymentAmount"/>
+					<set field="calculatedLoanRepayment.monthlyRepaymentAmount" from-field="monthlyRepaymentAmount"/>
+					<set field="calculatedLoanRepayment.loanId" from-field="loan.loanId"/>
+					<set field="calculatedLoanRepayment.loanPaymentPlanId" from-field="loanPaymentPlan.loanPaymentPlanId"/>
+					<set field="calculatedLoanRepayment.interestRate" from-field="loan.interestRate"/>	
+					
+					<make-value entity-name="LoanRepaymentLoan" value-field="loanRepaymentLoan"/>
+					<set field="loanRepaymentLoan.loanRepaymentId" from-field="loanRepayment.loanRepaymentId"/>
+			        <set field="loanRepaymentLoan.loanId" from-field="calculatedLoanRepayment.loanId"/>
+			        
+        			<set field="loanRepaymentLoan.principalAmount" from-field="calculatedLoanRepayment.principalRepaymentAmount"/>
+        			<set field="loanRepaymentLoan.interestAmount" from-field="calculatedLoanRepayment.interestRepaymentAmount"/>
+        			<set field="loanRepaymentLoan.interestRate" from-field="calculatedLoanRepayment.interestRate"/>
+        			<set field="loanRepaymentLoan.loanPaymentPlanId" from-field="calculatedLoanRepayment.loanPaymentPlanId"/>
+									
+			        <field-to-list field="loanRepaymentLoan" list="calculatedLoanRepaymentList"/>
+	            </iterate>
+	       
+	       <!-- 2c. Calculate total principal and interest amounts -->     
+	            <set field="principalAmount" value="0"/>
+            	<set field="interestAmount" value="0"/>
+	            <iterate entry="calculatedLoanRepaymentList" list="calculatedLoanRepayment">            	
+	            	<calculate field="principalAmount" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="calculatedLoanRepayment.principalRepaymentAmount"/>
+		                    <calcop operator="get" field="principalAmount"/>
+		                </calcop>	                
+			        </calculate>
+            		<calculate field="interestAmount" decimal-scale="6">
+		    			<calcop operator="add">
+							<calcop operator="get" field="calculatedLoanRepayment.interestRepaymentAmount"/>
+		                    <calcop operator="get" field="interestAmount"/>
+		                </calcop>	                
+			        </calculate>
+	            </iterate>
+	            <field-to-result field="calculatedLoanRepaymentList"/>
+			</if-not-empty>
+	</simple-method>
+	
+	<simple-method method-name="createLoanRepayment" short-description="Create LoanRepayment attributes for Loan Repayment Entity">
+		<!-- 1. Calculate loanRepayment attributes  -->
+	        <set-service-fields service-name="calculateLoanRepayment" map="parameters" to-map="calculateLoanRepaymentMap"/>
+			
+			<call-service service-name="calculateLoanRepayment" in-map-name="calculateLoanRepaymentMap">
+		    	<result-to-field result-name="principalAmount"/>
+		    	<result-to-field result-name="interestAmount"/>
+		    	<result-to-field result-name="calculatedLoanRepaymentList"/>
+		    </call-service>
+		
+		<!-- 2. Create loanRepayment attributes  -->    
+		    <make-value entity-name="LoanRepayment" value-field="loanRepayment"/>
+		    	    
+		    <if-empty field="parameters.loanRepaymentId">
+	            <sequenced-id sequence-name="LoanRepayment" field="loanRepayment.loanRepaymentId"/>
+	            <else>
+	                <set field="loanRepayment.loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+	            </else>
+        	</if-empty>
+        	<set field="loanRepayment.principalAmount" from-field="principalAmount"/>
+        	<set field="loanRepayment.interestAmount" from-field="interestAmount"/>
+        	<if-not-empty field="parameters.repaymentDate">
+        		<set field="loanRepayment.repaymentDate" from-field="parameters.repaymentDate"/>
+        	</if-not-empty>
+        	<if-not-empty field="parameters.statusId">
+        		<set field="loanRepayment.statusId" value="LOAN_REPMT_CRTD"/>
+        	</if-not-empty>
+        	<create-value value-field="loanRepayment"/>
+        	
+        <!-- 3. Create a new LoanRepaymentLoan and associate with loanRepaymentLoan by using loanRepaymentId and loanId, initialize other attributes  -->
+        	<if-not-empty field="loanRepayment.principalAmount">        		
+        		<iterate entry="calculatedLoanRepaymentList" list="calculatedLoanRepayment">
+        			<make-value entity-name="LoanRepaymentLoan" value-field="loanRepaymentLoan"/>
+			        <set field="loanRepaymentLoan.loanRepaymentId" from-field="loanRepayment.loanRepaymentId"/>
+			        <set field="loanRepaymentLoan.loanId" from-field="calculatedLoanRepayment.loanId"/>
+			        
+        			<set field="loanRepaymentLoan.principalAmount" from-field="calculatedLoanRepayment.principalRepaymentAmount"/>
+        			<set field="loanRepaymentLoan.interestAmount" from-field="calculatedLoanRepayment.interestRepaymentAmount"/>
+        			<set field="loanRepaymentLoan.interestRate" from-field="calculatedLoanRepayment.interestRate"/>
+        			<set field="loanRepaymentLoan.loanPaymentPlanId" from-field="calculatedLoanRepayment.loanPaymentPlanId"/>
+        			
+        			<calculate field="installmentSeqId">
+		    			<calcop operator="add" field="loan.lastInstallmentSeqId">
+		                    <number value="1"/>
+		                </calcop>	                
+			        </calculate>
+		<!-- 3b. Update loan.lastInstallmentSeqId -->	    
+					<entity-one entity-name="Loan" value-field="loan">
+	                	<field-map field-name="loanId" from-field="calculatedLoanRepayment.loanId"/>
+	            	</entity-one>    
+	            	<set field="loan.lastInstallmentSeqId" from-field="installmentSeqId"/>
+	            	
+        			<create-value value-field="loanRepaymentLoan"/>
+        		</iterate>
+        	</if-not-empty>
+	</simple-method>
+	
+	<simple-method method-name="updateLoanRepaymentStatus" short-description="Update LoanRepayment statusId attribute in LoanRepayment Entity and create new instance of LoanRepaymentStatus">
+		<!--1. Get current loan record in LoanRepayment Entity  -->
+	        <if-not-empty field="parameters.loanRepaymentId">
+	            <entity-one entity-name="LoanRepayment" value-field="loanRepayment">
+                	<field-map field-name="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of LoanRepayment Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanRepayment.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+        <!--3. Create new record of LoanRepaymentStatus Entity -->
+        		<make-value entity-name="LoanRepaymentStatus" value-field="loanRepaymentStatus"/>
+        		
+        		<if-empty field="parameters.loanRepaymentId">
+		            <sequenced-id sequence-name="LoanRepaymentStatus" field="loanRepaymentStatus.loanRepaymentId"/>
+		            <else>
+		                <set field="loanRepaymentStatus.loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+		            </else>
+		        </if-empty>
+       	<!--4. Modify attributes of LoanRepaymentStatus and associate with LoanRepayment Entity -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="loanRepaymentStatus.statusId" from-field="parameters.statusId"/>
+            		<set field="loanRepaymentStatus.loanId" from-field="parameters.loanId"/>
+					<now-timestamp field="nowTimestamp"/>
+					<set field="loanRepaymentStatus.statusDate" from-field="nowTimestamp"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="loanRepayment"/>
+	        <create-value value-field="loanRepaymentStatus"/>
+	</simple-method>
+	
+	<simple-method method-name="updateLoanRepayment" short-description="Update an existing Loan Repayment">
+	    <!-- find the current record -->
+        <make-value value-field="lookupPKMap" entity-name="LoanRepayment"/>
+        <set-pk-fields map="parameters" value-field="lookupPKMap"/>
+        <find-by-primary-key entity-name="LoanRepayment" map="lookupPKMap" value-field="lookedUpValue"/>
+
+            <clone-value value-field="lookedUpValue" new-value-field="savedValue"/>
+            <set-nonpk-fields map="parameters" value-field="lookedUpValue"/>
+
+            <!-- only save if something has changed, do not update status here -->
+            <set from-field="savedValue.statusId" field="lookedUpValue.statusId"/>  <!-- get old status back -->
+            <if-compare-field field="lookedUpValue" to-field="savedValue" operator="not-equals" type="Object">
+                <store-value value-field="lookedUpValue"/> <!-- update all non status and key fields -->
+            </if-compare-field>
+
+        <!-- check if there is a requested status change if yes call status update service -->
+        <if-not-empty field="parameters.statusId">
+            <if-compare-field field="parameters.statusId" to-field="savedValue.statusId" operator="not-equals">
+                <set from-field="parameters.loanRepaymentId" field="inputMap.loanRepayment"/>
+                <set from-field="parameters.statusId" field="inputMap.statusId"/>
+                <now-timestamp field="inputMap.statusDate"/>
+                <call-service service-name="updateLoanRepaymentStatus" in-map-name="inputMap"/>
+            </if-compare-field>
+        </if-not-empty>
+    </simple-method>    
+</simple-methods>

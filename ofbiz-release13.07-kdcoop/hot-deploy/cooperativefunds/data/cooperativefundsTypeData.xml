@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<entity-engine-xml>
+
+    <StatusType description="Payment Group Status" hasTable="N" statusTypeId="PMTGRP_STATUS"/>
+    <StatusItem description="Incomplete" sequenceId="01" statusCode="INCOMPLETE" statusId="PMTGRP_INCPL" statusTypeId="PMTGRP_STATUS"/>
+	<StatusItem description="Complete" sequenceId="02" statusCode="COMPLETE" statusId="PMTGRP_CPL" statusTypeId="PMTGRP_STATUS"/>
+	<StatusItem description="Confirmed" sequenceId="03" statusCode="CONFIRMED" statusId="PMTGRP_CNF" statusTypeId="PMTGRP_STATUS"/>
+
+	<StatusType description="Fund Status" hasTable="N" statusTypeId="FUND_STATUS"/>
+	<StatusItem description="Active" sequenceId="01" statusCode="ACTIVE" statusId="FNDSTAT_ACT" statusTypeId="FUND_STATUS"/>
+	<StatusItem description="Inactive" sequenceId="02" statusCode="INACTIVE" statusId="FNDSTAT_INACT" statusTypeId="FUND_STATUS"/>
+	
+	<Fund fundId="SavingsFund" fundName="Savings Fund" statusId="FNDSTAT_ACT"/>
+	<Fund fundId="InvestmentFund" fundName="Investment Fund" statusId="FNDSTAT_ACT"/>
+	
+	<FinAccount finAccountId="BANK01_CURRENT_01" finAccountTypeId="BANK_ACCOUNT" statusId="FNACT_ACTIVE" finAccountName="BANK01 Current Account" finAccountCode="0123456789" finAccountPin="1234" 
+			currencyUomId="NGN" organizationPartyId="Company" ownerPartyId="Company" postToGlAccountId="111100" isRefundable="Y" replenishLevel="0" actualBalance="0" availableBalance=""/>
+	<FinAccount finAccountId="BANK01_SAVINGS_01" finAccountTypeId="BANK_ACCOUNT" statusId="FNACT_ACTIVE" finAccountName="BANK02 Savings Account" finAccountCode="1234567890" finAccountPin="1234" 
+			currencyUomId="NGN" organizationPartyId="Company" ownerPartyId="Company" postToGlAccountId="111100" isRefundable="Y" replenishLevel="0" actualBalance="0" availableBalance=""/>
+	<PaymentMethod paymentMethodId="BANK01_CURRENT_01" paymentMethodTypeId="FIN_ACCOUNT" partyId="Company" glAccountId="111100" finAccountId="BANK01_CURRENT_01" description="Current Account 01 at BANK01" fromDate="2015-05-29 19:22:58.408"/>
+	<PaymentMethod paymentMethodId="BANK01_SAVINGS_01" paymentMethodTypeId="FIN_ACCOUNT" partyId="Company" glAccountId="111100" finAccountId="BANK01_SAVINGS_01" description="Savings Account 01 at BANK01" fromDate="2015-05-29 19:22:58.408"/>
+	<FundPaymentMethod fundId="SavingsFund01" paymentMethodId="BANK01_CURRENT_01"/>
+	<FundPaymentMethod fundId="InvestmentFund" paymentMethodId="BANK01_SAVINGS_01"/>
+	
+	<GlAccountType glAccountTypeId="MEMBER_DEPOSIT" parentTypeId="CURRENT_LIABILITY" hasTable="N" description="Member Deposits"/>
+	<GlAccount glAccountId="217000" glAccountTypeId="MEMBER_DEPOSIT"  glAccountClassId="CURRENT_LIABILITY" glResourceTypeId="MONEY" parentGlAccountId="210000" accountCode="217000" accountName ="MEMBER DEPOSIT ACCOUNTS"/>
+	<GlAccountTypeDefault glAccountTypeId="MEMBER_DEPOSIT" organizationPartyId="Company"  glAccountId="217000"/>
+	<GlAccountOrganization glAccountId="217000" organizationPartyId="Company" fromDate="2001-01-01 00:00:00.000"/>
+	
+	<GlAccountType glAccountTypeId="MEMBER_LOAN" parentTypeId="ACCOUNTS_RECEIVABLE" hasTable="N" description="Member Loans"/>
+	<GlAccount glAccountId="124400" glAccountTypeId="MEMBER_LOAN"  glAccountClassId="CURRENT_ASSET" glResourceTypeId="MONEY" parentGlAccountId="124000" accountCode="124400" accountName ="LOANS RECEIVABLE - MEMBERS"/>
+	<GlAccountTypeDefault glAccountTypeId="MEMBER_LOAN" organizationPartyId="Company"  glAccountId="124400"/>
+	<GlAccountOrganization glAccountId="124400" organizationPartyId="Company" fromDate="2001-01-01 00:00:00.000"/>
+	
+	<PartyAcctgPreference partyId="Company" taxFormId="US_IRS_1120" cogsMethodId="COGS_LIFO"  baseCurrencyUomId="NGN" invoiceSeqCustMethId="INV_HOOK_ENF_SEQ" invoiceIdPrefix="CI"  lastInvoiceNumber="2"  quoteIdPrefix="CQ" orderIdPrefix="CO" errorGlJournalId="ERROR_JOURNAL"/>
+	
+	<PaymentType paymentTypeId="MEMBER_CONTRIBUTION" parentTypeId="RECEIPT" hasTable="N" description="Cooperative Member Contribution"/>
+	<PaymentGlAccountTypeMap paymentTypeId="MEMBER_CONTRIBUTION" organizationPartyId="Company" glAccountTypeId="MEMBER_DEPOSIT"/>
+	
+	<RoleType roleTypeId="COOPERATIVE_ROLE" hasTable="N" description="Cooperative"/>
+	<RoleType roleTypeId="COOPERATIVE_MEMBER" parentTypeId="COOPERATIVE_ROLE" hasTable="N" description="Cooperative Member Role"/>
+	<RoleType roleTypeId="COOPERATIVE_MANAGER" parentTypeId="COOPERATIVE_ROLE" hasTable="N" description="Cooperative Manager Role"/>
+	<RoleType roleTypeId="COOPERATIVE_CLERK" parentTypeId="COOPERATIVE_ROLE" hasTable="N" description="Cooperative Clerk Role"/>
+
+	<StatusType description="Contribution Status" hasTable="N" statusTypeId="CONTRIB_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="CONTRIB_CRTD" statusTypeId="CONTRIB_STATUS"/>
+	<StatusItem description="Complete" sequenceId="02" statusCode="COMPLETE" statusId="CONTRIB_CPL" statusTypeId="CONTRIB_STATUS"/>
+	<StatusItem description="Confirmed" sequenceId="03" statusCode="CONFIRMED" statusId="CONTRIB_CNF" statusTypeId="CONTRIB_STATUS"/>
+	<StatusItem description="Paid" sequenceId="02" statusCode="PAID" statusId="CONTRIB_PAID" statusTypeId="CONTRIB_STATUS"/>
+	<StatusItem description="Canceled" sequenceId="03" statusCode="CANCELED" statusId="CONTRIB_CNCLD" statusTypeId="CONTRIB_STATUS"/>
+	
+	<!-- Loan -->
+	<TermType termTypeId="LOAN_TERM" parentTypeId="" hasTable="N" description="Loan Term"></TermType>
+	<TermType termTypeId="LOAN_PRINCIPAL" parentTypeId="LOAN_TERM" hasTable="N" description="Loan Principal"></TermType>
+	<TermType termTypeId="LOAN_INTEREST_RATE" parentTypeId="LOAN_TERM" hasTable="N" description="Loan Interest Rate"></TermType>
+	<TermType termTypeId="LOAN_INSTALLMENTS" parentTypeId="LOAN_TERM" hasTable="N" description="Loan Number of Installments"></TermType>
+	<TermType termTypeId="LOAN_INTEREST_TYPE" parentTypeId="LOAN_TERM" hasTable="N" description="Loan Interest Rate Type"></TermType>
+	<AgreementType agreementTypeId="LOAN_AGREEMENT" parentTypeId="" hasTable="N" description="Loan"></AgreementType>
+
+	<StatusType description="Loan Request Status" hasTable="N" statusTypeId="LOAN_REQ_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_REQ_CRTD" statusTypeId="LOAN_REQ_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_REQ_APPRVD" statusTypeId="LOAN_REQ_STATUS"/>	
+	<StatusItem description="Cancelled" sequenceId="03" statusCode="CANCELLED" statusId="LOAN_REQ_CANCLD" statusTypeId="LOAN_REQ_STATUS"/>	
+	
+	<StatusType description="Loan Status" hasTable="N" statusTypeId="LOAN_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_CRTD" statusTypeId="LOAN_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_APPRVD" statusTypeId="LOAN_STATUS"/>	
+	<StatusItem description="Active" sequenceId="03" statusCode="ACTIVE" statusId="LOAN_ACTIVE" statusTypeId="LOAN_STATUS"/>	
+	<StatusItem description="Inactive" sequenceId="04" statusCode="INACTIVE" statusId="LOAN_INACTIVE" statusTypeId="LOAN_STATUS"/>
+	<StatusItem description="Cancelled" sequenceId="05" statusCode="CANCELLED" statusId="LOAN_CANCLD" statusTypeId="LOAN_STATUS"/>
+	<StatusItem description="Paidoff" sequenceId="06" statusCode="PAIDOFF" statusId="LOAN_PAIDOFF" statusTypeId="LOAN_STATUS"/>
+
+	<StatusType description="Loan Repayment Status" hasTable="N" statusTypeId="LOAN_REPMT_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_REPMT_CRTD" statusTypeId="LOAN_REPMT_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_REPMT_APPRVD" statusTypeId="LOAN_REPMT_STATUS"/>	
+	<StatusItem description="Completed" sequenceId="03" statusCode="COMPLETED" statusId="LOAN_REPMT_CPL" statusTypeId="LOAN_REPMT_STATUS"/>	
+	<StatusItem description="Cancelled" sequenceId="04" statusCode="CANCELLED" statusId="LOAN_REPMT_CANCLD" statusTypeId="LOAN_REPMT_STATUS"/>	
+	<StatusItem description="Paid" sequenceId="05" statusCode="PAID" statusId="LOAN_REPMT_PAID" statusTypeId="LOAN_REPMT_STATUS"/>	
+	
+	<StatusType description="Loan Disbursement Status" hasTable="N" statusTytruepeId="LOAN_DISBMT_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_DISBMT_CRTD" statusTypeId="LOAN_DISBMT_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_DISBMT_APPRVD" statusTypeId="LOAN_DISBMT_STATUS"/>	
+	<StatusItem description="Completed" sequenceId="03" statusCode="COMPLETED" statusId="LOAN_DISBMT_CPL" statusTypeId="LOAN_DISBMT_STATUS"/>	
+	<StatusItem description="Paid" sequenceId="04" statusCode="PAID" statusId="LOAN_DISBMT_PAID" statusTypeId="LOAN_DISBMT_STATUS"/>	
+	<StatusItem description="Cancelled" sequenceId="05" statusCode="CANCELLED" statusId="LOAN_DISBMT_CANCLD" statusTypeId="LOAN_DISBMT_STATUS"/>
+	
+	<StatusType description="Loan Payoff Status" hasTable="N" statusTypeId="LOAN_PAYOFF_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_PAYOFF_CRTD" statusTypeId="LOAN_PAYOFF_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_PAYOFF_APPRVD" statusTypeId="LOAN_PAYOFF_STATUS"/>
+	<StatusItem description="Completed" sequenceId="03" statusCode="COMPLETED" statusId="LOAN_PAYOFF_CPL" statusTypeId="LOAN_PAYOFF_STATUS"/>	
+	<StatusItem description="Paid" sequenceId="04" statusCode="PAID" statusId="LOAN_PAYOFF_PAID" statusTypeId="LOAN_PAYOFF_STATUS"/>	
+	<StatusItem description="Cancelled" sequenceId="05" statusCode="CANCELLED" statusId="LOAN_PAYOFF_CANCLD" statusTypeId="LOAN_PAYOFF_STATUS"/>	
+	
+
+	<StatusType description="Loan Payment Plan Status" hasTable="N" statusTypeId="LOAN_PMTPLAN_STATUS"/>
+    <StatusItem description="Created" sequenceId="01" statusCode="CREATED" statusId="LOAN_PMTPLAN_CRTD" statusTypeId="LOAN_PMTPLAN_STATUS"/>
+	<StatusItem description="Approved" sequenceId="02" statusCode="APPROVED" statusId="LOAN_PMTPLAN_APPRVD" statusTypeId="LOAN_PMTPLAN_STATUS"/>	
+	<StatusItem description="Active" sequenceId="03" statusCode="ACTIVE" statusId="LOAN_PMTPLAN_ACTIVE" statusTypeId="LOAN_PMTPLAN_STATUS"/>	
+	<StatusItem description="Inactive" sequenceId="04" statusCode="INACTIVE" statusId="LOAN_PMTPLAN_INACT" statusTypeId="LOAN_PMTPLAN_STATUS"/>
+	<StatusItem description="Cancelled" sequenceId="05" statusCode="CANCELLED" statusId="LOAN_PMTPLAN_CANCLD" statusTypeId="LOAN_PMTPLAN_STATUS"/>
+	
+	<Banks bankId="accessbank" bankName="Access Bank Plc" website="www.accessbankplc.com"/>
+	<Banks bankId="diamondbank" bankName="Diamond Bank Limited" website="www.diamondbank.com"/>
+	<Banks bankId="ecobank" bankName="Ecobank Nigeria Plc" website=""/>
+	<Banks bankId="fidelitybank" bankName="Fidelity Bank Plc" website=""/>
+	<Banks bankId="firstbank" bankName="First Bank of Nigeria Plc" website=""/>
+	<Banks bankId="fcmb" bankName="First City Monument Bank Ltd" website=""/>
+	<Banks bankId="gtbank" bankName="Guaranty Trust Bank Plc." website="www.gtbank.com"/>
+	<Banks bankId="stanbicbank" bankName="StanbicIBTC Bank" website=""/>
+	<Banks bankId="standardchattered" bankName="Standard Chartered Bank Nigeria Ltd" website="www.standardchartered.com"/>
+	<Banks bankId="sterlingbank" bankName="Sterling Bank Plc" website="www.sterlingbankng.com"/>
+	<Banks bankId="unionbank" bankName="Union Bank of Nigeria Plc" website="www.unionbankng.com"/>
+	<Banks bankId="uba" bankName="United Bank for Africa Plc" website="www.ubagroup.com"/>
+	<Banks bankId="unitybank" bankName="Unity Bank" website=""/>
+	<Banks bankId="wemabank" bankName="Wema Bank Plc" website="www.wemabank.com"/>
+	<Banks bankId="zenithbank" bankName="Zenith International Bank Ltd" website="www.zenithbank.com"/>
+	
+	<PaymentType paymentTypeId="LOAN_DISBURSEMENT" parentTypeId="DISBURSEMENT" hasTable="N" description="Loan Disbursement"/>
+	<PaymentType paymentTypeId="LOAN_REPAYMENT" parentTypeId="RECEIPT" hasTable="N" description="Loan Repayment"/>
+	<PaymentType paymentTypeId="LOAN_PAYOFF" parentTypeId="RECEIPT" hasTable="N" description="Loan Payoff"/>
+	
+	<LoanInterestType  loanInterestTypeId="SIMPLE_INTEREST" description="Interest is calculated as simple interest per annum"></LoanInterestType>
+	<LoanInterestType  loanInterestTypeId="COMPOUND_INTEREST" description="Interest is calculated as compound interest per annum on loan principal balance"></LoanInterestType>
+	
+	<LoanType loanTypeId="TenTwelve" description="10% Interest - 12 months Installments" currencyUomId="NGN" noOfInstallments="12" LoanInterestType="SIMPLE_INTEREST" interestRate="10"/>
+	<LoanType loanTypeId="FifteenTwentyfour" description="15% Interest - 24 months Installments" currencyUomId="NGN" noOfInstallments="24" LoanInterestType="SIMPLE_INTEREST" interestRate="15"/>
+	<LoanType loanTypeId="TwentyThirtysix" description="20% Interest - 36 months Installments" currencyUomId="NGN" noOfInstallments="36" LoanInterestType="SIMPLE_INTEREST" interestRate="20"/>
+
+<!-- Loan Party Portlet -->	
+	<PortalPortlet portalPortletId="Loans" portletName="Loans"
+        screenName="Loans"
+        screenLocation="component://cooperativefunds/widget/loans/LoansScreens.xml"
+        description="Loans of a certain party"/>
+    <PortletPortletCategory portalPortletId="Loans" portletCategoryId="PARTY_PROFILE"/>
+    
+    <PortalPagePortlet portalPageId="PartyProfile" portalPortletId="Loans" portletSeqId="00001" columnSeqId="00002" sequenceNum="9"/>
+    
+</entity-engine-xml>

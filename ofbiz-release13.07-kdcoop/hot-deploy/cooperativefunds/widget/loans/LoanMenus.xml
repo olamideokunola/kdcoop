@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-menu.xsd">
+	
+    <menu name="LoanAppBar" title="${uiLabelMap.LoansManager}" extends="CommonAppBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="loanRequest" title="${uiLabelMap.CooperativefundsLoanRequestMenu}"><link target="findLoanRequests"/></menu-item>
+        <menu-item name="loan" title="${uiLabelMap.CooperativefundsLoanMenu}"><link target="findLoans"/></menu-item>
+ 	</menu>
+ 	
+ 	<menu name="LoanRequestTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="find" title="${uiLabelMap.CommonFind}">
+            <link target="findLoanRequests"/>
+        </menu-item>
+        <menu-item name="requestOverview" title="${uiLabelMap.CooperativefundsLoanRequestOverview}">
+            <condition>
+                <not><if-empty field="loanRequest.loanRequestId"/></not>
+            </condition>
+            <link target="loanRequestOverview">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+            </link>
+        </menu-item>
+
+        <menu-item name="editLoanRequest" title="${uiLabelMap.CooperativefundsLoanRequest}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="editLoanRequest">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+            </link>
+        </menu-item>
+        
+        <menu-item name="loanRequestContents" title="${uiLabelMap.LoanRequestContents}">
+        	<condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="editLoanRequestContents">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+            </link>
+        </menu-item>
+    </menu>
+ 	
+ 	<menu name="LoanRequestSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="createNew" title="${uiLabelMap.CooperativefundsCreateNewLoanRequest}" widget-style="buttontext create">
+            <link target="newLoanRequest"/>
+        </menu-item>
+        <menu-item name="pdf" title="${uiLabelMap.CooperativefundsLoanRequestPDF}">
+            <condition>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+            </condition>
+            <link target="loanRequest.pdf" target-window="_BLANK">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanRequestStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanRequestStatus">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+                <parameter param-name="statusId" value="LOAN_REQ_APPRVD"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanRequestStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <if-empty field="loanRequest.loanId"/>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanRequestStatus">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+                <parameter param-name="statusId" value="LOAN_REQ_CRTD"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanRequestStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanRequestStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoanRequest}">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+                <parameter param-name="statusId" value="LOAN_REQ_CANCLD"/>
+            </link>
+        </menu-item>
+        <menu-item name="createLoanFromRequest" title="${uiLabelMap.CooperativefundsLoanRequestCreateLoan}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRequest.loanRequestId"/></not>
+                    <if-empty field="loanRequest.loanId"/>
+                    <or>
+                        <if-compare field="loanRequest.statusId" operator="equals" value="LOAN_REQ_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="createLoanFromRequest" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelCreateLoan}">
+                <parameter param-name="loanRequestId" from-field="loanRequest.loanRequestId"/>
+                <parameter param-name="loanTypeId" from-field="loanRequest.loanTypeId"/>
+                <parameter param-name="partyId" from-field="loanRequest.partyId"/>
+            </link>
+        </menu-item>
+    </menu>
+
+    
+    <menu name="PartyLoansMenu" title="${uiLabelMap.PartyLoansMenu}" extends="CommonTabBarMenu"
+    	extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="Create" title="${uiLabelMap.CommonCreate}">
+    		<!-- link target="/loans/control/newLoanRequest" text="${uiLabelMap.CommonCreate}" style="buttontext" url-mode="inter-app" full-path="true">
+                        <parameter param-name="partyId"/>
+                    </link-->
+    		<link target="/loans/control/newLoanRequest" text="${uiLabelMap.CommonCreate}" url-mode="inter-app" full-path="true">
+    			<parameter param-name="partyId" from-field="parameters.partyId" />
+    		</link>
+    	</menu-item>
+    </menu>
+    
+    <menu name="LoanTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="find" title="${uiLabelMap.CommonFind}">
+            <link target="findLoans"/>
+        </menu-item>
+        <menu-item name="requestOverview" title="${uiLabelMap.CooperativefundsLoanOverview}">
+            <condition>
+                <not><if-empty field="loan.loanId"/></not>
+            </condition>
+            <link target="loanOverview">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+
+        <menu-item name="editLoan" title="${uiLabelMap.CooperativefundsLoan}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="editLoan">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        
+        <menu-item name="loanDisbursements" title="${uiLabelMap.CooperativefundsLoanDisbursements}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="newLoanDisbursement">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        
+        <menu-item name="loanRepayments" title="${uiLabelMap.CooperativefundsLoanRepayments}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="newLoanRepayment">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>        
+        
+        <menu-item name="loanPayoffs" title="${uiLabelMap.CooperativefundsLoanPayoffs}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="newLoanPayoff">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>  
+        
+        <menu-item name="loanPaymentPlans" title="${uiLabelMap.CooperativefundsLoanPaymentPlans}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="newLoanPaymentPlan">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>  
+        
+        <menu-item name="loanAgreements" title="${uiLabelMap.CooperativefundsLoanAgreements}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="loanAgreements">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item> 
+    </menu>
+ 	
+ 	<menu name="LoanSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="pdf" title="${uiLabelMap.CooperativefundsLoanPDF}">
+            <condition>
+                    <not><if-empty field="loan.loanId"/></not>
+            </condition>
+            <link target="loan.pdf" target-window="_BLANK">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanStatus">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+                <parameter param-name="statusId" value="LOAN_APPRVD"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <if-empty field="loan.loanId"/>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanStatus">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+                <parameter param-name="statusId" value="LOAN_CRTD"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loan.loanId"/></not>
+                    <or>
+                        <if-compare field="loan.statusId" operator="equals" value="LOAN_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoan}">
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+                <parameter param-name="statusId" value="LOAN_CANCLD"/>
+            </link>
+        </menu-item>
+    </menu>
+    
+    <menu name="LoanDisbursementMenu" title="${uiLabelMap.LoanDisbursementMenu}" extends="CommonTabBarMenu"
+    	extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="Create" title="${uiLabelMap.CommonCreate}">
+    		<link target="newLoanDisbursement" text="${uiLabelMap.CommonCreate}">
+    			<parameter param-name="loanId" from-field="parameters.loanId" />
+    		</link>
+    	</menu-item>
+    </menu>   
+    
+    <menu name="LoanDisbursementSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="pdf" title="${uiLabelMap.CooperativefundsLoanPDF}">
+            <condition>
+                    <not><if-empty field="loanDisbursement.loanDisbursementId"/></not>
+            </condition>
+            <link target="loanDisbursement.pdf" target-window="_BLANK">
+                <parameter param-name="loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+				<parameter param-name="loanId" from-field="loan.loanId"/>
+				
+            </link>
+        </menu-item>
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanDisbursement.loanDisbursementId"/></not>
+                    <or>
+                        <if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanDisbursementStatus">
+                <parameter param-name="loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+                <parameter param-name="statusId" value="LOAN_DISBMT_APPRVD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanDisbursement.loanDisbursementId"/></not>
+                    <or>
+                        <if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanDisbursementStatus">
+                <parameter param-name="loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+                <parameter param-name="statusId" value="LOAN_DISBMT_CRTD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanDisbursement.loanDisbursementId"/></not>
+                    <or>
+                        <if-compare field="loanDisbursement.statusId" operator="equals" value="LOAN_DISBMT_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanDisbursementStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoan}">
+                <parameter param-name="loanDisbursementId" from-field="loanDisbursement.loanDisbursementId"/>
+                <parameter param-name="statusId" value="LOAN_DISBMT_CANCLD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+    </menu> 
+    
+    <menu name="LoanPaymentPlanSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="pdf" title="${uiLabelMap.CooperativefundsLoanPDF}">
+            <condition>
+                    <not><if-empty field="loanPaymentPlan.loanPaymentPlanId"/></not>
+            </condition>
+            <link target="loanPaymentPlan.pdf" target-window="_BLANK">
+                <parameter param-name="loanPaymentPlanId" from-field="loanPaymentPlan.loanPaymentPlanId"/>
+				<parameter param-name="loanId" from-field="loan.loanId"/>
+				
+            </link>
+        </menu-item>
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPaymentPlan.loanPaymentPlanId"/></not>
+                    <or>
+                        <if-compare field="loanPaymentPlan.statusId" operator="equals" value="LOAN_PMTPLAN_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPaymentPlanStatus">
+                <parameter param-name="loanPaymentPlanId" from-field="loanPaymentPlan.loanPaymentPlanId"/>
+                <parameter param-name="statusId" value="LOAN_PMTPLAN_APPRVD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPaymentPlan.loanPaymentPlanId"/></not>
+                    <or>
+                        <if-compare field="loanPaymentPlan.statusId" operator="equals" value="LOAN_PMTPLAN_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPaymentPlanStatus">
+                <parameter param-name="loanPaymentPlanId" from-field="loanPaymentPlan.loanPaymentPlanId"/>
+                <parameter param-name="statusId" value="LOAN_PMTPLAN_CRTD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPaymentPlan.loanPaymentPlanId"/></not>
+                    <or>
+                        <if-compare field="loanPaymentPlan.statusId" operator="equals" value="LOAN_PMTPLAN_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPaymentPlanStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoan}">
+                <parameter param-name="loanPaymentPlanId" from-field="loanPaymentPlan.loanPaymentPlanId"/>
+                <parameter param-name="statusId" value="LOAN_PMTPLAN_CANCLD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+    </menu> 
+    
+    <menu name="LoanPayoffMenu" title="${uiLabelMap.CooperativefundsLoanPayoffMenu}" extends="CommonTabBarMenu"
+    	extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="Create" title="${uiLabelMap.CommonCreate}">
+    		<link target="newLoanPayoff" text="${uiLabelMap.CommonCreate}">
+    			<parameter param-name="loanId" from-field="parameters.loanId" />
+    		</link>
+    	</menu-item>
+    </menu>  
+    
+    <menu name="LoanPayoffSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="pdf" title="${uiLabelMap.CooperativefundsLoanPDF}">
+            <condition>
+                    <not><if-empty field="loanPayoff.loanPayoffId"/></not>
+            </condition>
+            <link target="loanPayoff.pdf" target-window="_BLANK">
+                <parameter param-name="loanPayoffId" from-field="loanPayoff.loanPayoffId"/>
+				<parameter param-name="loanId" from-field="loan.loanId"/>
+				
+            </link>
+        </menu-item>
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPayoff.loanPayoffId"/></not>
+                    <or>
+                        <if-compare field="loanPayoff.statusId" operator="equals" value="LOAN_PAYOFF_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPayoffStatus">
+                <parameter param-name="loanPayoffId" from-field="loanPayoff.loanPayoffId"/>
+                <parameter param-name="statusId" value="LOAN_PAYOFF_APPRVD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPayoff.loanPayoffId"/></not>
+                    <or>
+                        <if-compare field="loanPayoff.statusId" operator="equals" value="LOAN_PAYOFF_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPayoffStatus">
+                <parameter param-name="loanPayoffId" from-field="loanPayoff.loanPayoffId"/>
+                <parameter param-name="statusId" value="LOAN_PAYOFF_CRTD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanPayoff.loanPayoffId"/></not>
+                    <or>
+                        <if-compare field="loanPayoff.statusId" operator="equals" value="LOAN_PAYOFF_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanPayoffStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoan}">
+                <parameter param-name="loanPayoffId" from-field="loanPayoff.loanPayoffId"/>
+                <parameter param-name="statusId" value="LOAN_PAYOFF_CANCLD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+    </menu> 
+    <menu name="LoanRepaymentSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        
+        <menu-item name="createNew" title="${uiLabelMap.CooperativefundsLoanCreateNewRepayment}" widget-style="buttontext create">
+            <link target="newLoanRepayment" target-window="_BLANK">>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        
+        <!-- <menu-item name="calculateRepaymentLines" title="${uiLabelMap.CooperativefundsLoanCalculateRepaymentLines}">
+	        <condition>
+	        	<and>
+                	<not><if-empty field="loanRepayment"/></not>
+                	<not><if-compare field="loanRepayment.statusId" operator="equals" value="LOAN_REPMT_APPRVD"/></not>
+                	<if-empty field="loanRepaymentLines"/>
+                </and>
+            </condition>
+            <link target="calculateLoanRepaymentLines" target-window="_BLANK">
+                <parameter param-name="loanRepaymentId"/>
+				<parameter param-name="totalRepaymentAmount"/>
+				
+				<parameter param-name="partyId"/>
+            </link>
+        </menu-item>/-->
+        
+        <menu-item name="statusToApproved" title="${uiLabelMap.CooperativefundsLoanStatusToApproved}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRepayment.loanRepaymentId"/></not>
+                    <or>
+                        <if-compare field="loanRepayment.statusId" operator="equals" value="LOAN_REPMT_CRTD"/>
+                    </or>
+                     <not><if-empty field="loanRepaymentLines"/></not>
+                </and>
+            </condition>
+            <link target="updateLoanRepaymentStatus">
+                <parameter param-name="loanRepaymentId" from-field="loanRepayment.loanRepaymentId"/>
+                <parameter param-name="statusId" value="LOAN_REPMT_APPRVD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.CooperativefundsLoanStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRepayment.loanRepaymentId"/></not>
+                    <or>
+                        <if-compare field="loanRepayment.statusId" operator="equals" value="LOAN_REPMT_APPRVD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanRepaymentStatus">
+                <parameter param-name="loanRepaymentId" from-field="loanRepayment.loanRepaymentId"/>
+                <parameter param-name="statusId" value="LOAN_REPAYMENT_CRTD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.CooperativefundsLoanStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="loanRepayment.loanRepaymentId"/></not>
+                    <or>
+                        <if-compare field="loanRepayment.statusId" operator="equals" value="LOAN_REPMT_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="updateLoanRepaymentStatus" request-confirmation="true" confirmation-message="${uiLabelMap.CooperativefundsConfirmationCancelLoan}">
+                <parameter param-name="loanRepaymentId" from-field="loanRepayment.loanRepaymentId"/>
+                <parameter param-name="statusId" value="LOAN_REPAYMENT_CANCLD"/>
+                <parameter param-name="loanId" from-field="loan.loanId"/>
+            </link>
+        </menu-item>
+    </menu> 
+</menus>

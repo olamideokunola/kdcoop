@@ -1,0 +1,756 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-form.xsd">
+
+    <form name="NewContributionPaymentGroupForm" type="single" target="createContributionPaymentBatch"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-service service-name="createContributionPaymentBatch"/>
+        <field name="paymentGroupTypeId" title="Payment Group Type"
+        	use-when='"${statusId}".equals("PMTGRP_INCPL")'>
+        	<display-entity entity-name="PaymentGroupType"
+        		key-field-name="paymentGroupTypeId"
+        		description="${description}">
+        	</display-entity>
+        </field>
+        <field name="paymentGroupTypeId" title="Payment Group Type"
+        	use-when='"${statusId}".equals("PMTGRP_CPL")'>
+        	<display/>
+        </field>
+        <field name="paymentGroupTypeId" title="Payment Group Type"
+        	use-when='"${statusId}".equals("PMTGRP_CNF")'>
+        	<display/>
+        </field>
+        <field name="statusId" title="Payment Group Status">
+        	<display-entity entity-name="StatusItem"
+    			key-field-name="statusId"
+    			description="${description}">
+    		</display-entity>
+        </field>
+        <field name="paymentGroupId"><hidden/></field>
+        <field name="paymentGroupId" use-when='"${statusId}".equals("PMTGRP_CPL")'>
+        	<display/>
+        </field>
+        <field name="partyId"><hidden/></field>
+        <field name="paymentGroupName" title="Contribution Batch Description" ><text/></field>
+        <field name="paymentGroupName" use-when='"${statusId}".equals("PMTGRP_CPL")'>
+        	<display default-value="${paymentGroupName}"></display>
+        </field>
+        <field name="submitButton" title="${uiLabelMap.CommonCreate}" use-when='"${statusId}".equals("PMTGRP_INCPL")'><submit button-type="button"/></field>		
+    </form>
+
+    <form name="ContributionPaymentGroupForm" type="single" target="createContributionPaymentBatch"
+        header-row-style="header-row" default-table-style="basic-table" 
+        default-map-name="paymentGroupPaymentSummaryByGroupView">
+        
+		<field name="paymentGroupId"><display/></field>
+		<field name="paymentGroupTypeId">
+			<display-entity entity-name="PaymentGroupType">
+			</display-entity>
+		</field>
+		<field name="paymentGroupName"><display/></field>
+		<field name="statusId" title="Status">
+			<display-entity entity-name="StatusItem"></display-entity>
+		</field>
+		<field name="partyId"><display/></field>
+		<field name="total"><display/></field>
+		
+    </form>
+<!-- Payment Batch Members -->
+    <form name="ListPaymentsInPaymentBatch" type="list"
+    	list-name="payment" target="updateContributionPayment"
+    	odd-row-style="alternate-row"
+    	default-table-style="basic-table hover-bar"
+    	header-row-style="header-row" paginate-target="newContributionPaymentInPaymentBatch">
+    	<row-actions>
+    		<entity-one entity-name="Payment" value-field="payment" />
+    		<set field="paymentTypeId"
+    			from-field="payment.paymentTypeId" />
+    		<set field="partyIdFrom" from-field="payment.partyIdFrom" />
+    		<set field="partyIdTo" from-field="payment.partyIdTo" />
+    		<set field="paymentMethodTypeId"
+    			from-field="payment.paymentMethodTypeId" />
+    		<set field="fundId" from-field="payment.fundId" />
+    		<entity-one entity-name="CreditCard"
+    			value-field="creditCard">
+    			<field-map field-name="paymentMethodId"
+    				from-field="payment.paymentMethodId" />
+    		</entity-one>
+    		<set field="cardType" from-field="creditCard.cardType" />
+    		<set field="amount" from-field="payment.amount"
+    			type="BigDecimal" />
+    		<set field="paymentRefNum"
+    			from-field="payment.paymentRefNum" />
+    	</row-actions>
+    	<field name="paymentGroupId">
+    		<hidden />
+    	</field>
+    	
+    	<field name="paymentId">
+    		<hyperlink target="EditContributionPayment"
+    			description="${paymentId}">
+    			<parameter param-name="paymentId" />
+    		</hyperlink>
+    	</field>
+    	
+    	<field name="fundId">
+    		<display />
+    	</field>
+
+    	<field name="paymentRefNum"
+    		title="${uiLabelMap.AccountingReferenceNumber}">
+    		<hidden />
+    	</field>
+    	<field name="partyIdFrom"
+    		title="${uiLabelMap.AccountingFromParty}">
+    		<display-entity entity-name="PartyNameView"
+    			key-field-name="partyId"
+    			description="${groupName} ${lastName} ${firstName}">
+    			<sub-hyperlink target="/partymgr/control/viewprofile"
+    				target-type="inter-app" description="[${partyIdFrom}]">
+    				<parameter param-name="partyId"
+    					from-field="partyIdFrom" />
+    			</sub-hyperlink>
+    		</display-entity>
+    	</field>
+    	<field name="paymentMethodId"
+    		title="${uiLabelMap.ContributionPaymentMethod}">
+    		<display-entity entity-name="PaymentMethod"
+    			description="${description}" />
+    	</field>
+    	<field name="comments">
+    		<display />
+    	</field>
+    	<field name="paymentMethodTypeId" use-when="cardType==null">
+    		<display-entity entity-name="PaymentMethodType"
+    			description="${description}" />
+    	</field>
+    	<field name="amount"><text currency="${payment.currencyUomId}" type="currency"/></field>
+    	<field name="fromDate">
+    		<hidden />
+    	</field>
+    	<field name="thruDate">
+    		<hidden />
+    	</field>
+
+    	<field name="editLink" widget-style="buttontext">
+    		<hyperlink target="EditContributionPayment" description="${uiLabelMap.CommonEdit}" also-hidden="false">
+    			<parameter param-name="paymentGroupId" /><parameter
+    				param-name="paymentId" /></hyperlink></field>
+    	<field name="deleteLink" title="" widget-style="buttontext">
+    		<hyperlink target="removePaymentFromPaymentBatch"
+    			description="${uiLabelMap.CommonCancel}" also-hidden="false">
+    			<parameter param-name="paymentGroupId" />
+    			<parameter param-name="paymentId" />
+    			<parameter param-name="fromDate" />
+    		</hyperlink>
+    	</field>
+    	<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>
+    	
+    </form>
+
+    <form name="AddPaymentToPaymentBatch" type="single" target="createContributionPaymentInPaymentBatch">
+        <auto-fields-service service-name="createContributionPaymentInPaymentBatch"/>
+        <field name="paymentGroupId"><display/></field>
+        <field name="paymentGroup.statusId"><display/></field>
+        <field name="paymentTypeId"><hidden value="MEMBER_CONTRIBUTION"/></field>
+        <field name="paymentMethodTypeId"><hidden value="FIN_ACCOUNT"/></field>
+        <field name="paymentMethodId" title="${uiLabelMap.AccountingPaymentMethodId}" position="2">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="PaymentMethod" description="${description}">
+                    <entity-constraint name="partyId" operator="equals" value="Company"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="paymentGatewayResponseId"><hidden/></field>
+        <field name="paymentPreferenceId"><hidden/></field>
+        <field name="partyIdTo"><hidden value="Company"/></field>
+        <field name="partyIdFrom"><lookup target-form-name="LookupPerson"/></field>
+        <field name="roleTypeIdTo"><hidden/></field>
+        <field name="paymentRefNum"><hidden/></field>
+        <field name="finAccountTransId"><hidden/></field>
+        <field name="overrideGlAccountId"><hidden/></field>
+        <field name="actualCurrencyAmount"><hidden/></field>
+        <field name="actualCurrencyUomId"><hidden/></field>
+        <field name="finAccountTransTypeId"><hidden value="DEPOSIT"/></field>
+        <field name="isDepositWithDrawPayment"><hidden value="Y"/></field>
+        
+       	<field name="currencyUomId">
+            <drop-down allow-empty="false" current="selected">
+                <entity-options entity-name="Uom" key-field-name="uomId" description="${uomId}">
+                	<entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="uomId"/>
+                </entity-options>
+            </drop-down>
+        </field> 
+        
+        <field name="fundId" title="${uiLabelMap.ContributionFundId}">
+            <drop-down allow-empty="false">
+                <entity-options entity-name="Fund" description="${fundName}">
+                    <entity-order-by field-name="fundName"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        
+        
+        <field name="amount"><text currency="${payment.currencyUomId}" type="currency"/></field>
+        
+        <field name="statusId"><hidden value="PMNT_RECEIVED"/></field>
+        <field name="paymentId"><ignored/></field>
+        <field name="fromDate"><date-time default-value="${nowTimestamp}"/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonAdd}"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="FindContributionBatches" type="single" target="FindContributionBatches"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="FinAccount" default-field-type="find"/>
+        <field name="paymentGroupId"><text-find ignore-case="true"/></field>
+        <field name="paymentGroupTypeId" title="${uiLabelMap.FormFieldTitle_paymentGroupTypeId}">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="PaymentGroupType">
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="displayAdvancedSearch"><hidden value="true"></hidden></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+     
+    <form name="ListContributionBatches" type="list" separate-columns="true" default-entity-name="PaymentGroup" list-name="listIt" paginate-target="FindContributionBatches" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="PaymentGroup"/>
+                <field-map field-name="orderBy" value="paymentGroupId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <auto-fields-entity entity-name="PaymentGroup" default-field-type="display"/>
+        <field name="paymentGroupId">
+            <hyperlink  description="${paymentGroupId}" target="EditContributionBatch">
+                <parameter param-name="paymentGroupId"/>
+            </hyperlink>
+        </field>
+        <field name="statusId"  title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="paymentGroupTypeId"><display-entity entity-name="PaymentGroupType"/></field>
+        <field name="paymentGroupName">
+            <hyperlink description="${paymentGroupName}" target="EditContributionBatch">
+                <parameter param-name="paymentGroupId"/>
+            </hyperlink>
+        </field>
+    </form> 
+    
+    <form name="QuickFindContributionBatches" type="single" target="FindContributionBatches"
+            header-row-style="header-row" default-table-style="basic-table">
+        <field name="paymentGroupId"><text-find ignore-case="true"/></field>
+        <field name="paymentGroupTypeId"><hidden value="BATCH_PAYMENT"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="PMTGRP_STATUS"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="paymentGroupName"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    <form name="EditContributionBatchForm" type="single"
+    	target="updateContributionBatch" default-map-name="paymentGroup">
+    	<auto-fields-entity entity-name="PaymentGroup"></auto-fields-entity>
+    	<field name="paymentGroupId">
+    		<display/>
+    	</field>
+    	<field name="paymentGroupTypeId">
+    		<display-entity entity-name="PaymentGroupType"
+    			description="${description}">
+    		</display-entity>
+    	</field>
+    	<field name="statusId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="PMTGRP_STATUS"/>
+                </entity-options>
+
+    		</drop-down>
+    		
+    	</field>
+    	<field name="partyId">
+    		<hidden/>
+    	</field>
+        <field name="submitButton" use-when="paymentGroup!=null" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>
+        <field name="submitButton" use-when="display==true"><hidden/></field>
+    </form>
+    
+    <form name="EditContributionPaymentForm" type="single"
+    	target="updateContributionPayment" default-map-name="payment">
+    	<auto-fields-entity entity-name="Payment"></auto-fields-entity>
+    	<field name="paymentId">
+    		<display/>
+    	</field>
+    	<field name="paymentTypeId">
+    		<display-entity entity-name="PaymentType"
+    			description="${description}">
+    		</display-entity>
+    	</field>
+
+     	<field name="paymentMethodTypeId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="PaymentMethodType" description="${description}">
+                	<entity-constraint name="paymentMethodTypeId" value="FIN_ACCOUNT"/>               
+                </entity-options>
+    		</drop-down>    		
+    	</field>
+    	
+    	
+    	<field name="paymentMethodId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="PaymentMethod" description="${description}">
+                    <entity-constraint name="paymentMethodTypeId" value="FIN_ACCOUNT"/>
+                </entity-options>
+    		</drop-down>    		
+    	</field>
+    	
+        <field name="partyIdFrom"><lookup target-form-name="LookupPartyName"/></field>
+        <field name="partyIdTo"><lookup target-form-name="LookupPartyName"/></field>
+        
+    	<field name="statusId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="PMTGRP_STATUS"/>
+                </entity-options>
+    		</drop-down>    		
+    	</field>
+      	<field name="fundId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="Fund" description="${fundName}">
+                </entity-options>
+    		</drop-down>    		
+    	</field>
+    	<!-- Hidden Fields -->
+    	<field name="finAccountTransId"><hidden></hidden></field>
+    	<field name="paymentGatewayResponseId"><hidden></hidden></field>
+    	<field name="paymentPreferenceId"><hidden></hidden></field>
+    	<field name="roleTypeIdTo"><hidden></hidden></field>
+    	<field name="paymentRefNum"><hidden></hidden></field>
+     	<field name="actualCurrencyAmount"><hidden></hidden></field>
+    	<field name="actualCurrencyUomId"><hidden></hidden></field>
+    	<!-- Hidden Fields -->
+        <field name="submitButton" use-when="paymentGroup!=null" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>
+        <field name="submitButton" use-when="display==true"><hidden/></field>
+    </form>
+
+    <form name="FindMemberContributions" type="single" target="FindMemberContributions"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="Payment" default-field-type="find"/>
+        <field name="paymentId"><text-find ignore-case="true"/></field>
+        <field name="paymentGroupTypeId" title="${uiLabelMap.FormFieldTitle_paymentGroupTypeId}">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="PaymentGroupType">
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="displayAdvancedSearch"><hidden value="true"></hidden></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+     
+    <form name="ListMemberContributions" type="list" separate-columns="true" default-entity-name="PaymentGroup" list-name="listIt" paginate-target="FindContributionBatches" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="PaymentGroup"/>
+                <field-map field-name="orderBy" value="paymentGroupId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <auto-fields-entity entity-name="PaymentGroup" default-field-type="display"/>
+        <field name="paymentGroupId">
+            <hyperlink  description="${paymentGroupId}" target="EditContributionBatch">
+                <parameter param-name="paymentGroupId"/>
+            </hyperlink>
+        </field>
+        <field name="statusId"  title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="paymentGroupTypeId"><display-entity entity-name="PaymentGroupType"/></field>
+        <field name="paymentGroupName">
+            <hyperlink description="${paymentGroupName}" target="EditContributionBatch">
+                <parameter param-name="paymentGroupId"/>
+            </hyperlink>
+        </field>
+    </form> 
+
+    <form name="QuickFindMemberContributions" type="single" target="FindMemberContributions"
+            header-row-style="header-row" default-table-style="basic-table">
+        <field name="paymentId"><text-find ignore-case="true"/></field>
+        <field name="paymentTypeId"><hidden value="MEMBER_CONTRIBUTION"/></field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>    
+<!-- Coop Members -->    
+    <form name="ListMemberDetails" type="list" separate-columns="true" default-entity-name="PersonAndRoleView" list-name="listIt" paginate-target="FindContributionBatches" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="PersonAndRoleView"/>
+                <field-map field-name="orderBy" value="partyId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+            
+            <!--  >entity-condition entity-name="PersonAndRoleView" list="listit">
+            	<condition-list>
+            		<condition-expr field-name="partyId" from-field="parameters.partyId" />
+            		<condition-expr	field-name="roleTypeId" value="COOPERATIVE_MEMBER" />
+            	</condition-list>
+            </entity-condition-->
+            
+        </actions>
+        <auto-fields-entity entity-name="PersonAndRoleView" default-field-type="display"/>
+    </form> 
+    
+    <form name="FindPayments" type="single" target="findPayments"
+        header-row-style="header-row" default-table-style="basic-table">
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="paymentId"><text-find ignore-case="true"/></field>
+        <field name="paymentTypeId"><text-find ignore-case="true"/></field>
+        <field name="comments"><text-find ignore-case="true"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}" position="2">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="StatusItem">
+                    <entity-constraint name="statusTypeId" operator="equals" value="PMNT_STATUS"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field position="1" name="partyIdFrom"><lookup target-form-name="LookupPartyName"/></field>
+        <field position="2" name="partyIdTo"><lookup target-form-name="LookupPartyName"/></field>
+        <field position="1" name="amount"><text/></field>
+        <field name="paymentRefNum"><text-find ignore-case="true"/></field>
+        <field name="paymentGatewayResponseId"><text/></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    <form name="ListPayments" type="list" separate-columns="true" default-entity-name="Payment" list-name="listIt" paginate-target="findPayments" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="PaymentAndTypeAndCreditCard"/>
+                <field-map field-name="orderBy" value="effectiveDate DESC"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <row-actions>
+            <set field="amountToApply" value="${bsh:org.ofbiz.accounting.payment.PaymentWorker.getPaymentNotApplied(delegator,paymentId);}"/>
+        </row-actions>
+        <field name="paymentId" widget-style="buttontext">
+            <hyperlink description="${paymentId}" target="EditContributionPayment">
+                <parameter param-name="paymentId"/>
+            </hyperlink>
+        </field>
+        <field name="paymentTypeId" title="${uiLabelMap.AccountingPaymentType}"><display-entity entity-name="PaymentType"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="comments"><display/></field>
+        <field name="partyIdFrom" title="${uiLabelMap.AccountingFromParty}">
+            <display-entity entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${lastName},${firstName}">
+                <sub-hyperlink target="/partymgr/control/viewprofile" target-type="inter-app" description="[${partyIdFrom}]" >
+                    <parameter param-name="partyId" from-field="partyIdFrom"/>
+                </sub-hyperlink>
+            </display-entity>
+        </field>
+        <field name="partyIdTo" title="${uiLabelMap.AccountingToParty}">
+            <display-entity entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${lastName},${firstName}">
+                <sub-hyperlink target="/partymgr/control/viewprofile" target-type="inter-app" description="[${partyIdTo}]" >
+                    <parameter param-name="partyId" from-field="partyIdTo"/>
+                </sub-hyperlink>
+            </display-entity>
+        </field>
+        <field name="effectiveDate"><display/></field>
+        <field name="currencyUomId"><hidden/></field>
+        <field name="amount"><display also-hidden="false" type="currency" currency="${currencyUomId}"/></field>
+        <field name="amountToApply"><display also-hidden="false" type="currency" currency="${currencyUomId}"/></field>
+    </form>
+    
+<!-- Contribution Version 2 -->
+    <form name="FindContributions" type="single" target="findContributions"
+        header-row-style="header-row" default-table-style="basic-table">
+        <field name="contributionId"><text-find ignore-case="true"/></field>
+        <field name="description"><text-find ignore-case="true"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="StatusItem">
+                    <entity-constraint name="statusTypeId" operator="equals" value="PMNT_STATUS"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="displayAdvancedSearch"><hidden value="true"></hidden></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="QuickFindContributions" type="single" target="findContributions"
+            header-row-style="header-row" default-table-style="basic-table">
+        <field name="contrbutionId"><text-find ignore-case="true"/></field>
+        <field name="description"><text-find ignore-case="true"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="CONTRIB_STATUS"/>
+                </entity-options>
+            </drop-down>
+        </field>     
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="ListContributions" type="list" separate-columns="true" title="Contribution List" list-name="listIt" target="" default-entity-name="Contribution" paginate-target="findContributions"
+        odd-row-style="alternate-row" header-row-style="header-row-2" default-table-style="basic-table hover-bar">
+        <actions>
+            <set field="parameters.sortField" from-field="parameters.sortField" default-value="-creationDate"/>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="Contribution"/>
+                <field-map field-name="orderBy" from-field="parameters.sortField"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+
+        <field name="contributionId" widget-style="buttontext" sort-field="true">
+            <hyperlink description="${contributionId}" target="contributionOverview">
+                <parameter param-name="contributionId"/>
+            </hyperlink>
+        </field>
+        <field name="creationDate" sort-field="true"><display type="date"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}" sort-field="true"><display-entity entity-name="StatusItem"/></field>
+        <field name="description" sort-field="true"><display/></field>
+        <field name="totalAmount" widget-area-style="align-text"><display type="currency" currency="${currencyUomId}"/></field>
+    </form>
+    
+	<form name="NewContribution" type="single" target="createContribution"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-service service-name="createContribution"/>
+        <field name="description" title="Contribution Description"></field>
+        <field name="contributionId"><hidden/></field>
+		<field name="paymentId"><hidden/></field>
+		<field name="totalAmount"><hidden/></field>
+		<field name="statusId"><hidden/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>		
+    </form>
+
+	<form name="EditContribution" type="single" target="updateContribution"
+		default-map-name="contribution"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="Contribution"></auto-fields-entity>
+        <field name="description" title="Contribution Description"></field>
+        <field name="contributionId"><hidden/></field>
+		<field name="paymentId"><hidden/></field>
+		<field name="totalAmount"><display/></field>
+		<field name="statusId"><display/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>		
+    </form>
+    
+	<form name="NewContributionLineItem" type="single" target="createContributionItem"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-service service-name="createContributionItem"/>
+        <field name="finAccountId"><lookup target-form-name="LookupFinAccount"/></field>
+        <field name="partyId"><hidden/></field>
+        <field name="glReconciliationId"><hidden/></field>
+        <field name="orderId"><hidden/></field>
+        <field name="orderItemSeqId"><hidden/></field>
+        <field name="performedByPartyId"><hidden/></field>
+        <field name="reasonEnumId"><hidden/></field>
+        <field name="finAccountTransId"><hidden/></field>
+        <field name="finAccountTransTypeId"><hidden value="DEPOSIT"/></field>
+		<field name="paymentId"><hidden/></field>
+		<field name="fundId"><hidden/></field>
+		<field name="statusId"><hidden/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>		
+    </form>	    
+	    
+	<form name="EditContributionItems" type="list" separate-columns="true" default-entity-name="FinAccountTrans" list-name="finAccountTrans" target="updateContributionItem" paginate-target="newContributionItem" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+    	<row-actions>
+    		<entity-one entity-name="FinAccountTrans" value-field="finAccountTrans"/>
+
+    		<entity-one entity-name="Person" value-field="person">
+    			<field-map field-name="partyId"	from-field="finAccountTrans.partyId"/>
+    		</entity-one>
+    		
+    		<set field="firstName" from-field="person.firstName" />
+    		<set field="lastName" from-field="person.lastName" />
+			
+			<entity-one entity-name="FinAccountAndPartyName" value-field="finAccountAndPartyName">
+				<field-map field-name="finAccountId"
+    				from-field="finAccountTrans.finAccountId"/>
+			</entity-one>
+			<set field="fundId" from-field="finAccountAndPartyName.fundId" />
+						
+    	</row-actions>
+
+        <field name="finAccountTransId">
+            <hyperlink  description="${finAccountTransId}" target="EditContributionBatch">
+                <parameter param-name="finAccountTransId"/>
+            </hyperlink>
+        </field>
+        
+        <field name="entryDate"  title="${uiLabelMap.entryDate}"><display/></field>
+        
+		<field name="fundId"  title="${uiLabelMap.contributionFundType}">
+			<display-entity entity-name="Fund"
+    			description="${fundName}">
+    		</display-entity>
+    	</field>
+        
+        <field name="firstName"  title="${uiLabelMap.firstName}"><display/></field>
+        <field name="lastName"  title="${uiLabelMap.lastName}"><display/></field>
+        
+        <field name="contributionId"><hidden/></field>
+        <field name="statusId">
+            <display-entity entity-name="StatusItem" key-field-name="statusId" 
+            	description="${description}"/>
+        </field>        
+    	<field name="amount"><text currency="${finAccount.currencyUomId}" type="currency"/></field>
+    	<field name="cancel" title="" widget-style="buttontext">
+    		<hyperlink target="updateContributionItem"
+    			description="${uiLabelMap.CommonCancel}" also-hidden="false">
+    			<parameter param-name="contributionId" />
+    			<parameter param-name="finAccountTransId" />
+    			<parameter param-name="statusId" value="FINACT_TRNS_CANCELED"/>
+    		</hyperlink>
+    	</field>
+    	<field name="approve" title="" widget-style="buttontext">
+    		<hyperlink target="updateContributionItem"
+    			description="${uiLabelMap.Approve}" also-hidden="false">
+    			<parameter param-name="contributionId" />
+    			<parameter param-name="finAccountTransId" />
+    			<parameter param-name="statusId" value="FINACT_TRNS_APPROVED"/>
+    		</hyperlink>
+    	</field>
+		<!-- >field name="edit" widget-style="buttontext">
+    		<hyperlink target="editContributionItem" description="${uiLabelMap.CommonEdit}" also-hidden="false">
+    			<parameter param-name="finAccountTransId"/>
+    		</hyperlink>
+    	</field-->
+    	<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>
+    </form> 
+    
+    <form name="EditContributionItem" type="single" target="createContributionItem"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="FinAccountTrans"></auto-fields-entity>
+        <field name="finAccountId"><lookup target-form-name="LookupFinAccount"/></field>
+        <field name="amount"><text size="6"/></field>
+        <field name="partyId"><hidden/></field>
+        <field name="glReconciliationId"><hidden/></field>
+        <field name="orderId"><hidden/></field>
+        <field name="contributionId"><hidden/></field>
+        <field name="orderItemSeqId"><hidden/></field>
+        <field name="performedByPartyId"><hidden/></field>
+        <field name="reasonEnumId"><hidden/></field>
+        <field name="finAccountTransId"><hidden/></field>
+        <field name="finAccountTransTypeId"><hidden/></field>
+		<field name="paymentId"><hidden/></field>
+		<field name="fundId"><hidden/></field>
+		<field name="statusId">
+    	    <drop-down allow-empty="false">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="FINACT_TRNS_STATUS"/>
+                </entity-options>
+    		</drop-down>    		
+    	</field>
+        <field name="submitButton" title="${uiLabelMap.CommonAdd}"><submit button-type="button"/></field>		
+    </form>	
+    
+    <form name="contributionHeader" type="single" title="Contribution header information" default-map-name="contribution"
+        header-row-style="header-row" default-table-style="basic-table">
+        <actions>
+            <set field="total" from-field="contribution.totalAmount"/>
+        </actions>
+        <field name="contributionId"><hidden/></field>
+        <field position="1" name="description"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}" position="2"><display-entity entity-name="StatusItem"/></field>       
+        <field position="2" name="creationDate"><display/></field>
+        <field position="2" name="total"><display description="${total}" type="currency" currency="NGN"/></field>
+    </form>
+    
+    <form name="ListContributionStatus" list-name="contributionStatus" target="" title="" type="list" paginate-target="ListContributionStatus"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <field name="contributionId"><hidden/></field>
+        <field name="statusDate"><display description="${bsh:statusDate.toString().substring(0,10)}"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="contributionItems" list-name="contributionItems" target="" title="" type="list" separate-columns="true" paginate-target="contributionOverview"        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <auto-fields-entity entity-name="FinAccountTrans" default-field-type="display"/>
+        <field name="name" entry-name="partyId">
+            <display-entity also-hidden="false" entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${firstName} ${lastName}"/>
+        </field>
+        <field name="fund" entry-name="finAccountId">
+            <display-entity also-hidden="false" entity-name="FinAccount" key-field-name="finAccountId" description="${fundId}"/>
+        </field>
+        <field name="contributionId"><hidden/></field>
+        <field name="totalAmount"><hidden/></field>
+        <field name="paymentId"><hidden/></field>
+        <field name="finAccountId">
+        	<hyperlink  description="${finAccountId}" target="/accounting/control/FindFinAccountTrans" target-type="inter-app" full-path="true">>
+                <parameter param-name="finAccountId"/>
+                <parameter param-name="finAccountTransTypeId"/>
+            </hyperlink>
+        </field>
+        <field name="partyId"><hidden/></field>
+        <field name="finAccountTransTypeId"><display/></field>
+        <field name="creationDate"><hidden/></field>
+        <field name="entryDate"><hidden/></field>
+        <field name="orderItemSeqId"><hidden/></field>
+        <field name="orderId"><hidden/></field>
+        <field name="glReconciliationId"><hidden/></field>
+        <field name="reasonEnumId"><hidden/></field>
+
+        <field name="description"><display/></field>
+        <field name="amount" title="${uiLabelMap.AccountingUnitPrice}" widget-area-style="align-text"><display type="currency" currency="${invoice.currencyUomId}"/></field>
+
+    </form>
+
+    <form name="ContributionAcctgTransAndEntries" type="list" title="Accounting Transactions" list-name="ContributionAcctgTransAndEntries"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <auto-fields-entity entity-name="AcctgTransAndEntries" default-field-type="display"/>
+        <field name="invoiceId"><hidden/></field>
+        <field name="paymentId"><hyperlink target="paymentOverview?paymentId=${paymentId}" description="${paymentId}"/></field>
+        <field name="amount"><display type="currency" currency="${currencyUomId}"/></field>
+        <field name="origAmount"><display type="currency" currency="${origCurrencyUomId}"/></field>
+        <field name="acctgTransId"><hyperlink description="${acctgTransId}" target="EditAcctgTrans?acctgTransId=${acctgTransId}&amp;organizationPartyId=${organizationPartyId}"/></field>
+        <field name="acctgTransTypeId"><display-entity entity-name="AcctgTransType"/></field>
+        <field name="glJournalId"><display-entity entity-name="GlJournal" description="${glJournalName}"/></field>
+        <field name="glAccountTypeId" title="${uiLabelMap.FormFieldTitle_glAccountType}"><display-entity entity-name="GlAccountType"/></field>
+        <field name="glAccountClassId" title="${uiLabelMap.AccountingGlAccountClass}"><display-entity entity-name="GlAccountClass" description="${description}"/></field>
+        <field name="partyId" title="${uiLabelMap.PartyParty}"><display-entity entity-name="PartyNameView" description="${lastName} ${groupName}"/></field>
+        <field name="reconcileStatusId"><display-entity entity-name="StatusItem" key-field-name="statusId"/></field>
+        <field name="origCurrencyUomId"><ignored/></field>
+        <field name="currencyUomId"><ignored/></field>
+        <field name="shipmentId"><ignored/></field>
+        <field name="receiptId"><ignored/></field>
+        <field name="inventoryItemId"><ignored/></field>
+        <field name="workEffortId"><ignored/></field>
+        <field name="physicalInventoryId"><ignored/></field>
+        <field name="transDescription"><ignored/></field>
+        <sort-order>
+            <sort-field name="acctgTransId"/>
+            <sort-field name="acctgTransEntrySeqId"/>
+        </sort-order>
+    </form>
+    
+
+</forms>

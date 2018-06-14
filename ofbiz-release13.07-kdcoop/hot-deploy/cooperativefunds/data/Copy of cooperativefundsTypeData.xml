@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+
+    <StatusType description="Payment Group Status" hasTable="N" statusTypeId="PMTGRP_STATUS"/>
+    <StatusItem description="Incomplete" sequenceId="01" statusCode="INCOMPLETE" statusId="PMTGRP_INCPL" statusTypeId="PMTGRP_STATUS"/>
+	<StatusItem description="Complete" sequenceId="02" statusCode="COMPLETE" statusId="PMTGRP_CPL" statusTypeId="PMTGRP_STATUS"/>
+	<StatusItem description="Confirmed" sequenceId="03" statusCode="CONFIRMED" statusId="PMTGRP_CNF" statusTypeId="PMTGRP_STATUS"/>
+
+	<StatusType description="Fund Status" hasTable="N" statusTypeId="FUND_STATUS"/>
+	<StatusItem description="Active" sequenceId="01" statusCode="ACTIVE" statusId="FNDSTAT_ACT" statusTypeId="FUND_STATUS"/>
+	<StatusItem description="Inactive" sequenceId="02" statusCode="INACTIVE" statusId="FNDSTAT_INACT" statusTypeId="FUND_STATUS"/>
+	
+	<Fund fundId="SavingsFund" fundName="Savings Fund" statusId="FNDSTAT_ACT"/>
+	<Fund fundId="InvestmentFund" fundName="Investment Fund" statusId="FNDSTAT_ACT"/>
+	
+	<FinAccount finAccountId="BANK01_CURRENT_01" finAccountTypeId="BANK_ACCOUNT" statusId="FNACT_ACTIVE" finAccountName="BANK01 Current Account" finAccountCode="0123456789" finAccountPin="1234" 
+			currencyUomId="NGN" organizationPartyId="Company" ownerPartyId="Company" postToGlAccountId="111100" isRefundable="Y" replenishLevel="0" actualBalance="0" availableBalance=""/>
+	<FinAccount finAccountId="BANK01_SAVINGS_01" finAccountTypeId="BANK_ACCOUNT" statusId="FNACT_ACTIVE" finAccountName="BANK02 Savings Account" finAccountCode="1234567890" finAccountPin="1234" 
+			currencyUomId="NGN" organizationPartyId="Company" ownerPartyId="Company" postToGlAccountId="111100" isRefundable="Y" replenishLevel="0" actualBalance="0" availableBalance=""/>
+	<PaymentMethod paymentMethodId="BANK01_CURRENT_01" paymentMethodTypeId="EFT_ACCOUNT" partyId="Company" glAccountId="111100" finAccountId="BANK01_CURRENT_01" description="Current Account 01 at BANK01" fromDate="2015-05-29 19:22:58.408"/>
+	<PaymentMethod paymentMethodId="BANK01_SAVINGS_01" paymentMethodTypeId="EFT_ACCOUNT" partyId="Company" glAccountId="111100" finAccountId="BANK01_SAVINGS_01" description="Savings Account 01 at BANK01" fromDate="2015-05-29 19:22:58.408"/>
+	<FundPaymentMethod fundId="SavingsFund01" paymentMethodId="BANK01_CURRENT_01"/>
+	<FundPaymentMethod fundId="InvestmentFund" paymentMethodId="BANK01_SAVINGS_01"/>
+	
+</entity-engine-xml>

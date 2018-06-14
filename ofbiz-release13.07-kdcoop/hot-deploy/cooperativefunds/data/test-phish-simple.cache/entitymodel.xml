@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entitymodel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/entitymodel.xsd">
+    <!-- ========================================================= -->
+    <!-- ======================== Defaults ======================= -->
+    <!-- ========================================================= -->
+    <title>Entity of cooperativefunds Component</title>
+    <description>None</description>
+    <copyright></copyright>
+    <version></version>
+
+<!-- ========================================================= -->
+    <!-- ======================== Data Model ===================== -->
+    <!-- The modules in this file are as follows:                  -->
+    <!--  - org.ofbiz.cooperativefunds.funds -->
+    <!-- ========================================================= -->
+    
+    <!-- ========================================================= -->
+    <!-- org.ofbiz.cooperativefunds.funds -->
+    <!-- ========================================================= -->
+    <entity entity-name="Fund"
+            package-name="org.ofbiz.cooperativefunds.fund"
+            title="Fund Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="fundName" type="description"></field>
+      <field name="statusId" type="id-ne"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="longDescription" type="description"></field>
+      <field name="openingDate" type="date-time"></field>
+      <field name="closureDate" type="date-time"></field>
+      <field name="finAccountId" type="id"></field>      
+      <prim-key field="fundId"/>
+      <relation type="one" fk-name="FUND_STTS_STTS" rel-entity-name="StatusItem">
+        <key-map field-name="statusId"/>
+      </relation>
+      <relation type="many" fk-name="FUND_FND_SUBS" rel-entity-name="FundSubscribers">
+        <key-map field-name="fundId"/>
+      </relation>
+      <relation type="many" fk-name="FUND_PMT" rel-entity-name="Payment">
+        <key-map field-name="fundId"/>
+      </relation>   
+    </entity>   
+    
+   
+
+    <entity entity-name="FundSubscribers"
+            package-name="org.ofbiz.cooperativefunds.fundsubscribers"
+            title="FundSubscribers Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="partyId" type="id-ne"></field>
+      <prim-key field="fundId"/>
+      <prim-key field="partyId"/>
+    </entity>   
+
+    <entity entity-name="FundPaymentMethod"
+            package-name="org.ofbiz.cooperativefunds.fundpaymentmethod"
+            title="FundPaymentMethod Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="paymentMethodId" type="id-ne"></field>
+      <prim-key field="fundId"/>
+      <prim-key field="paymentMethodId"/>
+    </entity>
+    
+    <extend-entity entity-name="Payment">
+    	<field name="paymentGroupId" type="id"></field>
+    	<field name="fundId" type="id"></field>
+    </extend-entity>
+    
+    <extend-entity entity-name="PaymentGroup">
+    	<field name="statusId" type="id-ne"></field>
+    	<field name="partyId" type="id-ne"></field>
+    	<field name="defaultCurrency" type="id"></field>
+    	<field name="defaultfundId" type="id"></field>
+    	<field name="totalBatchAmount" type="currency-amount"></field>
+    	<field name="totalPaymentsAmountInBatch" type="currency-amount"></field>
+    	<field name="batchCreationDate" type="date-time"></field>
+    	<relation type="many" fk-name="PMT_GRP_PMT" rel-entity-name="Payment">
+        	<key-map field-name="paymentGroupId"/>
+      	</relation>
+      	<relation type="one" fk-name="PMT_GRP_STITM" rel-entity-name="StatusItem">
+        	<key-map field-name="statusId"/>
+      	</relation>
+    </extend-entity>
+    
+    <extend-entity entity-name="Party">
+      	<relation type="many" fk-name="PARTY_FND_SUBS" rel-entity-name="FundSubscribers">
+        	<key-map field-name="partyId"/>
+      	</relation>
+    	<relation type="many" fk-name="PARTY_PMT_GRPS" title="CreatedBy" rel-entity-name="PaymentGroup">
+        	<key-map field-name="partyId"/>
+      	</relation>
+    </extend-entity>
+	
+	<view-entity entity-name="PaymentSummaryByGroupView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Payment Summary View Entity">
+		<member-entity entity-alias="PT" entity-name="Payment"/>		
+
+		<alias entity-alias="PT" name="total" field="amount" function="sum"/>
+		<alias entity-alias="PT" name="paymentGroupId" group-by="true"/>		
+	</view-entity>
+
+	<view-entity entity-name="PaymentGroupPaymentSummaryByGroupView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Payment Group LineItem View Entity">
+		<member-entity entity-alias="PG" entity-name="PaymentGroup"/>
+		<member-entity entity-alias="PTS" entity-name="PaymentSummaryByGroupView"/>		
+		<alias-all entity-alias="PG"/>
+		<alias-all entity-alias="PTS"/>
+		<view-link entity-alias="PG" rel-entity-alias="PTS">
+			<key-map field-name="paymentGroupId"/>
+		</view-link>
+	</view-entity>
+	
+	<view-entity entity-name="PersonAndRoleView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Persons and Role View Entity">
+		<member-entity entity-alias="PTYRL" entity-name="PartyRole"/>		
+		<member-entity entity-alias="USLPRT" entity-name="UserLoginAndPartyDetails"/>
+		
+		<alias-all entity-alias="PTYRL"/>
+		<alias-all entity-alias="USLPRT"/>
+	
+		<view-link entity-alias="PTYRL" rel-entity-alias="USLPRT">
+			<key-map field-name="partyId"/>
+		</view-link>			
+	</view-entity>
+
+</entitymodel>

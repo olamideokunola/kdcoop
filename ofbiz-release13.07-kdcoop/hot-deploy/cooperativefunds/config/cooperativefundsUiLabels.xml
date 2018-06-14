@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Licensed to the Apache Software Foundation (ASF) under one
+    or more contributor license agreements.  See the NOTICE file
+    distributed with this work for additional information
+    regarding copyright ownership.  The ASF licenses this file
+    to you under the Apache License, Version 2.0 (the
+    "License"); you may not use this file except in compliance
+    with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing,
+    software distributed under the License is distributed on an
+    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+    KIND, either express or implied.  See the License for the
+    specific language governing permissions and limitations
+    under the License.
+-->
+<resource xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <property key="cooperativefundsApplication">
+        <value xml:lang="en">Cooperative Funds</value>
+        <value xml:lang="zh">cooperativefunds应用程序</value>
+    </property>
+    <property key="cooperativefundsCompanyName">
+        <value xml:lang="en">OFBiz: cooperativefunds</value>
+    </property>
+    <property key="cooperativefundsCompanySubtitle">
+        <value xml:lang="en">Part of the Open For Business Family of Open Source Software</value>
+        <value xml:lang="it">Un modulo della famiglia di software open source Open For Business</value>
+        <value xml:lang="zh">开源软件OFBiz的组成部分</value>
+    </property>
+    <property key="cooperativefundsViewPermissionError">
+        <value xml:lang="en">You are not allowed to view this page.</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="ContributionNewPaymentInPaymentBatch">
+        <value xml:lang="en">Members' Contribution Batch</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="ContributionPaymentToPaymentBatch">
+        <value xml:lang="en">New Contribution Batch Line:</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="ContributionPaymentsInPaymentBatch">
+        <value xml:lang="en">Contribution Batch Payments</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="PaymentBatchCompleteMenu">
+        <value xml:lang="en">Complete Batch</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="PaymentBatchConfirmMenu">
+        <value xml:lang="en">Confirm Batch</value>
+        <value xml:lang="zh">不允许你浏览这个页面。</value>
+    </property>
+     <property key="PaymentBatchReopenMenu">
+     	<value xml:lang="en">Reopen Batch</value>
+     </property>
+    <property key="ContributionMenuItem">
+     	<value xml:lang="en">Contributions</value>
+    </property>
+    <property key="CooperativeMembersMenuItem">
+     	<value xml:lang="en">Cooperative Members</value>
+    </property>
+    <property key="PageTitleFindContributionBatch">
+     	<value xml:lang="en">Find Batch</value>
+    </property>
+    <property key="PageTitleNewContributionBatch">
+     	<value xml:lang="en">New Batch</value>
+    </property>
+    <property key="PageTitleFindMembers">
+    	<value xml:lang="en">Find Members</value>
+    </property>
+    <property key="PageTitleNewMember">
+    	<value xml:lang="en">New Member</value>
+    </property>
+    <property key="PageTitleFindMemberContributions">
+    	<value xml:lang="en">Find Contributions</value>
+    </property>
+    
+<!-- Contribution Version 2 -->   
+    <property key="PageTitleFindContributions">
+    	<value xml:lang="en">Find</value>
+    </property>
+    <property key="PageTitleContributionOverview">
+    	<value xml:lang="en">Overview</value>
+    </property>
+    <property key="PageTitleContributionHeader">
+    	<value xml:lang="en">Header</value>
+    </property>
+    <property key="PageTitleContributionItems">
+    	<value xml:lang="en">Items</value>
+    </property>
+    <property key="PageTitleContributionApplications">
+    	<value xml:lang="en">Applications</value>
+    </property>
+    <property key="CreateNewContribution">
+    	<value xml:lang="en">Create Contribution</value>
+    </property>
+    <property key="ContributionPDF">
+    	<value xml:lang="en">Create Contribution</value>
+    </property>
+    <property key="ContributionPDF">
+    	<value xml:lang="en">PDF</value>
+    </property>
+    <property key="ContributionStatusToConfirmed">
+    	<value xml:lang="en">Status to confirmed</value>
+    </property>
+    <property key="ContributionStatusToPaid">
+    	<value xml:lang="en">Status to paid</value>
+    </property>
+    <property key="ContributionStatusToCancelled">
+    	<value xml:lang="en">Status to cancelled</value>
+    </property>   
+    <property key="ContributionStatusToCompleted">
+    	<value xml:lang="en">Status to completed</value>
+    </property>
+    <property key="ContributionStatusToCreated">
+    	<value xml:lang="en">Status to created</value>
+    </property>
+   	<property key="LoansNoLoansFoundForThisParty">
+    	<value xml:lang="en">No loans found for this party.</value>
+    </property>
+    <property key="CooperativefundsRequestId">
+	    	<value xml:lang="en">Request</value>
+   	</property>
+    <property key="CooperativefundsFindContributionsMenuItem">
+    	<value xml:lang="en">Find Contributions</value>
+    </property>
+	    
+ <!-- Loan Requests -->
+ 	<property key="CooperativefundsLoanApplication">
+    	<value xml:lang="en">Loans</value>
+    </property>
+    <property key="CooperativefundsLoanRequestMenu">
+    	<value xml:lang="en">Loan Request</value>
+    </property>
+    <property key="CooperativefundsLoanMenu">
+    	<value xml:lang="en">Loan</value>
+    </property>
+
+    <property key="CooperativefundsFormFieldTitle_loanTypeId">
+    	<value xml:lang="en">Loan Type</value>
+    </property>
+    <property key="CooperativeEditLoanRequest">
+    	<value xml:lang="en">Loan Request</value>
+    </property>
+    <property key="LoanRequestApprove">
+    	<value xml:lang="en">Approve</value>
+    </property>
+    <property key="CooperativefundsNewLoanRequest">
+    	<value xml:lang="en">New Loan Request</value>
+    </property>
+    <property key="CooperativefundsLoanRequest">
+    	<value xml:lang="en">Loan Request</value>
+    </property>
+    <property key="CooperativefundsLoanRequestOverview">
+    	<value xml:lang="en">Overview</value>
+    </property>
+    <property key="CooperativefundsCreateNewLoanRequest">
+    	<value xml:lang="en">Create New LoanRequest</value>
+    </property>
+    <property key="CooperativefundsLoanRequestStatusToApproved">
+    	<value xml:lang="en">Status to Approved</value>
+    </property>
+    <property key="CooperativefundsLoanRequestStatusToCancelled">
+    	<value xml:lang="en">Status to Cancelled</value>
+    </property>
+    <property key="CooperativefundsLoanRequestStatusToCreated">
+    	<value xml:lang="en">Cancel Approval</value>
+    </property>
+    <property key="CooperativefundsConfirmationCancelLoanRequest">
+    	<value xml:lang="en">Are you sure you want to cancel this loan request?</value>
+    </property>
+    <property key="CooperativefundsLoanRequestPDF">
+    	<value xml:lang="en">PDF</value>
+    </property>
+    <property key="CooperativefundsLoanTermsAccepted">
+    	<value xml:lang="en">Accept Loan Policy</value>
+    </property>
+    <property key="CooperativefundsLoanTerms">
+    	<value xml:lang="en">View Loan Policy Document</value>
+    </property>
+    <property key="CooperativefundsLoanTermsTitle">
+    	<value xml:lang="en">Loan Policy</value>
+    </property>
+    <property key="CooperativefundsLoanRequestLoanPolicyError">
+    	<value xml:lang="en">Loan Policy not agreed to! Request cannot be created!</value>
+    </property>
+    <property key="CooperativePayslipContent">
+    	<value xml:lang="en">2. Upload Payslip</value>
+    </property>
+    <property key="CooperativePensionStmtContent">
+    	<value xml:lang="en">3. Upload Pension Account Statement</value>
+    </property>
+    <property key="LoanRequestContents">
+    	<value xml:lang="en">Contents</value>
+    </property>
+    <property key="LoanRequestIsPublic">
+    	<value xml:lang="en">Is Public</value>
+    </property>
+    <property key="CooperativefundsLoanRequestCreateLoan">
+    	<value xml:lang="en">Convert to Loan</value>
+    </property>
+    <property key="CooperativefundsConfirmationCancelCreateLoan">
+    	<value xml:lang="en">Are you sure you want to convert this request to a Loan?</value>
+    </property>
+    <property key="CooperativeEditLoan">
+    	<value xml:lang="en">Edit Loan</value>
+    </property>    
+    <property key="CooperativefundsLoanOverview">
+    	<value xml:lang="en">Overview</value>
+    </property>
+    <property key="CooperativefundsLoan">
+    	<value xml:lang="en">Loan</value>
+    </property>
+    <property key="CooperativefundsCreateNewLoan">
+    	<value xml:lang="en">Create New Loan</value>
+    </property>
+    <property key="CooperativefundsLoanPDF">
+    	<value xml:lang="en">PDF</value>
+    </property>
+    <property key="CooperativefundsLoanStatusToApproved">
+    	<value xml:lang="en">Status to Approved</value>
+    </property>
+    <property key="CooperativefundsLoanStatusToCreated">
+    	<value xml:lang="en">Cancel Approval</value>
+    </property>
+    <property key="CooperativefundsLoanStatusToCancelled">
+    	<value xml:lang="en">Status to Cancelled</value>
+    </property>
+    <property key="CooperativefundsConfirmationCancelLoan">
+    	<value xml:lang="en">Are you sure you want to cancel this loan?</value>
+    </property>
+    <property key="CooperativefundsLoanDisbursement">
+    	<value xml:lang="en">Loan Disbursement</value>
+    </property>
+    <property key="CooperativefundsLoanDisbursements">
+    	<value xml:lang="en">Loan Disbursements</value>
+    </property>
+    
+    <property key="CooperativefundsLoanRepayments">
+    	<value xml:lang="en">Loan Repayments</value>
+    </property>
+    
+    <property key="CooperativefundsLoanCreateNewRepayment">
+    	<value xml:lang="en">New</value>
+    </property>
+    
+    <property key="CooperativefundsLoanCalculateRepaymentLines">
+    	<value xml:lang="en">Calculate repayment lines</value>
+    </property>
+    
+    <property key="CooperativefundsLoanCreateRepayments">
+    	<value xml:lang="en">Create Repayments</value>
+    </property>
+    
+    <property key="CooperativefundsLoanPayoffs">
+    	<value xml:lang="en">Loan Payoffs</value>
+    </property>
+    <property key="CooperativefundsLoanPaymentPlan">
+    	<value xml:lang="en">Loan Payment Plan</value>
+    </property>
+    <property key="CooperativefundsLoanPaymentPlans">
+    	<value xml:lang="en">Loan Payment Plans</value>
+    </property>
+    <property key="CooperativefundsLoanAgreements">
+    	<value xml:lang="en">Loan Agreements</value>
+    </property>
+    <property key="CooperativefundsLoanDoesNotExists">
+    	<value xml:lang="en">Loan does not exist!</value>
+    </property>
+    <property key="CooperativefundsLoanHeader">
+    	<value xml:lang="en">Loan Header</value>
+    </property>
+    <property key="CooperativefundsLoanAgreementDescPrefix">
+    	<value xml:lang="en">Loan Agreement with </value>
+    </property>
+    <property key="CooperativefundsNewLoanDisbursement">
+    	<value xml:lang="en">Edit Loan Disbursements</value>
+    </property>
+    <property key="CooperativefundsEditLoanDisbursement">
+    	<value xml:lang="en">Edit Loan Disbursements</value>
+    </property>
+    <property key="CooperativefundsLoanAmount">
+    	<value xml:lang="en">Loan Amount</value>
+    </property>
+    <property key="CooperativefundsNewLoanPaymentPlan">
+    	<value xml:lang="en">New Loan Payment Plan</value>
+    </property>
+    <property key="CooperativefundsEditLoanPaymentPlan">
+    	<value xml:lang="en">Edit Loan Payment Plan</value>
+    </property>
+    <property key="CooperativefundsLoanPayoffMenu">
+    	<value xml:lang="en">Loan Payoff Menu</value>
+    </property>
+    <property key="CooperativefundsNewLoanPayoff">
+    	<value xml:lang="en">New Loan Payoff</value>
+    </property>
+    <property key="CooperativefundsLoanPayoff">
+    	<value xml:lang="en">Loan Payoff</value>
+    </property>
+    
+    
+</resource>

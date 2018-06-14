@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<services xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/services.xsd">
+    <description>cooperativefunds contribution Services</description>
+    <vendor></vendor>
+    <version>1.0</version>
+
+    <!-- Contribution services -->
+    <service name="createContributionPaymentBatch" engine="simple" default-entity-name="PaymentGroup"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="createContributionPaymentBatch" auth="true">
+        <description>Create a PaymentGroup. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>
+
+    <service name="createContributionPaymentInPaymentBatch" engine="simple" default-entity-name="Payment"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="createContributionPaymentInPaymentBatch" auth="true">
+        <description>Create a Payment.  If a paymentMethodId is supplied, paymentMethodTypeId is gotten from paymentMethod.  Otherwise, it must be supplied.  If no
+        paymentMethodTypeId and no paymentMethodId is supplied, then an error will be returned. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="paymentTypeId" optional="false"/>
+        <override name="partyIdFrom" optional="false"/>
+        <override name="partyIdTo" optional="false"/>
+        <override name="statusId" optional="false"/>
+        <override name="amount" optional="false"/>
+        <override name="fundId" optional="false"/>
+        <override name="paymentGroupId" mode="INOUT" optional="false"/>
+        <override name="finAccountTransTypeId" type="String" mode="IN" optional="false"/>
+        <override name="isDepositWithDrawPayment" type="String" mode="IN" optional="false"/>
+    </service>   
+    
+    <service name="updatePaymentBatchStatus" engine="simple" default-entity-name="PaymentGroup"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="updatePaymentBatchStatus" auth="true">
+        <description>Update Status of PaymentGroup. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>    
+
+    <service name="updateContributionBatch" engine="simple" default-entity-name="PaymentGroup"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="updateContributionBatch" auth="true">
+        <description>Update PaymentGroup attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>   
+    
+    <service name="updateContributionPayment" engine="simple" default-entity-name="Payment"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="updateContributionPayment" auth="true">
+        <description>Update Payment attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service> 
+
+
+
+
+    <!-- Cooperative Member services -->
+    <service name="createCooperativeMember" engine="simple" default-entity-name="Party"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/membership/MembershipServices.xml" invoke="updateContributionPayment" auth="true">
+        <description>Create Cooperative Member and attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service> 
+    
+<!-- Contribution Version 2 -->
+     <service name="createContribution" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="createContribution" auth="true">
+        <description>Create a Contribution</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="description" mode="IN" optional="false"/>
+        <override name="creationDate" mode="IN" optional="false"/>
+    </service>
+
+     <service name="createContributionItem" engine="simple" default-entity-name="FinAccountTrans"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="createContributionItem" auth="true">
+        <description>Create a Contribution line item as a FinAccountTrans</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+		<override name="contributionId" optional="false"/>
+        <override name="finAccountId" optional="false"/>
+        <!-- override name="finAccountTransId" optional="false"/-->
+    </service>
+
+     <service name="updateContribution" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="updateContribution" auth="true">
+        <description>Update a contribution's attributes</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>
+ 
+      <service name="completeContribution" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="completeContribution" auth="true">
+        <description>Complete a contribution and create Accounting Transaction</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>
+       
+     <service name="endContribution" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="endContribution" auth="true">
+        <description>End a contribution and update attributes</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>  
+
+     <service name="calculateContributionTotal" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="calculateContributionTotal" auth="true">
+        <description>Calculate total contributions (FinAccountTrans) in a Contribution Entity and update totalAmount field</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service>   
+      
+    <service name="confirmContribution" engine="simple" default-entity-name="Contribution"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="confirmContribution" auth="true">
+        <description>Confirm Contribution</description>
+        <auto-attributes include="nonpk" mode="INOUT" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+        <override name="contributionId" optional="false"/>
+    </service>
+
+    <service name="updateContributionItem" engine="simple" default-entity-name="FinAccountTrans"
+        location="component://cooperativefunds/script/org/ofbiz/cooperativefunds/contribution/ContributionServices.xml" invoke="updateContributionItem" auth="true">
+        <description>Update Contribution Item (FinAccountTrans) attributes. </description>
+        <auto-attributes include="nonpk" mode="IN" optional="true"/>
+        <auto-attributes include="pk" mode="INOUT" optional="true"/>
+    </service> 
+
+    <!-- Portal Services-->
+    
+</services>

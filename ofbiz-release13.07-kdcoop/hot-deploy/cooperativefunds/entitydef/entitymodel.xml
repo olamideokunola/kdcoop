@@ -1,0 +1,684 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entitymodel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/entitymodel.xsd">
+    <!-- ========================================================= -->
+    <!-- ======================== Defaults ======================= -->
+    <!-- ========================================================= -->
+    <title>Entity of cooperativefunds Component</title>
+    <description>None</description>
+    <copyright></copyright>
+    <version></version>
+
+<!-- ========================================================= -->
+    <!-- ======================== Data Model ===================== -->
+    <!-- The modules in this file are as follows:                  -->
+    <!--  - org.ofbiz.cooperativefunds.funds -->
+    <!-- ========================================================= -->
+    
+    <!-- ========================================================= -->
+    <!-- org.ofbiz.cooperativefunds.funds -->
+    <!-- ========================================================= -->
+    <entity entity-name="Fund"
+            package-name="org.ofbiz.cooperativefunds.fund"
+            title="Fund Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="fundName" type="description"></field>
+      <field name="statusId" type="id-ne"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="longDescription" type="description"></field>
+      <field name="openingDate" type="date-time"></field>
+      <field name="closureDate" type="date-time"></field>    
+      <prim-key field="fundId"/>
+      <relation type="one" fk-name="FUND_STTS_STTS" rel-entity-name="StatusItem">
+        <key-map field-name="statusId"/>
+      </relation>
+      <relation type="many" fk-name="FUND_FND_SUBS" rel-entity-name="FundSubscribers">
+        <key-map field-name="fundId"/>
+      </relation>
+      <relation type="many" fk-name="FUND_PMT" rel-entity-name="Payment">
+        <key-map field-name="fundId"/>
+      </relation>   
+    </entity>   
+    
+   
+
+    <entity entity-name="FundSubscribers"
+            package-name="org.ofbiz.cooperativefunds.fundsubscribers"
+            title="FundSubscribers Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="partyId" type="id-ne"></field>
+      <prim-key field="fundId"/>
+      <prim-key field="partyId"/>
+    </entity>   
+
+    <entity entity-name="FundPaymentMethod"
+            package-name="org.ofbiz.cooperativefunds.fundpaymentmethod"
+            title="FundPaymentMethod Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="paymentMethodId" type="id-ne"></field>
+      <prim-key field="fundId"/>
+      <prim-key field="paymentMethodId"/>
+    </entity>
+    
+    <extend-entity entity-name="Payment">
+    	<field name="paymentGroupId" type="id"></field>
+    	<field name="fundId" type="id"></field>
+    </extend-entity>
+    
+    <extend-entity entity-name="PaymentGroup">
+    	<field name="statusId" type="id-ne"></field>
+    	<field name="partyId" type="id-ne"></field>
+    	<field name="defaultCurrency" type="id"></field>
+    	<field name="defaultfundId" type="id"></field>
+    	<field name="totalBatchAmount" type="currency-amount"></field>
+    	<field name="totalPaymentsAmountInBatch" type="currency-amount"></field>
+    	<field name="batchCreationDate" type="date-time"></field>
+    	<relation type="many" fk-name="PMT_GRP_PMT" rel-entity-name="Payment">
+        	<key-map field-name="paymentGroupId"/>
+      	</relation>
+      	<relation type="one" fk-name="PMT_GRP_STITM" rel-entity-name="StatusItem">
+        	<key-map field-name="statusId"/>
+      	</relation>
+    </extend-entity>
+    
+    <extend-entity entity-name="Party">
+      	<relation type="many" fk-name="PARTY_FND_SUBS" rel-entity-name="FundSubscribers">
+        	<key-map field-name="partyId"/>
+      	</relation>
+    	<relation type="many" fk-name="PARTY_PMT_GRPS" title="CreatedBy" rel-entity-name="PaymentGroup">
+        	<key-map field-name="partyId"/>
+      	</relation>
+      	<relation type="many" fk-name="PARTY_PMT_REPMT" title="PaidBy" rel-entity-name="LoanRepayment">
+        	<key-map field-name="partyId"/>
+      	</relation>
+    </extend-entity>
+	
+	<view-entity entity-name="PaymentSummaryByGroupView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Payment Summary View Entity">
+		<member-entity entity-alias="PT" entity-name="Payment"/>		
+
+		<alias entity-alias="PT" name="total" field="amount" function="sum"/>
+		<alias entity-alias="PT" name="paymentGroupId" group-by="true"/>		
+	</view-entity>
+
+	<view-entity entity-name="PaymentGroupPaymentSummaryByGroupView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Payment Group LineItem View Entity">
+		<member-entity entity-alias="PG" entity-name="PaymentGroup"/>
+		<member-entity entity-alias="PTS" entity-name="PaymentSummaryByGroupView"/>		
+		<alias-all entity-alias="PG"/>
+		<alias-all entity-alias="PTS"/>
+		<view-link entity-alias="PG" rel-entity-alias="PTS">
+			<key-map field-name="paymentGroupId"/>
+		</view-link>
+	</view-entity>
+	
+	<view-entity entity-name="PersonAndRoleView"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Persons and Role View Entity">
+		<member-entity entity-alias="PTYRL" entity-name="PartyRole"/>		
+		<member-entity entity-alias="USLPRT" entity-name="UserLoginAndPartyDetails"/>
+		
+		<alias-all entity-alias="PTYRL"/>
+		<alias-all entity-alias="USLPRT"/>
+	
+		<view-link entity-alias="PTYRL" rel-entity-alias="USLPRT">
+			<key-map field-name="partyId"/>
+		</view-link>			
+	</view-entity>
+
+    <entity entity-name="Contribution"
+            package-name="org.ofbiz.cooperativefunds.contribution"
+            title="Contribution Entity">
+      <field name="contributionId" type="id-ne"></field>
+      <field name="description" type="description"></field>
+      <field name="creationDate" type="date-time"></field>
+      <field name="paymentId" type="id-ne"></field>
+      <field name="totalAmount" type="currency-amount"></field>
+      <field name="defaultCurrencyUomId" type="id-ne"></field>
+      <field name="statusId" type="id-ne"></field>
+      <prim-key field="contributionId"/>
+      <relation type="one" fk-name="CNT_PMT" rel-entity-name="Payment">
+      	<key-map field-name="paymentId"/>
+      </relation>
+    </entity>   
+ 
+    <entity entity-name="FundContribution"
+            package-name="org.ofbiz.cooperativefunds.fundcontribution"
+            title="Fund Contribution Entity">
+      <field name="fundId" type="id-ne"></field>
+      <field name="contributionId" type="id-ne"></field>  
+      <field name="amount" type="currency-amount"></field>
+      <field name="currency" type="id"></field>
+      <prim-key field="fundId"/>
+      <prim-key field="contributionId"/>
+      <relation type="many" fk-name="FND_FND_CNT" rel-entity-name="Fund">
+      	<key-map field-name="fundId"/>
+      </relation>
+      <relation type="many" fk-name="CNT_FND_CNT" rel-entity-name="Contribution">
+      	<key-map field-name="contributionId"/>
+      </relation>
+    </entity> 
+    
+    <extend-entity entity-name="FinAccountTrans">
+    	<field name="contributionId" type="id-ne"></field>
+    	<relation type="many" fk-name="CON_FINACCT_TRANS" rel-entity-name="Contribution">
+        	<key-map field-name="contributionId"/>
+      	</relation>
+    </extend-entity>
+
+	<view-entity entity-name="FinAccountAndPartyName"
+		package-name="org.ofbiz.cooperativefunds"
+		title="FinAccount and Persons View Entity">
+		<member-entity entity-alias="FINACCT" entity-name="FinAccount"/>		
+		<member-entity entity-alias="PTYPERS" entity-name="PartyAndPerson"/>
+		
+		<alias-all entity-alias="FINACCT"/>
+		<alias-all entity-alias="PTYPERS"/>
+	
+		<view-link entity-alias="FINACCT" rel-entity-alias="PTYPERS">
+			<key-map field-name="ownerPartyId" rel-field-name="partyId" />
+		</view-link>			
+	</view-entity>
+
+	<entity entity-name="ContributionStatus"
+            package-name="org.ofbiz.cooperativefunds.contributionStatus"
+            title="Contribution Status Entity">
+      <field name="statusId" type="id-ne"></field>
+      <field name="contributionId" type="id-ne"></field>  
+      <field name="statusDate" type="date-time"></field>
+      <prim-key field="statusId"/>
+      <prim-key field="contributionId"/>
+      <prim-key field="statusDate"/>
+      <relation type="many" fk-name="CNT_STS_STSITM" rel-entity-name="StatusItem">
+      	<key-map field-name="statusId"/>
+      </relation>
+      <relation type="many" fk-name="CNT_STS_CNT" rel-entity-name="Contribution">
+      	<key-map field-name="contributionId"/>
+      </relation>
+    </entity>	
+    
+    <extend-entity entity-name="FinAccount">
+    	<field name="fundId" type="id-ne"></field>
+      	<relation type="one" fk-name="FND_FINACCT" rel-entity-name="Fund">
+        	<key-map field-name="fundId"/>
+      	</relation>
+    </extend-entity>	
+    
+	<view-entity entity-name="ContributionFinAccountTrans"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Contribution and FinAccountTrans View Entity">
+		<member-entity entity-alias="CONTRIB" entity-name="Contribution"/>		
+		<member-entity entity-alias="FINACCTTRANS" entity-name="FinAccountTrans"/>
+		
+		<alias-all entity-alias="CONTRIB"/>
+		<alias-all entity-alias="FINACCTTRANS"/>
+	
+		<view-link entity-alias="CONTRIB" rel-entity-alias="FINACCTTRANS">
+			<key-map field-name="contributionId" rel-field-name="contributionId" />
+		</view-link>			
+	</view-entity>       
+
+	<view-entity entity-name="ContributionAcctgTrans"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Contribution and AcctgTrans View Entity">
+		<member-entity entity-alias="CONTFINACCTRNS" entity-name="ContributionFinAccountTrans"/>		
+		<member-entity entity-alias="ACCTRNS" entity-name="AcctgTrans"/>
+		
+		<alias-all entity-alias="CONTFINACCTRNS"/>
+		<alias-all entity-alias="ACCTRNS"/>
+	
+		<view-link entity-alias="CONTFINACCTRNS" rel-entity-alias="ACCTRNS">
+			<key-map field-name="finAccountTransId" rel-field-name="finAccountTransId" />
+		</view-link>			
+	</view-entity>
+	
+	<view-entity entity-name="ContributionAcctgTransAndEntries"
+		package-name="org.ofbiz.cooperativefunds"
+		title="ContributionAcctgTrans and AcctgTransEntry View Entity">
+		<member-entity entity-alias="CONTACCTRNS" entity-name="ContributionAcctgTrans"/>		
+		<member-entity entity-alias="ACCTRNSENT" entity-name="AcctgTransEntry"/>
+		
+		<alias-all entity-alias="CONTACCTRNS"/>
+		<alias-all entity-alias="ACCTRNSENT"/>
+	
+		<view-link entity-alias="CONTACCTRNS" rel-entity-alias="ACCTRNSENT">
+			<key-map field-name="acctgTransId" rel-field-name="acctgTransId" />
+		</view-link>			
+	</view-entity>      
+
+	<view-entity entity-name="FundFinAccounts"
+		package-name="org.ofbiz.cooperativefunds"
+		title="Fund and FinAccount View Entity">
+		<member-entity entity-alias="FND" entity-name="Fund"/>		
+		<member-entity entity-alias="FINACCT" entity-name="FinAccount"/>
+		
+		<alias-all entity-alias="FND"/>
+		<alias-all entity-alias="FINACCT"/>
+	
+		<view-link entity-alias="FND" rel-entity-alias="FINACCT">
+			<key-map field-name="fundId" rel-field-name="fundId" />
+		</view-link>			
+	</view-entity> 
+	
+	<view-entity entity-name="FundFinAccountTrans"
+		package-name="org.ofbiz.cooperativefunds"
+		title="FundFinAccounts and FinAccountTrans View Entity">
+		<member-entity entity-alias="FNDFINACCT" entity-name="FundFinAccounts"/>		
+		<member-entity entity-alias="FINACCTTRANS" entity-name="FinAccountTrans"/>
+		
+		<alias-all entity-alias="FNDFINACCT"/>
+		<alias-all entity-alias="FINACCTTRANS"/>
+	
+		<view-link entity-alias="FNDFINACCT" rel-entity-alias="FINACCTTRANS">
+			<key-map field-name="finAccountId" rel-field-name="finAccountId" />
+		</view-link>			
+	</view-entity> 
+
+    <entity entity-name="WorkDepartment"
+            package-name="org.ofbiz.cooperativefunds.fundcontribution"
+            title="Work Department Entity">
+      <field name="departmentId" type="id-ne"></field>
+      <field name="description" type="description"></field>  
+      <prim-key field="departmentId"/>
+    </entity>
+
+    <entity entity-name="BreweryLocation"
+            package-name="org.ofbiz.cooperativefunds.fundcontribution"
+            title="Brewery Location Entity">
+      <field name="locationId" type="id-ne"></field>
+      <field name="description" type="description"></field>  
+      <prim-key field="locationId"/>
+    </entity> 
+
+    <extend-entity entity-name="Person">
+	<field name="sapNumber" type="id-ne"></field>
+      	<field name="department" type="id-ne"></field>  
+	<field name="breweryLocation" type="id-ne"></field> 
+    </extend-entity>
+
+    <!-- ========================================================= -->
+    <!-- org.ofbiz.cooperativefunds.loans -->
+    <!-- ========================================================= -->
+        
+    <entity entity-name="LoanRequest"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Request Entity">
+      <field name="loanRequestId" type="id-ne"></field>
+      <field name="partyId" type="id-ne"></field>
+      <field name="loanTypeId" type="id"></field>     
+      <field name="amount" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="purpose" type="description"></field>
+      <field name="noOfInstallments" type="numeric"></field>  
+      <field name="interestRate" type="floating-point"></field>  
+      <field name="startDate" type="date-time"></field>
+      <field name="lastModifiedDate" type="date-time"></field>
+      <field name="bankId" type="id"></field> 
+      <field name="accountNumber" type="id"></field>  
+      <field name="sortCode" type="id"></field>   
+      <field name="guarantorPartyId" type="id"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanId" type="id"></field>
+      <field name="isLoanTermsAccepted" type="indicator"></field> 
+      <field name="finAccountId" type="id"></field>
+      <prim-key field="loanRequestId"/>
+      <relation type="one" fk-name="LOAN_REQ_PARTY" rel-entity-name="Party">
+        	<key-map field-name="partyId"/>
+      </relation>
+      <relation type="one" fk-name="LOAN_REQ_LOAN" rel-entity-name="Loan">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="one" fk-name="LOAN_REQ_LOAN_TYPE" rel-entity-name="LoanType">
+        	<key-map field-name="LoanTypeId"/>
+      </relation>
+    </entity> 
+
+    <entity entity-name="LoanRequestStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Request Status Entity">
+      <field name="loanRequestStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanRequestId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanRequestStatusId"/>
+      <relation type="one" fk-name="LOAN_REQ_STS" rel-entity-name="LoanRequest">
+        	<key-map field-name="loanRequestId"/>
+      </relation>
+    </entity> 
+    
+    <entity entity-name="LoanRequestContent" 
+    		package-name="org.ofbiz.cooperativefunds.loans" 
+    		title="Loan Request Content Entity">
+      <field name="loanRequestId" type="id-ne"></field>
+      <field name="contentId" type="id-ne"></field>
+      <field name="fromDate" type="date-time"></field>
+      <field name="thruDate" type="date-time"></field>
+      <prim-key field="loanRequestId"/>
+      <prim-key field="contentId"/>
+      <prim-key field="fromDate"/>
+      <relation type="one" fk-name="LOANREQ_CNT_LOANRQ" rel-entity-name="LoanRequest">
+        <key-map field-name="loanRequestId"/>
+      </relation>
+      <relation type="one" fk-name="LOANREQ_CNT_CNT" rel-entity-name="Content">
+        <key-map field-name="contentId"/>
+      </relation>
+    </entity>
+    
+    <view-entity entity-name="LoanRequestContentDetail" 
+    	package-name="org.ofbiz.cooperativefunds.loans" 
+    	title="LoanRequest Content Detail View Entity">
+        <member-entity entity-alias="PCT" entity-name="LoanRequestContent"/>
+        <member-entity entity-alias="CNT" entity-name="Content"/>
+        <alias-all entity-alias="PCT"/>
+        <alias-all entity-alias="CNT"/>
+        <view-link entity-alias="PCT" rel-entity-alias="CNT">
+            <key-map field-name="contentId"/>
+        </view-link>
+        <relation type="one-nofk" rel-entity-name="DataResource">
+            <key-map field-name="dataResourceId"/>
+        </relation>
+        <relation type="one-nofk" rel-entity-name="ContentType">
+            <key-map field-name="contentTypeId"/>
+        </relation>
+    </view-entity>
+    
+    <entity entity-name="LoanRequestContentType"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            default-resource-name="LoanRequestEntityLabels"
+            title="LoanRequest Content Type Entity">
+        <field name="loanRequestContentTypeId" type="id-ne"></field>
+        <field name="parentTypeId" type="id"></field>
+        <field name="description" type="description"></field>
+        <prim-key field="loanRequestContentTypeId"/>
+        <relation type="one" fk-name="LNRQCNT_TP_LOAN" title="Parent" rel-entity-name="LoanRequestContentType">
+            <key-map field-name="parentTypeId" rel-field-name="loanRequestContentTypeId"/>
+        </relation>
+    </entity>
+    
+    <entity entity-name="Loan"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Entity">
+      <field name="loanId" type="id-ne"></field>
+      <field name="partyId" type="id-ne"></field>
+      <field name="initialPrincipalAmount" type="currency-amount"></field>
+      <field name="balancePrincipalAmount" type="currency-amount"></field>
+      <field name="totalPrincipalPaid" type="currency-amount"></field>
+      <field name="totalInterestPaid" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="purpose" type="description"></field>
+      <field name="noOfInstallments" type="numeric"></field>
+      <field name="noOfUnpaidInstallments" type="numeric"></field>  
+      <field name="interestRate" type="floating-point"></field>  
+      <field name="startDate" type="date-time"></field>
+      <field name="statusId" type="id"></field>
+      <field name="loanTypeId" type="id"></field>
+      <field name="lastInstallmentSeqId" type="numeric"></field>
+      <field name="totalDisbursed" type="currency-amount"></field>
+      <field name="totalUndisbursed" type="currency-amount"></field>
+      <field name="finAccountId" type="id"></field>
+      <prim-key field="loanId"/>
+      <relation type="one" fk-name="LOAN_LOAN_REQ" rel-entity-name="LoanRequest">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="one" fk-name="LOAN_PARTY" rel-entity-name="Party">
+        	<key-map field-name="partyId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_AGREEMENT" rel-entity-name="Agreement">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_DISBSMT" rel-entity-name="LoanDisbursement">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_PAYOFF" rel-entity-name="LoanPayoff">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_PMT_PLAN" rel-entity-name="LoanPaymentPlan">
+        	<key-map field-name="loanId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_LOAN_REPMT_LOANS" rel-entity-name="LoanRepaymentLine">
+        	<key-map field-name="loanId"/>
+      </relation>
+    </entity>    
+    
+    <entity entity-name="LoanStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Status Entity">
+      <field name="loanStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanStatusId"/>
+      <relation type="one" fk-name="LOAN_STS" rel-entity-name="Loan">
+        	<key-map field-name="loanId"/>
+      </relation>
+    </entity>    
+    
+    <extend-entity entity-name="Agreement">
+		<field name="loanId" type="id-ne"></field>
+    </extend-entity>  
+
+    <entity entity-name="LoanRepayment"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Repayment Entity">
+      <field name="loanRepaymentId" type="id-ne"></field>
+      <!--field name="loanPaymentPlanId" type="id"></field-->
+      <field name="repaymentAmount" type="currency-amount"></field>
+      <field name="principalAmount" type="currency-amount"></field>
+      <field name="interestAmount" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="repaymentDate" type="date-time"></field>
+      <field name="statusId" type="id"></field>
+      <field name="paymentId" type="id"></field>
+      <field name="partyId" type="id"></field>
+      <field name="finAccountTransId" type="id"></field>
+      <prim-key field="loanRepaymentId"/>
+      <relation type="one" fk-name="LOAN_REPMT_PMT" rel-entity-name="Payment">
+        	<key-map field-name="paymentId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_REPMT_LOAN" rel-entity-name="LoanRepaymentLine">
+        	<key-map field-name="loanRepaymentId"/>
+      </relation>
+    </entity>    
+	
+	<view-entity entity-name="BorrowersRepayment"
+		package-name="org.ofbiz.cooperativefunds.loans"
+		title="Loan Receivers Repayment View Entity">
+		<member-entity entity-alias="LOANTAKEN" entity-name="Loan"/>		
+		<member-entity entity-alias="LOANTAKENREPAYMENT" entity-name="LoanRepaymentLine"/>
+		
+		<alias-all entity-alias="LOANTAKEN"/>
+		<alias-all entity-alias="LOANTAKENREPAYMENT"/>
+	
+		<view-link entity-alias="LOANTAKEN" rel-entity-alias="LOANTAKENREPAYMENT">
+			<key-map field-name="loanId" rel-field-name="loanId" />
+		</view-link>			
+	</view-entity> 
+	
+    <entity entity-name="LoanRepaymentStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Repayment Status Entity">
+      <field name="loanRepaymentStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanRepaymentId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanRepaymentStatusId"/>
+      <relation type="one" fk-name="LOAN_REPMT_STS" rel-entity-name="LoanRepayment">
+        	<key-map field-name="loanRepaymentId"/>
+      </relation>
+    </entity> 
+    
+    <entity entity-name="LoanRepaymentLine"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Repayment Line Entity">
+      <field name="loanRepaymentId" type="id-ne"></field>
+      <field name="loanId" type="id-ne"></field>
+      <field name="principalAmount" type="currency-amount"></field>
+      <field name="interestAmount" type="currency-amount"></field>
+      <field name="totalAmount" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="installmentSeqId" type="numeric"></field>  
+      <field name="interestRate" type="id"></field>  
+      <field name="loanPaymentPlanId" type="id"></field>
+      <prim-key field="loanRepaymentId"/>
+      <prim-key field="loanId"/>
+    </entity> 
+    
+    <entity entity-name="LoanDisbursement"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Disbursement Entity">
+      <field name="loanDisbursementId" type="id-ne"></field>
+      <field name="loanId" type="id-ne"></field>
+      <field name="disbursementAmount" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="disbursementDate" type="date-time"></field>
+      <field name="statusId" type="id"></field>
+      <field name="paymentMethodId" type="id"></field>
+      <field name="paymentId" type="id"></field>
+      <field name="finAccountTransId" type="id"></field>
+      <field name="loanPaymentPlanId" type="id"></field>
+      <prim-key field="loanDisbursementId"/>
+      <relation type="one" fk-name="LOAN_DISBMT_PMT" rel-entity-name="Payment">
+        	<key-map field-name="paymentId"/>
+      </relation>
+      <relation type="one" fk-name="LOAN_DISBMT_LOAN_PMTPLAN" rel-entity-name="LoanPaymentPlan">
+        	<key-map field-name="loanPaymentPlanId"/>
+      </relation>
+    </entity>  	
+
+    <entity entity-name="LoanDisbursementStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Disbursement Status Entity">
+      <field name="loanDisbursementStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanDisbursementId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanDisbursementStatusId"/>
+      <relation type="one" fk-name="LOAN_DISBMT_STS" rel-entity-name="LoanDisbursement">
+        	<key-map field-name="loanDisbursementId"/>
+      </relation>
+    </entity>  
+    
+    <entity entity-name="LoanPayoff"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Payoff Entity">
+      <field name="loanPayoffId" type="id-ne"></field>
+      <field name="loanId" type="id-ne"></field>
+      <field name="payoffAmount" type="currency-amount"></field>
+      <field name="payoffCharge" type="currency-amount"></field>
+      <field name="paymentMethodId" type="id"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="payoffDate" type="date-time"></field>
+      <field name="statusId" type="id"></field>
+      <field name="paymentId" type="id"></field>
+      <field name="finAccountTransId" type="id"></field>
+      <prim-key field="loanPayoffId"/>
+      <relation type="one" fk-name="LOAN_PAYOFF_PMT" rel-entity-name="Payment">
+        	<key-map field-name="paymentId"/>
+      </relation>
+    </entity>
+    
+    <entity entity-name="LoanPayoffStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Payoff Status Entity">
+      <field name="loanPayoffStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanPayoffId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanPayoffStatusId"/>
+      <relation type="one" fk-name="LOAN_PAYOFF_STS" rel-entity-name="LoanPayoff">
+        	<key-map field-name="loanPayoffId"/>
+      </relation>
+    </entity> 
+    
+    <entity entity-name="LoanInterestType"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Interest Rate Type Entity">
+      <field name="loanInterestTypeId" type="id-ne"></field>
+      <field name="description" type="description"></field>
+      <prim-key field="loanInterestTypeId"/>
+      <relation type="many" fk-name="LOAN_INTRTYP_LNTYP" rel-entity-name="LoanType">
+        	<key-map field-name="loanInterestTypeId"/>
+      </relation>
+    </entity>  	
+    
+    <entity entity-name="LoanPaymentPlan"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Payment Plan Entity">
+      <field name="loanPaymentPlanId" type="id-ne"></field>
+      <field name="loanId" type="id-ne"></field>
+      <field name="principalAmount" type="currency-amount"></field>
+      <field name="principalPaybackAmount" type="currency-amount"></field>
+      <field name="monthlyInterestPaybackAmount" type="currency-amount"></field>
+      <field name="monthlyPrincipalPaybackAmount" type="currency-amount"></field>
+      <field name="monthlyPaybackAmount" type="currency-amount"></field>
+      <field name="totalInterestAmount" type="currency-amount"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="noOfInstallments" type="numeric"></field>
+      <field name="loanTypeId" type="id"></field>
+      <field name="interestRate" type="floating-point"></field>
+      <field name="startDate" type="date-time"></field>
+      <field name="endDate" type="date-time"></field>
+      <field name="fromDate" type="date-time"></field>
+      <field name="toDate" type="date-time"></field>
+      <field name="statusId" type="id"></field>
+      <prim-key field="loanPaymentPlanId"/>
+      <relation type="many" fk-name="LOAN_PMTPLAN_LOAN_REPMT" rel-entity-name="LoanRepayment">
+        	<key-map field-name="loanPaymentPlanId"/>
+      </relation>
+    </entity>  	   
+
+    <entity entity-name="LoanPaymentPlanStatus"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Payment Plan Status Entity">
+      <field name="loanPaymentPlanStatusId" type="id-ne"></field>
+      <field name="statusId" type="id"></field> 
+      <field name="loanPaymentPlanId" type="id"></field>
+      <field name="statusDate" type="date-time"></field>
+      <field name="statusUserLogin" type="comment"></field>
+      <field name="changeReason" type="comment"></field>
+      <prim-key field="loanPaymentPlanStatusId"/>
+      <relation type="one" fk-name="LOAN_PMTPLAN_STS" rel-entity-name="LoanPaymentPlan">
+        	<key-map field-name="loanPaymentPlanId"/>
+      </relation>
+    </entity> 
+     
+    <entity entity-name="LoanType"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Loan Type Entity">
+      <field name="loanTypeId" type="id-ne"></field>
+      <field name="description" type="description"></field>
+      <field name="currencyUomId" type="id"></field>
+      <field name="noOfInstallments" type="numeric"></field>
+      <field name="loanInterestTypeId" type="id"></field>
+      <field name="interestRate" type="floating-point"></field>
+      <prim-key field="loanTypeId"/>
+      <relation type="many" fk-name="LOAN_TYPE_LOAN" rel-entity-name="Loan">
+        	<key-map field-name="loanTypeId"/>
+      </relation>
+      <relation type="many" fk-name="LOAN_TYPE_PMTPLAN" rel-entity-name="LoanPaymentPlan">
+        	<key-map field-name="loanTypeId"/>
+      </relation>
+    </entity>
+      
+    <entity entity-name="Banks"
+            package-name="org.ofbiz.cooperativefunds.loans"
+            title="Banks Entity">
+      <field name="bankId" type="id-ne"></field>
+      <field name="bankName" type="description"></field>
+      <field name="website" type="url"></field>
+      <prim-key field="bankId"/>
+    </entity> 
+      
+</entitymodel>

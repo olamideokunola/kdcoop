@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site-conf xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/site-conf.xsd">
+    <!-- The controller elements that are common to all OFBiz components
+         can be found in the following xml file. A component can override the
+         elements found in the common-controller.xml file. -->
+		 
+    <include location="component://common/webcommon/WEB-INF/common-controller.xml"/>
+	<include location="component://cooperativefunds/webapp/contributions/WEB-INF/controller.xml"/>
+	<include location="component://accounting/webapp/accounting/WEB-INF/controller.xml"/>
+    <include location="component://commonext/webapp/WEB-INF/controller.xml"/>
+    <description>cooperativefunds Component Site Configuration File</description>
+   
+    <handler name="service-multi" type="request" class="org.ofbiz.webapp.event.ServiceMultiEventHandler"/>
+    <handler name="simplecontent" type="view" class="org.ofbiz.content.view.SimpleContentViewHandler"/>
+
+    <!-- Events to run on every request before security (chains exempt) -->
+    <!--
+    <preprocessor>
+    </preprocessor>
+    -->
+    <!-- Events to run on every request after all other processing (chains exempt) -->
+    <!--
+    <postprocessor>
+        <event name="test" type="java" path="org.ofbiz.webapp.event.TestEvent" invoke="test"/>
+    </postprocessor>
+    -->
+
+
+    
+<!-- Loan Request Mappings -->    
+	<request-map uri="main">
+        <security https="false" auth="false"/>
+        <response name="success" type="view" value="main"/>
+    </request-map>
+
+	<request-map uri="login">
+        <security https="true" auth="false"/>
+        <event type="java" path="org.ofbiz.webapp.control.LoginWorker" invoke="login"/>
+        <response name="success" type="view" value="main"/>
+        <response name="requirePasswordChange" type="view" value="requirePasswordChange"/>
+        <response name="error" type="view" value="Login"/>
+    </request-map>
+
+	<request-map uri="logout">
+        <security https="true" auth="true"/>
+        <event type="java" path="org.ofbiz.webapp.control.LoginWorker" invoke="logout"/>
+        <response name="success" type="request-redirect" value="main"/>
+        <response name="error" type="view" value="main"/>
+    </request-map>
+
+	<request-map uri="requestAccountStatement">
+	 	<event type="java" path="org.ofbiz.cooperativefunds.coopPortal.PortalEvents" invoke="getContributionAccountStatementLines"/>
+    	<security https="true" auth="true"/>
+    	<response name="success" type="view" value="RequestAccountStatement"/>
+    </request-map>
+        
+
+  
+    <!-- View Mappings -->
+	
+	<view-map name="main" type="screen" page="component://cooperativefunds/widget/coopPortal/PortalScreens.xml#Index"/>
+	<view-map name="Login" type="screen" page="component://cooperativefunds/widget/coopPortal/PortalScreens.xml#Login"/>
+	<view-map name="RequestAccountStatement" type="screen" page="component://cooperativefunds/widget/coopPortal/PortalScreens.xml#RequestAccountStatement"/>
+	
+
+	<!-- Loan View Mappings -->
+
+</site-conf>

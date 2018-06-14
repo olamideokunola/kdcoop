@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<menus xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-menu.xsd">
+    <menu name="MainAppBarOld" title="${uiLabelMap.cooperativefundsApplication}" extends="CommonAppBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="main" title="${uiLabelMap.CommonMain}">
+        	<link target="main"/>
+        </menu-item>
+        <menu-item name="ContributionMenuItem" title="${uiLabelMap.ContributionMenuItem}">
+        	<link target="FindContributionBatches"></link>
+        </menu-item>
+        <menu-item name="CooperativeMembersMenuItem" title="${uiLabelMap.CooperativeMembersMenuItem}">
+        	<link target="newCoopMember"></link>
+        </menu-item>
+        <menu-item name="CooperativeFundsMenuItem" title="${uiLabelMap.CooperativeFundsMenuItem}">
+        	<link target="newCoopFund"></link>
+        </menu-item>
+    </menu>
+
+    <menu name="MainAppBar" title="${uiLabelMap.cooperativefundsApplication}" extends="CommonAppBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="main" title="${uiLabelMap.CooperativefundsFindContributionsMenuItem}">
+        	<link target="findContributions"/>
+        </menu-item>
+        <menu-item name="CooperativeMembersMenuItem" title="${uiLabelMap.CooperativeMembersMenuItem}">
+        	<link target="newCoopMember"></link>
+        </menu-item>
+        <menu-item name="CooperativeFundsMenuItem" title="${uiLabelMap.CooperativeFundsMenuItem}">
+        	<link target="newCoopFund"></link>
+        </menu-item>
+    </menu>
+        
+    <menu name="PaymentBatchMenu" title="${uiLabelMap.PaymentBatchStatusMenu}" extends="CommonTabBarMenu"
+    	extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="Confirm" title="${uiLabelMap.PaymentBatchConfirmMenu}">
+    		<link target="confirmPaymentBatch">
+    			<parameter param-name="paymentGroupId" from-field="parameters.paymentGroupId" />
+    			<parameter param-name="statusId" value="PMTGRP_CNF" />
+    		</link>
+    	</menu-item><menu-item name="Complete" title="${uiLabelMap.PaymentBatchCompleteMenu}">
+    		<link target="completePaymentBatch">
+    			<parameter param-name="paymentGroupId" from-field="parameters.paymentGroupId"></parameter>
+    			<parameter param-name="statusId" value="PMTGRP_CPL"/>
+    		</link>		
+    	</menu-item>
+    	<menu-item name="Reopen" title="${uiLabelMap.PaymentBatchReopenMenu}">
+    		<link target="reopenPaymentBatch">
+    			<parameter param-name="paymentGroupId" from-field="parameters.paymentGroupId"></parameter>
+    			<parameter param-name="statusId" value="PMTGRP_INCPL"/>
+    		</link>
+    	</menu-item>
+    </menu>
+    
+    <menu name="ContributionBatchTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml"
+          default-menu-item-name="EditContributionBatch">
+        <menu-item name="EditContributionBatch" title="${uiLabelMap.ContributionFundsContributionBatch}">
+            <link target="EditContributionBatch">
+                <parameter param-name="paymentGroupId"/>
+            </link>
+        </menu-item>
+        <menu-item name="FindContributionBatches" title="${uiLabelMap.PageTitleContributionBatch}">
+            <link target="FindContributionBatches"/>
+        </menu-item>
+    </menu>
+   	
+   	<menu name="ContributionBatchMainTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="FindContributionBatches" title="${uiLabelMap.PageTitleFindContributionBatch}">
+            <link target="FindContributionBatches"/>
+        </menu-item>
+        <menu-item name="NewContributionBatches" title="${uiLabelMap.PageTitleNewContributionBatch}">
+            <link target="newContributionPaymentBatch"/>
+        </menu-item>
+        <menu-item name="FindMemberContributions" title="${uiLabelMap.PageTitleFindMemberContributions}">
+            <link target="FindMemberContributions"/>
+        </menu-item>
+    </menu> 
+    
+    <menu name="ContributionBatchSubTabBar" menu-container-style="button-bar button-style-2" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <!-- >menu-item name="createNew" title="${uiLabelMap.CommonCreateNew} ${uiLabelMap.CooperativeFundsContribution}">
+            <link target="newContributionPaymentBatch"/>
+        </menu-item-->
+        <menu-item name="advancedContributionBatchSearch" title="${uiLabelMap.CommonAdvancedSearch}">
+            <condition>
+                <if-compare field="displayAdvancedSearch" operator="not-equals" value="true"/>
+            </condition>
+            <link target="FindContributionBatches">
+                <parameter param-name="displayAdvancedSearch" value="true"/>
+            </link>
+        </menu-item>
+        <menu-item name="quickContributionBatchSearch" title="${uiLabelMap.CooperativeFundsQuickSearch}">
+            <condition>
+                <if-compare field="displayAdvancedSearch" operator="equals" value="true"/>
+            </condition>
+            <link target="FindContributionBatches"/>
+        </menu-item>
+    </menu>
+    <menu name="MembersMainTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="FindMembers" title="${uiLabelMap.PageTitleFindMembers}">
+    		<link target="FindMembers"/>
+    	</menu-item>
+    	<menu-item name="NewMember" title="${uiLabelMap.PageTitleNewMember}">
+    		<link target="newCoopMember"></link>
+    	</menu-item>
+    </menu>
+    
+    <!-- Contribution Version 2 Menus -->
+    
+   	<menu name="ContributionMainTabBar" extends="CommonTabBarMenu" extends-resource="component://common/widget/CommonMenus.xml">
+        <menu-item name="FindContributions" title="${uiLabelMap.PageTitleFindContributions}">
+            <link target="findContributions"/>
+        </menu-item>
+        
+        <menu-item name="contributionOverview" title="${uiLabelMap.PageTitleContributionOverview}">
+            <condition>
+                <not><if-empty field="contribution.contributionId"/></not>
+            </condition>
+            <link target="contributionOverview">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+            </link>
+        </menu-item>
+
+        <menu-item name="editContribution" title="${uiLabelMap.PageTitleContributionHeader}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CRTD"/>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CNF"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="editContribution">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+            </link>
+        </menu-item>
+
+        <menu-item name="listContributionItems" title="${uiLabelMap.PageTitleContributionItems}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CRTD"/>                    
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CNF"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="listContributionItems">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+            </link>
+        </menu-item>
+
+    </menu>
+
+	<menu name="ContributionsStatusMenu" extends="CommonTabBarMenu"
+    	extends-resource="component://common/widget/CommonMenus.xml">
+    	<menu-item name="Edit" title="${uiLabelMap.ContributionEditMenu}">
+    		<link target="editContribution">
+    			<parameter param-name="contributionId" from-field="parameters.contributionId" />
+    			<parameter param-name="statusId" value="CONTRIB_CRTD" />
+    		</link>
+    	</menu-item>
+    	<menu-item name="Confirm" title="${uiLabelMap.ContributionConfirmMenu}">
+    		<link target="confirmContribution">
+    			<parameter param-name="contributionId" from-field="parameters.contributionId" />
+    			<parameter param-name="statusId" value="CONTRIB_CNF" />
+    		</link>
+    	</menu-item>
+    	<menu-item name="Complete" title="${uiLabelMap.ContributionCompleteMenu}">
+    		<link target="endContribution">
+    			<parameter param-name="contributionId" from-field="parameters.contributionId"></parameter>
+    			<parameter param-name="statusId" value="CONTRIB_CPL"/>
+    		</link>		
+    	</menu-item>
+    </menu>
+
+ 	<menu name="ContributionSubTabBar" menu-container-style="button-bar button-style-2" default-selected-style="selected">
+        <menu-item name="createNew" title="${uiLabelMap.CreateNewContribution}" widget-style="buttontext create">
+            <link target="newContribution"/>
+        </menu-item>
+        <menu-item name="pdf" title="${uiLabelMap.ContributionPDF}">
+            <condition>
+                    <not><if-empty field="contribution.contributionId"/></not>
+            </condition>
+            <link target="contribution.pdf" target-window="_BLANK">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToConfirmed" title="${uiLabelMap.ContributionStatusToConfirmed}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CRTD"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="setContributionStatus">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+                <parameter param-name="statusId" value="CONTRIB_CNF"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCompleted" title="${uiLabelMap.ContributionStatusToCompleted}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CNF"/>
+                </and>
+            </condition>
+            <link target="completeContribution">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+                <parameter param-name="statusId" value="CONTRIB_CPL"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCreated" title="${uiLabelMap.ContributionStatusToCreated}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CNF"/>
+
+                    </or>
+                </and>
+            </condition>
+            <link target="setContributionStatus">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+                <parameter param-name="statusId" value="CONTRIB_CRTD"/>
+            </link>
+        </menu-item>
+        <menu-item name="statusToCancelled" title="${uiLabelMap.ContributionStatusToCancelled}">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CRTD"/>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CNF"/>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CPL"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="setContributionStatus">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+                <parameter param-name="statusId" value="CONTRIB_CNCLD"/>
+            </link>
+        </menu-item>
+        <menu-item name="acctgTransEntriesPdf" title="Acctg Trans Entries PDF">
+            <condition>
+                <and>
+                    <not><if-empty field="contribution.contributionId"/></not>
+                    <or>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_CPL"/>
+                        <if-compare field="contribution.statusId" operator="equals" value="CONTRIB_PAID"/>
+                    </or>
+                </and>
+            </condition>
+            <link target="ContributionAcctgTransEntriesPdf">
+                <parameter param-name="contributionId" from-field="contribution.contributionId"/>
+            </link>
+        </menu-item>
+    </menu>
+        
+ </menus>

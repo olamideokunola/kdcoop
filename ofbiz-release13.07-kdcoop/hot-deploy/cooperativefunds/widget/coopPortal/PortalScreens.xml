@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-screen.xsd">
+
+    <screen name="CommonPortalDecorator">
+        <section>
+            <widgets>
+                <include-screen name="header1"/>
+                <decorator-section-include name="title"/>
+                <include-screen name="header2"/>
+                <include-screen name="mainmenu"/>
+                <include-screen name="usermenu"/>
+                <decorator-section-include name="body"/>
+                <include-screen name="footer"/>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="header1">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/header1.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="header2">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/header2.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="footer">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/footer.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="mainmenu">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/mainmenu.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="navbarbegin">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/navbarbegin.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="navbarend">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/navbarend.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="usermenu">
+        <section>
+            <widgets>
+                <platform-specific>
+                    <html>
+                        <html-template location="component://cooperativefunds/widget/coopPortal/usermenu.ftl"/>
+                    </html>
+                </platform-specific>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="Index">
+       	<section>
+       		<actions></actions>
+       		<widgets>
+       			<decorator-screen name="CommonPortalDecorator">
+                    <decorator-section name="title">
+                        <platform-specific>
+                            <html>
+                                <html-template location="component://cooperativefunds/widget/coopPortal/title.ftl"/>
+                            </html>
+                        </platform-specific>
+       				</decorator-section>
+       				<decorator-section name="body">
+
+       				</decorator-section>
+       			</decorator-screen>
+       		</widgets>
+       	</section>
+    </screen>
+
+    <screen name="Login">
+       	<section>
+       		<actions></actions>
+       		<widgets>
+       			<decorator-screen name="CommonPortalDecorator">
+                    <decorator-section name="title">
+                        <platform-specific>
+                            <html>
+                                <html-template location="component://cooperativefunds/widget/coopPortal/title.ftl"/>
+                            </html>
+                        </platform-specific>
+       				</decorator-section>
+       				<decorator-section name="body">
+                       <platform-specific>
+                            <html>
+                                <html-template location="component://cooperativefunds/widget/coopPortal/login.ftl"/>
+                            </html>
+                        </platform-specific>
+       				</decorator-section>
+       			</decorator-screen>
+       		</widgets>
+       	</section>
+    </screen>
+
+    <screen name="RequestAccountStatement">
+       	<section>
+       		<actions>
+       			<set field="partyId" from-field="userLogin.partyId"/>
+       			<set field="finAccountTransList" from-field="parameters.finAccountTransList"/>
+       			<set field="grandTotal" from-field="parameters.grandTotal"/>
+                <entity-condition entity-name="FinAccount" list="finAccountList">
+                    <condition-expr field-name="ownerPartyId"  operator="equals" from-field="partyId"/>
+                    <order-by field-name="fundId"/>
+                </entity-condition>
+            </actions>
+       		<widgets>
+       			<decorator-screen name="CommonPortalDecorator">
+                    <decorator-section name="title">
+                        <platform-specific>
+                            <html>
+                                <html-template location="component://cooperativefunds/widget/coopPortal/title.ftl"/>
+                            </html>
+                        </platform-specific>
+       				</decorator-section>
+       				<decorator-section name="body">
+                       <platform-specific>
+                            <html>
+                                <html-template location="component://cooperativefunds/widget/coopPortal/accountStatementForm.ftl"/>
+                            </html>
+                        </platform-specific>
+
+       						<platform-specific>
+	                            <html>
+	                                <html-template location="component://cooperativefunds/widget/coopPortal/accountStatementLines.ftl"/>
+	                            </html>
+	                        </platform-specific>
+
+       				</decorator-section>
+       			</decorator-screen>
+       			
+       		</widgets>
+       	</section>
+    </screen>
+    
+</screens>
+

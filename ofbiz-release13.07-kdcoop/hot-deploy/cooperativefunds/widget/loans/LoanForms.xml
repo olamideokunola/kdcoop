@@ -1,0 +1,877 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<forms xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-form.xsd">
+    <!-- Loan forms -->
+	
+	<form name="FindLoanRequests" type="single" target="findLoanRequests"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="LoanRequest" default-field-type="find"/>
+        <field name="loanRequestId"><text-find ignore-case="true"/></field>
+        <field name="loanTypeId" title="${uiLabelMap.CooperativefundsFormFieldTitle_loanTypeId}">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="LoanType">
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="displayAdvancedSearch"><hidden value="true"></hidden></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="QuickFindLoanRequests" type="single" target="findLoanRequests"
+            header-row-style="header-row" default-table-style="basic-table">
+        <field name="loanRequestId"><text-find ignore-case="true"/></field>
+        <field name="partyId"><lookup target-form-name="LookupPartyName"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="LOAN_REQ_STATUS"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="ListLoanRequests" type="list" separate-columns="true" default-entity-name="LoanRequest" list-name="listIt" paginate-target="findLoanRequests" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="LoanRequest"/>
+                <field-map field-name="orderBy" value="loanRequestId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <auto-fields-entity entity-name="LoanRequest" default-field-type="display"/>
+        <field name="loanRequestId">
+            <hyperlink  description="${loanRequestId}" target="editLoanRequest">
+                <parameter param-name="loanRequestId"/>
+            </hyperlink>
+        </field>
+        <field name="statusId"  title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="loanTypeId"><display-entity entity-name="LoanType"/></field>
+    </form> 
+
+	<form name="FindLoans" type="single" target="findLoans"
+        header-row-style="header-row" default-table-style="basic-table">
+        <auto-fields-entity entity-name="Loan" default-field-type="find"/>
+        <field name="loanId"><text-find ignore-case="true"/></field>
+        <field name="loanTypeId" title="${uiLabelMap.CooperativefundsFormFieldTitle_loanTypeId}">
+            <drop-down allow-empty="true">
+                <entity-options description="${description}" entity-name="LoanType">
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="partyId"><text-find ignore-case="true"/></field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="displayAdvancedSearch"><hidden value="true"></hidden></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="QuickFindLoans" type="single" target="findLoans"
+            header-row-style="header-row" default-table-style="basic-table">
+        <field name="loanId"><text-find ignore-case="true"/></field>
+        <field name="partyId"><lookup target-form-name="LookupPartyName"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}">
+            <drop-down allow-empty="true">
+                <entity-options entity-name="StatusItem" description="${description}">
+                    <entity-constraint name="statusTypeId" value="LOAN_STATUS"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="noConditionFind"><hidden value="Y"/><!-- if this isn't there then with all fields empty no query will be done --></field>
+        <field name="searchButton" title="${uiLabelMap.CommonFind}" widget-style="smallSubmit"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="ListLoans" type="list" separate-columns="true" default-entity-name="Loan" list-name="listIt" paginate-target="findLoans" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="Loan"/>
+                <field-map field-name="orderBy" value="loanId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service>
+        </actions>
+        <auto-fields-entity entity-name="Loan" default-field-type="display"/>
+        <field name="loanId">
+            <hyperlink  description="${loanId}" target="editLoan">
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="statusId"  title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="loanTypeId"><display-entity entity-name="LoanType"/></field>
+    </form>    
+    
+    <form name="NewLoanRequest" type="single" title="Loan Request" default-map-name="loanRequest" target="createLoanRequest"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanRequest"/>
+		<actions>
+			<entity-one value-field="contentAssocDataResourceViewFrom" entity-name="ContentAssocDataResourceViewFrom">
+				<field-map field-name="contentIdStart" value="10003"/>
+				<field-map field-name="contentId" value="10002"/>
+				<field-map field-name="caContentIdTo" value="10003"/>
+				<field-map field-name="caContentId" value="10002"/>
+				<field-map field-name="caFromDate" value="2017-04-22 14:10:38.800"/>
+				<field-map field-name="caContentAssocTypeId" value="ALTERNATIVE_URL"/>
+				<field-map field-name="drDataResourceId" value="10002"/>
+			</entity-one>
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        
+        <field name="partyId"><lookup target-form-name="LookupPartyName"/></field>
+		<field name="loanId"><display/></field>
+		<field name="loanTypeId">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="LoanType" description="${description}">
+	            </entity-options>
+	        </drop-down>
+        </field>
+		<field name="finAccountId">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="FinAccount" description="${finAccountName}">
+	                <entity-constraint name="ownerPartyId" value="${parameters.partyId}"/>
+	            </entity-options>
+	        </drop-down>
+        </field>
+        <field name="statusId"><hidden/></field>
+        <field name="bankId">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="Banks" description="${bankName}">
+	            </entity-options>
+	        </drop-down>
+        </field>
+        
+        <field name="loanRequestId" title="${uiLabelMap.CooperativefundsRequestId}" use-when="loanRequestId==null">
+            <hidden/>
+        </field>
+        
+        <field name="noOfInstallments"><hidden/></field>
+        <field name="interestRate"><hidden/></field>
+        <field name="lastModifiedDate"><hidden/></field>
+        
+        <field name="guarantorPartyId"><lookup target-form-name="LookupPartyName"/></field>
+        <field name="isLoanTermsAccepted" title="${uiLabelMap.CooperativefundsLoanTermsAccepted}">
+        	<check/>
+        </field>
+        <field name="loanTerms" title="${uiLabelMap.CooperativefundsLoanTermsTitle}">
+        	<hyperlink  description="${uiLabelMap.CooperativefundsLoanTerms}" target="viewLoanTerms">
+                <parameter param-name="MASTER_contentId" from-field="contentAssocDataResourceViewFrom.contentId"/>
+                <parameter param-name="MASTER_drDataResourceId" from-field="contentAssocDataResourceViewFrom.drDataResourceId"/>
+                <parameter param-name="MASTER_caContentIdTo" from-field="contentAssocDataResourceViewFrom.caContentIdTo"/>
+                <parameter param-name="MASTER_caContentAssocTypeId" from-field="contentAssocDataResourceViewFrom.caContentAssocTypeId"/>
+                <parameter param-name="MASTER_caFromDate" from-field="contentAssocDataResourceViewFrom.caFromDate"/>
+                <parameter param-name="MASTER_caMapKey" from-field="contentAssocDataResourceViewFrom.caMapKey"/>
+            </hyperlink>
+        </field>        
+		<field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>	
+    </form>
+	
+	<form name="loanRequestsList" type="list" separate-columns="true" default-entity-name="LoanRequest" list-name="loanRequests" paginate="true"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <row-actions>
+            <!-- service service-name="performFind" result-map="result" result-map-list="listIt">
+                <field-map field-name="inputFields" from-field="parameters"/>
+                <field-map field-name="entityName" value="PaymentGroup"/>
+                <field-map field-name="orderBy" value="paymentGroupId"/>
+                <field-map field-name="viewIndex" from-field="viewIndex"/>
+                <field-map field-name="viewSize" from-field="viewSize"/>
+            </service-->
+            <entity-one entity-name="LoanType" value-field="loanType"/>
+            <set field="noOfInstallments" from-field="loanType.noOfInstallments"/>
+            <set field="interestRate" from-field="loanType.interestRate"/>
+        </row-actions>
+        <!-- auto-fields-entity entity-name="Loan" default-field-type="display"/-->
+        <field name="loanRequestId" title="${uiLabelMap.CooperativefundsRequestId}">
+            <hyperlink  description="${loanRequestId}" target="/loans/control/editLoanRequest" target-type="inter-app" full-path="true">
+                <parameter param-name="loanRequestId"/>
+            </hyperlink>
+        </field>
+
+        <field name="loanId">
+            <hyperlink  description="${loanId}" target="/loans/control/editLoan" target-type="inter-app" full-path="true">>
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="amount" ><display/></field>
+        <field name="noOfInstallments" ><display/></field>
+        <field name="interestRate" ><display/></field>
+        <field name="statusId"  title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form> 
+    
+    <form name="EditLoanRequest" type="single" title="Loan Request" default-map-name="loanRequest" target="updateLoanRequest"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="updateLoanRequest"/>
+		<actions>
+			<entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+			<set field="loanId" from-field="loanRequest.loanId"/>
+			<set field="partyId" from-field="parameters.partyId"/>
+		</actions>
+		<field name="loanRequestId" ><hidden/></field>
+		
+		<field name="loanTypeId" use-when="loanId==null">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="LoanType" description="${description}">
+	            </entity-options>
+	        </drop-down>
+        </field>
+		<field name="loanTypeId" use-when="loanId!=null">
+			<display-entity also-hidden="false" entity-name="LoanType" key-field-name="loanTypeId" description="${description}"/>
+		</field>
+        <field name="amount" use-when="loanId!=null"><display/></field>
+        <field name="currencyUomId" use-when="loanId!=null"><display/></field>
+        <field name="noOfInstallments"><hidden/></field>
+        <field name="interestRate"><hidden/></field>
+        <field name="bankId" use-when="loanId!=null">
+        	<display-entity also-hidden="false" entity-name="Banks" key-field-name="bankId" description="${bankName}"/>
+        </field>
+        <field name="startDate" use-when="loanId!=null"><display/></field>
+        <field name="lastModifiedDate"><hidden/></field>
+        <field name="accountNumber" use-when="loanId!=null"><display/></field>
+        <field name="sortCode" use-when="loanId!=null"><display/></field>
+        <field name="guarantorPartyId" use-when="loanId!=null"><display/></field>
+        <field name="isLoanTermsAccepted"><hidden/></field>
+		<field name="partyId">
+			<display-entity also-hidden="false" entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${firstName} ${lastName}"/>
+		</field>
+		<field name="loanId"><display/></field>
+		<field name="purpose" use-when="loanId!=null"><display/></field>
+		
+		<field name="statusId">
+            <display/>
+        </field>
+		<field name="finAccountId">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="FinAccount" description="${finAccountName}">
+	                <entity-constraint name="ownerPartyId" value="${partyId}"/>
+	            </entity-options>
+	        </drop-down>
+        </field>
+        <field name="bankId" use-when="loanId==null">
+            <drop-down allow-empty="true">
+	            <entity-options entity-name="Banks" description="${bankName}">
+	            </entity-options>
+	        </drop-down>
+        </field>
+        
+        <field name="guarantorPartyId" use-when="loanId==null"><lookup target-form-name="LookupPartyName"/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}" use-when="loanId==null"><submit button-type="button"/></field>	
+    </form>
+    
+    <form name="CreatePayslipContent" type="upload" default-map-name="content"
+        focus-field-name="contentId" header-row-style="header-row" default-table-style="basic-table" target="createPayslipContent?loanRequestId=${parameters.loanRequestId}">
+        <actions>
+            <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+            <entity-one entity-name="StatusItem" value-field="currentStatus" auto-field-map="false">
+                <field-map field-name="statusId" from-field="content.statusId"/>
+            </entity-one>
+            <entity-one entity-name="DataResource" value-field="dataResource" auto-field-map="false">
+                <field-map field-name="dataResourceId" from-field="content.dataResourceId"/>
+            </entity-one>
+        </actions>
+        <field name="loanRequestId" map-name="parameters"><hidden/></field>
+        <field name="contentTypeId">
+        	<hidden value="DOCUMENT"/>
+        </field>
+        <field name="statusId">
+        	<hidden value="CTNT_AVAILABLE"/>
+        </field>
+        <field name="dataResourceName" title="${uiLabelMap.CommonUpload}*"><file/></field>
+        <!--field name="contentIdFrom" title="${uiLabelMap.ContentCompDocParentContentId}"><lookup target-form-name="LookupDetailContentTree"/></field-->
+        <field name="createButton"><submit button-type="button"/></field>
+    </form>
+	
+    <form name="CreatePensionStmtContent" type="upload" default-map-name="content"
+        focus-field-name="contentId" header-row-style="header-row" default-table-style="basic-table" target="createPensionStmtContent?loanRequestId=${parameters.loanRequestId}">
+        <actions>
+            <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+            <entity-one entity-name="StatusItem" value-field="currentStatus" auto-field-map="false">
+                <field-map field-name="statusId" from-field="content.statusId"/>
+            </entity-one>
+            <entity-one entity-name="DataResource" value-field="dataResource" auto-field-map="false">
+                <field-map field-name="dataResourceId" from-field="content.dataResourceId"/>
+            </entity-one>
+        </actions>
+        <field name="loanRequestId" map-name="parameters"><hidden/></field>
+        <field name="contentTypeId">
+        	<hidden value="DOCUMENT"/>
+        </field>
+        <field name="statusId">
+        	<hidden value="CTNT_AVAILABLE"/>
+        </field>
+        <field name="dataResourceName" title="${uiLabelMap.CommonUpload}*"><file/></field>
+        <field name="contentIdFrom" title="${uiLabelMap.ContentCompDocParentContentId}"><lookup target-form-name="LookupDetailContentTree"/></field>
+        <field name="createButton"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="AddLoanRequestContent" target="updateLoanRequestContent" type="upload" default-map-name="content"
+        focus-field-name="contentTypeId" header-row-style="header-row" default-table-style="basic-table">
+        <actions>
+            <entity-one entity-name="StatusItem" value-field="currentStatus" auto-field-map="false">
+                <field-map field-name="statusId" from-field="content.statusId"/>
+            </entity-one>
+            <entity-one entity-name="DataResource" value-field="dataResource" auto-field-map="false">
+                <field-map field-name="dataResourceId" from-field="content.dataResourceId"/>
+            </entity-one>
+        </actions>
+
+        <alt-target use-when="content==null" target="createLoanRequestContent"/>
+        <!-- <auto-fields-entity entity-name="Content"/> -->
+
+        <field name="loanRequestId" map-name="parameters"><hidden/></field>
+        <field name="dataResourceId" map-name="dataResource" use-when="content!=null"><hidden/></field>
+        <field use-when="content!=null" name="contentId" tooltip="${uiLabelMap.CommonNotModifRecreat}"><display/></field>
+        <field name="loanRequestContentTypeId">
+            <drop-down allow-empty="false">
+                <entity-options description="${description}" entity-name="LoanRequestContentType"/>
+            </drop-down>
+        </field>
+        <!-- note sure if these two are necessray, but they are kind of confusing in this context:
+        <field name="ownerContentId"><lookup target-form-name="LookupContent"/></field>
+        <field name="dataResourceId" title="${uiLabelMap.ContentDataResourceId}"><lookup target-form-name="LookupDataResource"/></field>
+        -->
+        <field name="contentTypeId">
+            <drop-down allow-empty="false" no-current-selected-key="DOCUMENT">
+                <entity-options description="${description}" entity-name="ContentType"/>
+            </drop-down>
+        </field>
+        <field name="statusId" use-when="content==null">
+            <drop-down allow-empty="false" no-current-selected-key="CTNT_AVAILABLE">
+                <entity-options description="${description}" entity-name="StatusItem">
+                    <entity-constraint name="statusTypeId" value="CONTENT_STATUS"/>
+                    <entity-order-by field-name="sequenceId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="statusId" use-when="content!=null">
+            <drop-down allow-empty="false" current-description="${currentStatus.description}" no-current-selected-key="CTNT_AVAILABLE">
+                <entity-options entity-name="StatusValidChangeToDetail" key-field-name="statusIdTo" description="${transitionName} (${description})">
+                    <entity-constraint name="statusId" value="${content.statusId}"/>
+                    <entity-order-by field-name="sequenceId"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="mimeTypeId" >
+            <drop-down allow-empty="false">
+                <entity-options description="${description}" entity-name="MimeType"/>
+            </drop-down>
+        </field>
+        <field name="dataResourceName" title="${uiLabelMap.CommonUpload}"><file/></field>
+        <field name="dataCategoryId" use-when="dataResource==null">
+            <drop-down allow-empty="false">
+                <entity-options description="${categoryName}" entity-name="DataCategory"/>
+            </drop-down>
+        </field>
+        <field name="dataCategoryId" use-when="dataResource!=null">
+            <drop-down allow-empty="false">
+                <entity-options description="${categoryName}" entity-name="DataCategory">
+                    <entity-constraint name="dataCategoryId" value="${dataResource.dataCategoryId}"/>
+                    <entity-order-by field-name="categoryName"/>
+                </entity-options>
+               <entity-options description="${categoryName}" entity-name="DataCategory"/>
+            </drop-down>
+        </field>
+        <field name="isPublic" title="${uiLabelMap.LoanRequestIsPublic}" map-name="dataResource">
+            <drop-down no-current-selected-key="N">
+                <option key="N" description="${uiLabelMap.CommonNo}"/>
+                <option key="Y" description="${uiLabelMap.CommonYes}"/>
+            </drop-down>
+        </field>
+        <field name="createButton" use-when="content==null"><submit button-type="button"/></field>
+        <field name="updateButton" use-when="content!=null"><submit button-type="button"/></field>
+    </form>
+
+    <form name="ListLoanRequestContents" type="list" separate-columns="false"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <actions>
+            <entity-and entity-name="LoanRequestContentDetail">
+                <field-map field-name="loanRequestId"/>
+            </entity-and>
+        </actions>
+        <field name="loanRequestId"><hidden/></field>
+        <field name="contentId"><hidden/></field>
+        <field name="contentName">
+            <display-entity entity-name="Content" description="${contentName}" key-field-name="contentId">
+                <sub-hyperlink target="editLoanRequestContents" description="${contentId}" link-style="smallSubmit">
+                    <parameter param-name="contentId"/>
+                    <parameter param-name="loanRequestId"/>
+                </sub-hyperlink>
+            </display-entity>
+        </field>
+        <field name="loanRequestContentTypeId"><display-entity entity-name="LoanRequestContentType"/></field>
+        <field name="description"><display/></field>
+        <field name="statusId"><display-entity entity-name="StatusItem"></display-entity></field>
+        <field name="localeString"><display-entity entity-name="CountryCode" key-field-name="countryCode" description="${countryName}${countryCode}"></display-entity></field>
+        <field name="contentTypeId"><display-entity entity-name="ContentType"></display-entity></field>
+        <field name="mimeTypeId"><display-entity entity-name="MimeType"></display-entity></field>
+        <field name="dataResourceId" title="${uiLabelMap.FormFieldTitle_dataResourceName}" use-when="dataResourceId==null"><display/> </field>
+        <field name="dataResourceId" title="${uiLabelMap.FormFieldTitle_dataResourceName}" use-when="dataResourceId!=null">
+            <display-entity entity-name="DataResource" description="${dataResourceName}"/>
+        </field>
+        <field name="editLink" title=" " widget-style="smallSubmit">
+           <hyperlink also-hidden="false" description="${uiLabelMap.CommonEdit}" target="editLoanRequestContents">
+                <parameter param-name="contentId"/>
+                <parameter param-name="loanRequestId"/>
+                <parameter param-name="dataResourceId"/>
+            </hyperlink>
+        </field>
+    </form>
+    
+    <form name="EditLoan" type="single" title="Loan" default-map-name="loan" target="updateLoan"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="updateLoan"/>
+		<field name="loanRequestId"><display/></field>
+
+        <field name="noOfInstallments"><display/></field>
+        <field name="noOfUnpaidInstallments"><text/></field>
+        <field name="interestRate"><display/></field>
+
+        <field name="balancePrincipalAmount"><display/></field>
+        <field name="totalPrincipalPaid"><display/></field>
+        <field name="totalInterestPaid"><display/></field>
+        
+		<field name="partyId"><display/></field>
+		<field name="loanId"><display/></field>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+		<field name="statusId"><display/></field>
+		<field name="loanTypeId">
+			<display-entity entity-name="LoanType"/>
+        </field>
+        <field name="totalDisbursed"><display/></field>
+        <field name="totalUndisbursed"><display/></field>
+		<field name="lastInstallmentSeqId"><hidden/></field>
+		<field name="bankId"><hidden/></field>
+        <field name="loanRequestId"><hidden/></field>
+        <field name="guarantorPartyId"><hidden/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>	
+    </form>
+    
+    <form name="loanHeader" type="single" title="Loan header information" default-map-name="loan"
+        header-row-style="header-row" default-table-style="basic-table">
+        <actions>
+			
+        </actions>
+        <field name="loanId"><hidden/></field>
+        <field position="1" name="loanTypeId"><display-entity entity-name="LoanType"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}" position="2"><display-entity entity-name="StatusItem"/></field>
+        <field position="1" name="purpose"><display/></field>
+        <field position="2" name="currencyUomId"><display/></field>
+        <field position="1" name="initialPrincipalAmount"><display/></field>
+        <field position="2" name="totalPrincipalPaid"><display/></field>
+        <field position="1" name="balancePrincipalAmount"><display/></field>
+        <field position="2" name="totalInterestPaid"><display/></field>
+        <field position="1" name="noOfInstallments"><display/></field>
+        <field position="2" name="startDate"><display/></field>
+        <field position="1" name="noOfUnpaidInstallments"><display/></field>
+        <field position="2" name="interestRate"><display/></field>
+        <field position="1" name="totalDisbursed"><display/></field>
+        <field position="2" name="lastInstallmentSeqId"><display/></field>
+        <field position="1" name="totalUndisbursed"><display/></field>
+        <field position="2" name="finAccountId"><display/></field>
+
+    </form>
+    
+    <form name="ListLoanStatus" list-name="loanStatus" type="list" paginate-target="ListLoanStatus"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <field name="loanId"><hidden/></field>
+        <field name="statusDate"><display description="${bsh:statusDate.toString().substring(0,10)}"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanDisbursements" list-name="loanDisbursements" type="list" paginate-target="loanDisbursements"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <field name="loanId"><hidden/></field>
+        <field name="loanDisbursementId">
+        	<hyperlink also-hidden="false" description="${loanDisbursementId}" target="editLoanDisbursement">
+                <parameter param-name="loanDisbursementId"/>
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="disbursementAmount"><display/></field>
+        <field name="disbursementDate"><display/></field>
+        <field name="paymentId">
+        	<hyperlink also-hidden="false" description="${paymentId}" target="/accounting/control/paymentOverview" target-type="inter-app" full-path="true">
+                <parameter param-name="paymentId"/>
+            </hyperlink>
+        </field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanAgreements" list-name="loanAgreements" type="list" paginate-target="loanAgreements"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <field name="loanId"><hidden/></field>
+        <field name="agreementId">           
+        	<hyperlink also-hidden="false" description="${agreementId}" target="editLoanAgreement">
+                <parameter param-name="agreementId"/>
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="description"><display/></field>
+        <field name="fromDate"><display description="${bsh:fromDate.toString().substring(0,10)}"/></field>
+        <field name="thruDate"><display description="${bsh:thruDate.toString().substring(0,10)}"/></field>    </form>
+    
+    <form name="loanPaymentPlans" list-name="loanPaymentPlans" type="list" paginate-target="loanPaymentPlans"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <!-- auto-fields-service service-name="createLoanPaymentPlan"/-->
+        <field name="loanId"><hidden/></field>
+        <field name="loanPaymentPlanId">
+        	<hyperlink also-hidden="false" description="${loanPaymentPlanId}" target="editLoanPaymentPlan">
+                <parameter param-name="loanPaymentPlanId"/>
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="monthlyInterestPaybackAmount"><display/></field>
+      	<field name="monthlyPrincipalPaybackAmount"><display/></field>
+      	<field name="monthlyPaybackAmount"><display/></field>
+      	<field name="startDate"><display/></field>
+      	<field name="endDate"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanRepaymentLoans" list-name="loanRepaymentLoans" type="list" paginate-target="loanRepaymentLoans"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <auto-fields-service service-name="createLoanRepayment"/>
+        <field name="loanId"><hidden/></field>
+        <field name="statusDate"><display description="${bsh:statusDate.toString().substring(0,10)}"/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanPayoffs" list-name="loanPayoffs" type="multi" paginate-target="loanPayoffs"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar">
+        <field name="loanId"><hidden/></field>
+        <field name="loanPayoffId">
+        	<hyperlink also-hidden="false" description="${loanPayoffId}" target="editLoanPayoff">
+                <parameter param-name="loanPayoffId"/>
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="payoffAmount"><display/></field>
+        <field name="payoffDate"><display/></field>
+        <field name="paymentMethodId"><display/></field>
+        <field name="paymentId">
+        	<hyperlink also-hidden="false" description="${paymentId}" target="/accounting/control/paymentOverview" target-type="inter-app" full-path="true">
+                <parameter param-name="paymentId"/>
+            </hyperlink>
+        </field>
+       																																																																																																					 <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanRepaymentLines" list-name="loanRepaymentList" type="multi" use-row-submit="true" paginate-target="loanRepayments"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar"
+        separate-columns="true"
+        target="createLoanRepaymentLines">
+        <auto-fields-entity entity-name="LoanRepaymentLine" default-field-type="display"/>
+        <!-- alt-target use-when="loanRepaymentId!=null" target="updateLoanRepaymentAndLines"/-->
+        <field name="loanId">
+        	<display/>
+        	<hyperlink also-hidden="false" description="${loanId}" target="loanOverview">
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="loanId"><display/></field>
+        <field name="loanRepaymentId"><display/></field>
+        <!-- field name="partyId">
+			<display-entity also-hidden="false" entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${firstName} ${lastName}"/>
+		</field-->
+        <field name="principalAmount"><text/></field>
+        <field name="interestAmount"><text/></field>
+        <field name="totalAmount"><display/></field>  
+        <field name="installmentSeqId"><display/></field>   
+        <field name="updateLink" title="Update" widget-style="smallSubmit">
+           <hyperlink also-hidden="false" description="${uiLabelMap.CommonUpdate}" target="updateLoanRepaymentEntry">
+                <parameter param-name="loanId"/>
+                <parameter param-name="principalAmount"/>
+                <parameter param-name="interestAmount"/>
+            </hyperlink>
+        </field>
+        <field name="_rowSubmit" title="Select"><check/></field>
+        <field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>																																																																																															 <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    <form name="loanRepaymentLinesDisplay" list-name="loanRepaymentList" type="multi" use-row-submit="true" paginate-target="loanRepayments"
+        odd-row-style="alternate-row" default-table-style="basic-table hover-bar"
+        separate-columns="true"
+        target="createLoanRepaymentLines">
+        <auto-fields-entity entity-name="LoanRepaymentLine" default-field-type="display"/>
+        <!-- alt-target use-when="loanRepaymentId!=null" target="updateLoanRepaymentAndLines"/-->
+        <field name="loanId">
+        	<display/>
+        	<hyperlink also-hidden="false" description="${loanId}" target="loanOverview">
+                <parameter param-name="loanId"/>
+            </hyperlink>
+        </field>
+        <field name="loanId"><display/></field>
+        <field name="loanRepaymentId"><display/></field>
+        <!-- field name="partyId">
+			<display-entity also-hidden="false" entity-name="PartyNameView" key-field-name="partyId" description="${groupName}${firstName} ${lastName}"/>
+		</field-->
+        <field name="principalAmount"><display/></field>
+        <field name="interestAmount"><display/></field>
+        <field name="totalAmount"><display/></field>  
+        <field name="installmentSeqId"><display/></field>   																																																																																															 <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+    </form>
+    
+    
+    <form name="NewLoanDisbursement" type="single" title="New Loan Disbursement" default-map-name="loanDisbursement" target="createLoanDisbursement"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanDisbursement"/>
+		<actions>
+			<entity-one value-field="loan" entity-name="Loan"/>
+			
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="paymentMethodId">
+            <drop-down>
+                <entity-options key-field-name="paymentMethodId" description="${description}" entity-name="PaymentMethod">
+                    <entity-constraint name="partyId" operator="equals" value="Company"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="loan.balancePrincipalAmount" title="${uiLabelMap.CooperativeLoanAmount}"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="paymentId"><display/></field>
+        <field name="loanDisbursementId"><display/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>	
+		
+    </form>
+    
+    <form name="EditLoanDisbursement" type="single" title="Edit Loan Disbursement" default-map-name="loanDisbursement" target="updateLoanDisbursement"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="updateLoanDisbursement"/>
+		<actions>
+			<entity-one value-field="loanDisbursement" entity-name="LoanDisbursement"/>
+		</actions>
+		<field name="disbursementAmount"><display/></field>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="paymentMethodId">
+            <drop-down>
+                <entity-options key-field-name="paymentMethodId" description="${description}" entity-name="PaymentMethod">
+                    <entity-constraint name="partyId" operator="equals" value="Company"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="loan.balancePrincipalAmount" title="${uiLabelMap.CooperativeLoanAmount}"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+        <field name="paymentId"><display/></field>
+        <field name="loanDisbursementId"><display/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>	
+		
+    </form>
+    
+	<form name="NewLoanPaymentPlan" type="single" title="New Loan Payment Plan" default-map-name="loanPaymentPlan" target="createLoanPaymentPlan"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanPaymentPlan"/>
+		<actions>
+			<entity-one value-field="loan" entity-name="Loan"/>
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="loan.balancePrincipalAmount" title="${uiLabelMap.CooperativeLoanAmount}"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>	
+		
+    </form>
+    
+    <form name="EditLoanPaymentPlan" type="single" title="Edit Loan Payment Plan" default-map-name="loanPaymentPlan" target="updateLoanPaymentPlan"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="updateLoanPaymentPlan"/>
+		<actions>
+			<entity-one value-field="loanPaymentPlan" entity-name="LoanPaymentPlan"/>
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+
+        <field name="loan.balancePrincipalAmount" title="${uiLabelMap.CooperativeLoanAmount}"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display-entity entity-name="StatusItem"/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>	
+		
+    </form>
+    
+	<form name="NewLoanPayoff" type="single" title="New Loan Payoff" default-map-name="loanPayoff" target="createLoanPayoff"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanPayoff"/>
+		<actions>
+			<entity-one value-field="loan" entity-name="Loan"/>
+			<set field="payoffAmount" from-field="loan.balancePrincipalAmount"/>
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="paymentMethodId">
+            <drop-down>
+                <entity-options key-field-name="paymentMethodId" description="${description}" entity-name="PaymentMethod">
+                    <entity-constraint name="partyId" operator="equals" value="${loan.partyId}"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="payoffAmount"><display/></field>
+        <field name="paymentId"><display/></field>
+        <field name="loanPayoffId"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><hidden/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>	
+		
+    </form>
+    
+    <form name="EditLoanPayoff" type="single" title="Edit Loan Payoff" default-map-name="loanPayoff" target="updateLoanPayoff"
+        header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="updateLoanPayoff"/>
+		<actions>
+			<entity-one value-field="loanPayoff" entity-name="LoanPayoff"/>
+		</actions>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+		<field name="paymentMethodId">
+            <drop-down>
+                <entity-options key-field-name="paymentMethodId" description="${description}" entity-name="PaymentMethod">
+                    <entity-constraint name="partyId" operator="equals" value="${loan.partyId}"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>
+        <field name="payoffAmount"><display/></field>
+        <field name="paymentId"><display/></field>
+        <field name="loanPayoffId"><display/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><hidden/></field>
+		<field name="loanId"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}"><submit button-type="button"/></field>	
+		
+    </form>
+	
+	<form name="NewLoanRepayment" type="single" title="New Loan Repayment" 
+		target="createLoanRepayment" header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanRepayment"/>
+		<alt-target use-when="loanRepayment!=null" target="updateLoanRepayment"/>
+		<actions>
+			
+		</actions>
+		
+		<field name="partyId"><lookup target-form-name="LookupPartyName"/></field>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <drop-down no-current-selected-key="${defaultCurrencyUomId}">
+                <entity-options key-field-name="uomId" description="${description} - ${abbreviation}" entity-name="Uom">
+                    <entity-constraint name="uomTypeId" operator="equals" value="CURRENCY_MEASURE"/>
+                    <entity-order-by field-name="description"/>
+                </entity-options>
+            </drop-down>
+        </field>	
+        <field name="repaymentDate"><date-time/></field>
+        <!-- field name="totalRepaymentAmount"><text/></field-->
+        <field name="repaymentAmount"><text/></field>
+        <field name="principalAmount"><display/></field>
+        <field name="interestAmount"><display/></field>
+        <field name="paymentId"><hidden/></field>
+        <field name="finAccountTransId"><hidden/></field>
+        <field name="loanRepaymentId"><display/></field>
+        <field name="paymentMethodId"><hidden/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display/></field>
+		<field name="submitButton" title="${uiLabelMap.CommonCreate}"><submit button-type="button"/></field>	
+		<field name="submitButton" title="${uiLabelMap.CommonUpdate}" use-when="loanRepayment!=null"><submit button-type="button"/></field>
+    </form>
+    
+    <form name="DisplayLoanRepayment" type="single" title="Loan Repayment" 
+		target="createLoanRepayment" header-row-style="header-row" default-table-style="basic-table">
+		<auto-fields-service service-name="createLoanRepayment"/>
+		<actions>
+			
+		</actions>
+		
+		<field name="partyId"><display/></field>
+		<field name="currencyUomId" title="${uiLabelMap.CommonCurrency}">
+            <display/>
+        </field>	
+        <field name="repaymentDate"><display/></field>
+        <!-- field name="totalRepaymentAmount"><text/></field-->
+        <field name="repaymentAmount"><display/></field>
+        <field name="principalAmount"><display/></field>
+        <field name="interestAmount"><display/></field>
+        <field name="paymentId"><hidden/></field>
+        <field name="finAccountTransId"><hidden/></field>
+        <field name="loanRepaymentId"><display/></field>
+        <field name="paymentMethodId"><hidden/></field>
+        <field name="statusId" title="${uiLabelMap.CommonStatus}"><display/></field>
+    </form>
+</forms>

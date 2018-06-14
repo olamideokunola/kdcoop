@@ -1,0 +1,7 @@
+2015-05-30 10:41:41,631 |-0.0.0.0-8443-exec-7 |ProductStoreWorker            |E| No product store found in request, cannot set locale!
+2015-05-30 10:41:41,631 |-0.0.0.0-8443-exec-7 |ProductStoreWorker            |E| No product store found in request, cannot set CurrencyUomId!
+2015-05-30 10:41:41,633 |-0.0.0.0-8443-exec-7 |RequestHandler                |E| Request initorderentry caused an error with the following message: Please select either sale or purchase order.
+2015-05-30 10:42:28,546 |-0.0.0.0-8443-exec-8 |ProductStoreWorker            |E| No product store found in request, cannot set locale!
+2015-05-30 10:42:28,547 |-0.0.0.0-8443-exec-8 |ProductStoreWorker            |E| No product store found in request, cannot set CurrencyUomId!
+2015-05-30 11:04:06,721 |0.0.0.0-8443-exec-13 |ProductStoreWorker            |E| No product store found in request, cannot set locale!
+2015-05-30 11:04:06,721 |0.0.0.0-8443-exec-13 |ProductStoreWorker            |E| No product store found in request, cannot set CurrencyUomId!

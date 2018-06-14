@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<simple-methods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/simple-methods-v2.xsd">
+        
+    <simple-method method-name="createContributionPaymentBatch" short-description="Create a Payment Group for Coorperative Contribution Payments">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>
+
+        <make-value entity-name="PaymentGroup" value-field="paymentGroup"/>
+        <if-empty field="parameters.paymentGroupId">
+            <sequenced-id sequence-name="PaymentGroup" field="paymentGroup.paymentGroupId"/>
+            <else>
+                <set field="paymentGroup.paymentGroupId" from-field="parameters.paymentGroupId"/>
+            </else>
+        </if-empty>
+        <field-to-result field="paymentGroup.paymentGroupId" result-name="paymentGroupId"/>
+
+        <set field="paymentGroup.paymentGroupTypeId" value="BATCH_PAYMENT"/>
+
+        <set field="paymentGroup.paymentGroupName" from-field="parameters.paymentGroupName"/>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																														        
+        <set field="paymentGroup.statusId" value="PMTGRP_INCPL"/>
+        
+        <set field="paymentGroup.partyId" from-field="userLogin.partyId"/>
+        
+        <set field="paymentGroup.batchCreationDate" from-field="parameters.batchCreationDate"/>
+        
+        <set field="paymentGroup.defaultCurrency" from-field="parameters.defaultCurrency"/>
+        
+        <set field="paymentGroup.totalAmount" from-field="parameters.totalAmount"/>
+
+        <create-value value-field="paymentGroup"/>
+    </simple-method>
+
+ 	<simple-method method-name="createContributionPaymentInPaymentBatch" short-description="Create a Payment and associate with Payment Batch in PaymentGroup Entity">
+		<!--1. Create new Payment and associate with Party (partyIdFrom) new FinAccountTrans  -->
+        <!--2. Associate Payment with Fund and current PaymentGroup  -->
+        <!--  -->
+        
+        <!--1. Create new Payment and associate with Party (partyIdFrom) new FinAccountTrans  -->
+        	<!-- Get parameters for creation of Payment record -->
+        	
+			<set-service-fields service-name="createPaymentAndFinAccountTrans" map="parameters" to-map="createPaymentMap"/>
+	        
+	        <call-service service-name="createPaymentAndFinAccountTrans" in-map-name="createPaymentMap">
+	            <result-to-field result-name="paymentId"/>
+	            <result-to-field result-name="finAccountTransId"/>
+	        </call-service>	        
+
+		<!--2. Associate Payment with Fund and current PaymentGroup  -->
+	        <if-not-empty field="parameters.fundId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="paymentId"/>
+            	</entity-one>
+            	<set field="payment.fundId" from-field="parameters.fundId"/>
+            	<set field="payment.finAccountTransId" from-field="finAccountTransId"/>
+	        </if-not-empty>		
+	        <if-not-empty field="parameters.paymentGroupId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="paymentId"/>
+            	</entity-one>
+            	<set field="payment.paymentGroupId" from-field="parameters.paymentGroupId"/>
+	        </if-not-empty>	
+	        <field-to-result field="paymentId"/>
+	        <field-to-result field="parameters.paymentGroupId" result-name="paymentGroupId"/>
+    </simple-method>    
+
+ 	<simple-method method-name="updatePaymentBatchStatus" short-description="Update Status of Payment Batch in PaymentGroup Entity">
+		<!--1. Get current PaymentGroup record in PaymentGroup Entity  -->
+	        <if-not-empty field="parameters.statusId">
+	            <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                	<field-map field-name="paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of PaymentGroup Entity  -->
+
+            			<set field="paymentGroup.statusId" from-field="parameters.statusId"/>
+
+	        </if-not-empty>
+	        <store-value value-field="paymentGroup"/>
+        	<field-to-result field="statusId"/>
+        	<log level="info" message="OLAMIDE:-parameters.statusId:${parameters.statusId}"></log>
+        	<log level="info" message="OLAMIDE:-paymentGroup.statusId:${paymentGroup.statusId}"></log>
+    </simple-method>  
+
+ 	<simple-method method-name="updateContributionBatch" short-description="Update Payment Batch attributes in PaymentGroup Entity">
+		<!--1. Get current PaymentGroup record in PaymentGroup Entity  -->
+	        <if-not-empty field="parameters.paymentGroupId">
+	            <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                	<field-map field-name="paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	</entity-one>
+        <!--2. Update all attributes for record of PaymentGroup Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="paymentGroup.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.paymentGroupName">
+            		<set field="paymentGroup.paymentGroupName" from-field="parameters.paymentGroupName"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="paymentGroup"/>
+	</simple-method>      
+
+ 	<simple-method method-name="updateContributionPayment" short-description="Update Payment attributes in Payment Entity">
+		<!--1. Get current Payment record in Payment Entity  -->
+	        <if-not-empty field="parameters.paymentId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="parameters.paymentId"/>
+            	</entity-one>
+        <!--2. Update all attributes for record of Payment Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="payment.statusId" from-field="parameters.statusId"/>
+            		<set field="payment.amount" from-field="parameters.amount"/>
+            		<set field="payment.paymentMethodTypeId" from-field="parameters.paymentMethodTypeId"/>
+            		<set field="payment.paymentMethodId" from-field="parameters.paymentMethodId"/>
+            		<set field="payment.partyIdFrom" from-field="parameters.partyIdFrom"/>
+            		<set field="payment.effectiveDate" from-field="parameters.effectiveDate"/>
+            		<set field="payment.currencyUomId" from-field="parameters.currencyUomId"/>
+            		<set field="payment.effectiveDate" from-field="parameters.effectiveDate"/>
+            		<set field="payment.comments" from-field="parameters.comments"/>
+            	</if-not-empty>
+            	<set field="payment.amount" from-field="parameters.amount"/>
+            	<if-not-empty field="parameters.overrideGlAccountId">
+            		<set field="paymentGroup.overrideGlAccountId" from-field="parameters.overrideGlAccountId"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.paymentGroupId">
+            		<set field="paymentGroup.paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.fundId">
+            		<set field="paymentGroup.fundId" from-field="parameters.fundId"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="payment"/>
+	</simple-method> 
+	
+	
+<!-- Contribution Version 2 -->
+	<simple-method method-name="createContribution" short-description="Create a Contribution in Contribution Entity">
+		<if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                    <not><if-has-permission permission="PAY_INFO" action="_CREATE"/></not>
+                    <not><if-compare-field field="userLogin.partyId" to-field="parameters.partyIdFrom" operator="equals"/></not>
+                    <not><if-compare-field field="userLogin.partyId" to-field="parameters.partyIdTo" operator="equals"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        
+        <make-value entity-name="Contribution" value-field="contribution"/>
+        <if-empty field="parameters.contributionId">
+            <sequenced-id sequence-name="Contribution" field="contribution.contributionId"/>
+            <set field="contribution.statusId" value="CONTRIB_CRTD"/>
+            <else>
+                <set field="contribution.contributionId" from-field="parameters.contributionId"/>
+                  
+            </else>
+        </if-empty>
+        <field-to-result field="contribution.contributionId" result-name="contributionId"/>
+
+        <if-not-empty field="parameters.description">
+            <set field="contribution.description" from-field="parameters.description"/>
+        </if-not-empty>
+ 
+        <if-not-empty field="parameters.creationDate">
+            <set field="contribution.creationDate" from-field="parameters.creationDate"/>
+            <else>
+            	<now-timestamp field="contribution.creationDate"/>
+            </else>
+        </if-not-empty>
+
+		   
+             
+
+        <!--set-nonpk-fields map="parameters" value-field="contribution"/-->
+
+        <create-value value-field="contribution"/>
+        
+	</simple-method>
+
+	<simple-method method-name="updateContribution" short-description="Update contribution attributes in Contribution Entity">
+		<!-- 1. Change Contribution.statusId-->
+			<entity-one entity-name="Contribution" value-field="contribution">
+            	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+       		</entity-one>
+		<!-- 1b. Update contribution attributes -->
+       		<if-not-empty field="parameters.statusId">
+           		<set field="contribution.statusId" from-field="parameters.statusId"/>
+          		<!-- Update ContributionStatus Records -->
+          		<make-value entity-name="ContributionStatus" value-field="contributionStatus"/>
+          		<now-timestamp field="nowTimestamp"/>
+          		<set field="contributionStatus.statusId" from-field="contribution.statusId"/>
+          		<set field="contributionStatus.contributionId" from-field="parameters.contributionId"/>
+          		<set field="contributionStatus.statusDate" from-field="nowTimestamp"/>	          		
+          		<create-value value-field="contributionStatus"/>
+           	</if-not-empty>
+           	
+           	<if-not-empty field="parameters.description">
+           		<set field="contribution.description" from-field="parameters.description"/>
+           	</if-not-empty>
+
+           	<if-not-empty field="parameters.creationDate">
+           		<set field="contribution.creationDate" from-field="parameters.creationDate"/>
+           	</if-not-empty>
+            	
+            	
+		<!-- 2. Calculate total Contribution amount and Update Contribution amount -->
+			<entity-condition entity-name="FinAccountTrans" list="finAccountTransList">
+	            <condition-expr field-name="contributionId" from-field="parameters.contributionId"/>
+	            <order-by field-name="contributionId"/>
+        	</entity-condition>
+			<calculate field="contributionTotal" type="BigDecimal"><number value="0"/></calculate>
+			<iterate entry="finAccountTrans" list="finAccountTransList">
+				<if-compare field="finAccountTrans.statusId" operator="not-equals"  value="FINACT_TRNS_CANCELED">
+					 <if-not-empty field="finAccountTrans.amount">
+					 	<calculate field="contributionTotal" type="BigDecimal" decimal-scale="${ledgerDecimals}" rounding-mode="${roundingMode}">
+	                        <calcop operator="add">
+	                            <calcop operator="get" field="contributionTotal"/>
+	                            <calcop operator="get" field="finAccountTrans.amount"/>
+	                        </calcop>
+	               		</calculate>
+					 </if-not-empty>
+				</if-compare>
+			</iterate>
+			<set field="finAccountTrans.statusId" value="CONTRIB_CRTD"/>
+			<set field="contribution.totalAmount" from-field="contributionTotal"/>
+		<!-- 3. Create new instance of FundContribution and initialize the fields -->
+		<!-- 4. Save contribution -->	
+			<store-value value-field="contribution"/>
+	</simple-method> 
+		
+	<simple-method method-name="createContributionItem" short-description="Create a Contribution line item as a FinAccountTrans in FinAccountTrans Entity">
+		<log level="info" message="OLAMIDE:-In Create Contribution Service Method"></log>
+		
+		<!-- 1. Create a new FinAccountTrans finAccountTrans-->
+			<set-service-fields service-name="createFinAccountTrans" map="parameters" to-map="createContributionItemMap"/>
+	        
+	        <!-- Get partyId from finAccountId -->
+	        <if-not-empty field="parameters.finAccountId">
+            		<entity-one entity-name="FinAccount" value-field="finAccount">
+                		<field-map field-name="finAccountId" from-field="parameters.finAccountId"/>
+            		</entity-one>
+            		<log level="info" message="OLAMIDE:-In Get partyId ${parameters.partyId} from finAccountId ${parameters.finAccountId}"></log>
+            		
+            		<set field="createContributionItemMap.partyId" from-field="finAccount.ownerPartyId"/>
+            		<set field="createContributionItemMap.finAccountTransTypeId" value="DEPOSIT"/>
+            </if-not-empty>
+	        
+	        <call-service service-name="createFinAccountTrans" in-map-name="createContributionItemMap">
+	            <!-- result-to-field result-name="contributionId"/-->
+	            <result-to-field result-name="finAccountTransId"/>
+	        </call-service>
+	        <log level="info" message="OLAMIDE:-parameters.finAccountTransId:${parameters.finAccountTransId}"></log>
+	        
+		<!-- 2. FinAccountTrans finAccountTrans associated with Contribution using contributionId-->
+			<if-not-empty field="parameters.contributionId">
+            		<entity-one entity-name="FinAccountTrans" value-field="finAccountTrans">
+                		<field-map field-name="finAccountTransId" from-field="finAccountTransId"/>
+            		</entity-one>
+            		<set field="finAccountTrans.contributionId" from-field="parameters.contributionId"/>
+            </if-not-empty>
+            
+            
+		<!-- 3. Initialize finAccountTrans.fundId with parameters.fundId -->
+			<if-not-empty field="parameters.fundId">
+            	<set field="finAccountTrans.fundId" from-field="parameters.fundId"/>
+            </if-not-empty>	
+            
+            <field-to-result field="parameters.contributionId" result-name="contributionId"/>
+            <field-to-result field="parameters.finAccountId" result-name="finAccountId"/>
+            
+	    <!-- 3. Recalculate Total -->
+            <entity-one entity-name="Contribution" value-field="contribution">
+               	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+           	</entity-one>
+			<set-service-fields service-name="calculateContributionTotal" map="contribution" to-map="calculateContributionTotalMap"/>		
+			<call-service service-name="calculateContributionTotal" in-map-name="calculateContributionTotalMap"/>
+
+	</simple-method>   
+
+	<simple-method method-name="endContribution" short-description="End a contribution and update attributes in Contribution Entity">
+		<!-- 1. Change Contribution.statusId to created-->
+			<entity-one entity-name="Contribution" value-field="contribution">
+            	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+       		</entity-one>
+          	<set field="contribution.statusId" value="CONTRIB_CPL"/>
+
+		<!-- 2. Calculate total Contribution amount and Update Contribution amount -->
+			<entity-condition entity-name="FinAccountTrans" list="finAccountTransList">
+	            <condition-expr field-name="contributionId" from-field="parameters.contributionId"/>
+	            <order-by field-name="contributionId"/>
+        	</entity-condition>
+			<calculate field="contributionTotal" type="BigDecimal"><number value="0"/></calculate>
+			<iterate entry="finAccountTrans" list="finAccountTransList">
+				<if-compare field="finAccountTrans.statusId" operator="not-equals"  value="FINACT_TRNS_CANCELED">
+					 <if-not-empty field="finAccountTrans.amount">
+					 	<calculate field="contributionTotal" type="BigDecimal" decimal-scale="${ledgerDecimals}" rounding-mode="${roundingMode}">
+	                        <calcop operator="add">
+	                            <calcop operator="get" field="contributionTotal"/>
+	                            <calcop operator="get" field="finAccountTrans.amount"/>
+	                        </calcop>
+	               		</calculate>
+					 </if-not-empty>
+				</if-compare>
+			</iterate>
+			<set field="finAccountTrans.statusId" value="CONTRIB_CRTD"/>
+			<set field="contribution.totalAmount" from-field="contributionTotal"/>
+		<!-- 3. Create new instance of FundContribution and initialize the fields -->
+		<!-- 4. Save contribution -->	
+			<store-value value-field="contribution"/>
+	</simple-method> 
+
+	<simple-method method-name="calculateContributionTotal" short-description="Calculate total contributions (FinAccountTrans) in a Contribution Entity and update totalAmount field">
+		<!-- 1. Calculate total Contribution amount and Update Contribution amount -->
+			<entity-one entity-name="Contribution" value-field="contribution">
+            	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+       		</entity-one>
+          	
+			<entity-condition entity-name="FinAccountTrans" list="finAccountTransList">
+	            <condition-expr field-name="contributionId" from-field="parameters.contributionId"/>
+	            <order-by field-name="contributionId"/>
+        	</entity-condition>
+			<calculate field="contributionTotal" type="BigDecimal"><number value="0"/></calculate>
+			<iterate entry="finAccountTrans" list="finAccountTransList">
+				<if-compare field="finAccountTrans.statusId" operator="not-equals"  value="FINACT_TRNS_CANCELED">
+					 <if-not-empty field="finAccountTrans.amount">
+					 	<calculate field="contributionTotal" type="BigDecimal" decimal-scale="${ledgerDecimals}" rounding-mode="${roundingMode}">
+	                        <calcop operator="add">
+	                            <calcop operator="get" field="contributionTotal"/>
+	                            <calcop operator="get" field="finAccountTrans.amount"/>
+	                        </calcop>
+	               		</calculate>
+					 </if-not-empty>
+				</if-compare>
+			</iterate>
+			<set field="contribution.totalAmount" from-field="contributionTotal"/>
+		<!-- 2. Save contribution -->	
+			<store-value value-field="contribution"/>
+	</simple-method> 
+	
+	<simple-method method-name="completeContribution" short-description="Complete a contribution and create AcctgTrans instance">
+		<if-not-empty field="parameters.statusId">
+			<entity-one entity-name="Contribution" value-field="contribution">
+	        	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+			</entity-one>
+			<log level="info" message="contribution.statusId: ${contribution.statusId}"/>
+			<if-compare field="contribution.statusId" operator="not-equals" value="CONTRIB_CPL">
+			  <if-compare field="contribution.statusId" operator="not-equals" value="CONTRIB_CNCLD">
+				<!-- 1. Change contribution.statusId to confirmed -->
+		          		<set field="contribution.statusId" value="CONTRIB_CPL"/>
+		          		
+		          		<!-- Update ContributionStatus Records -->
+		          		<make-value entity-name="ContributionStatus" value-field="contributionStatus"/>
+		          		<now-timestamp field="nowTimestamp"/>
+		          		<set field="contributionStatus.statusId" from-field="contribution.statusId"/>
+		          		<set field="contributionStatus.contributionId" from-field="parameters.contributionId"/>
+		          		<set field="contributionStatus.statusDate" from-field="nowTimestamp"/>	          		
+		          		<create-value value-field="contributionStatus"/>
+		       			
+		          		<store-value value-field="contribution"/>		          		
+				
+				<!-- 2. Set glAccountID -->
+					<if-empty field="parameters.glAccountId">
+		        	    <property-to-field resource="general" property="glAccount.default" field="parameters.glAccountId"/>
+			        	<set field="parameters.glAccountId" value="217000"/>
+			        </if-empty>
+		        
+		        <!-- 3. Get the list of finAccountTrans associated with the current contribution -->
+					<entity-condition entity-name="FinAccountTrans" list="finAccountTransList">
+						<condition-list combine="and">
+				            <condition-expr field-name="contributionId" from-field="parameters.contributionId"/>
+				            <condition-expr field-name="statusId" operator="equals" value="FINACT_TRNS_APPROVED"/>
+			            </condition-list>
+			            <order-by field-name="contributionId"/>
+		        	</entity-condition>
+		        	
+		
+		        	<!-- Create AcctgTrans for each -->        	
+		        	<iterate entry="finAccountTrans" list="finAccountTransList">
+						<set-service-fields service-name="postFinAccountTransToGl" map="finAccountTrans" to-map="postFinAccountTransToGlMap"/>
+			        	<set field="postFinAccountTransToGlMap.glAccountId" from-field="parameters.glAccountId"/>
+						<set field="finAccountId" from-field="finAccountTrans.finAccountId"/>
+				        <call-service service-name="postFinAccountTransToGl" in-map-name="postFinAccountTransToGlMap">
+				        </call-service>
+					</iterate>
+				</if-compare>
+			</if-compare>	
+		</if-not-empty>
+	</simple-method>
+	
+	<simple-method method-name="updateContributionItem" short-description="Update Contribution Item attributes in FinAccountTrans Entity">
+		<!--1. Get current FinAccountTrans record in FinAccountTrans Entity  -->
+	        <if-not-empty field="parameters.finAccountTransId">
+	            <entity-one entity-name="FinAccountTrans" value-field="finAccountTrans">
+                	<field-map field-name="finAccountTransId" from-field="parameters.finAccountTransId"/>
+            	</entity-one>
+        <!--2. Update all attributes for record of FinAccountTrans Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="finAccountTrans.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.amount">
+            		<set field="finAccountTrans.amount" from-field="parameters.amount"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.partyId">
+            		<set field="finAccountTrans.partyId" from-field="parameters.partyIdFrom"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.effectiveDate">
+            		<set field="finAccountTrans.effectiveDate" from-field="parameters.effectiveDate"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.transactionDate">
+            		<set field="finAccountTrans.transactionDate" from-field="parameters.transactionDate"/>
+            	</if-not-empty>
+				<if-not-empty field="parameters.comments">
+            		<set field="finAccountTrans.comments" from-field="parameters.comments"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="finAccountTrans"/>
+
+	    <!-- 3. Recalculate Total -->
+            <entity-one entity-name="Contribution" value-field="contribution">
+               	<field-map field-name="contributionId" from-field="parameters.contributionId"/>
+           	</entity-one>
+			<set-service-fields service-name="calculateContributionTotal" map="contribution" to-map="calculateContributionTotalMap"/>		
+			<call-service service-name="calculateContributionTotal" in-map-name="calculateContributionTotalMap"/>
+	</simple-method>
+
+
+	<!--Portal Services-->
+
+	
+</simple-methods>

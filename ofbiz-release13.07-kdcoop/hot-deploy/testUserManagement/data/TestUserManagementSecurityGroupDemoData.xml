@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityGroupPermission groupId="FULLADMIN" permissionId="OFBIZ_ADMIN"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="OFBIZ_CREATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="OFBIZ_DELETE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="OFBIZ_UPDATE"/>
+    <SecurityGroupPermission groupId="FLEXADMIN" permissionId="OFBIZ_VIEW"/>
+    <SecurityGroupPermission groupId="VIEWADMIN" permissionId="OFBIZ_VIEW"/>
+    <SecurityGroupPermission groupId="BIZADMIN" permissionId="OFBIZ_ADMIN"/>
+</entity-engine-xml>

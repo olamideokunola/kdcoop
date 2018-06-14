@@ -1,0 +1,1426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<screens xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/widget-screen.xsd">
+
+	<screen name="CommonLoanDecoratorOld">
+        <section>
+            <actions>
+                <set field="headerItem" value="CooperativefundsLoan"/>
+                <entity-one value-field="loan" entity-name="Loan"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <!-- >condition><not><if-empty field="paymentGroupId"/></not></condition-->
+                                    <widgets>
+                                        <include-menu name="LoanMainTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                    </widgets>
+                                    <fail-widgets>
+                                        <include-menu name="LoanMainTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                    </fail-widgets>
+                                </section>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/></not>
+                            </condition>
+                            <widgets>
+                            	<include-menu name="LoanSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: [${partyId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                                <label style="h3" text="${uiLabelMap.AccountingViewPermissionError}"/>
+                            </widgets>
+                            <fail-widgets>
+                                <include-menu name="LoanSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: [${partyId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                            </fail-widgets>
+                        </section>
+                        <decorator-section-include name="body"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+ 
+ 	<screen name="CommonLoanDecorator-FromContribution">
+        <section>
+            <actions>
+                <set field="headerItem" value="ContributionBatch"/>
+                <entity-one value-field="paymentGroup" entity-name="PaymentGroup"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <!-- >condition><not><if-empty field="paymentGroupId"/></not></condition-->
+                                    <widgets>
+                                        <include-menu name="ContributionMainTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    </widgets>
+                                    <fail-widgets>
+                                        <include-menu name="ContributionMainTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    </fail-widgets>
+                                </section>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-service-permission service-name="acctgFinAcctPermissionCheck" main-action="VIEW"/></not>
+                            </condition>
+                            <widgets>
+                            	<include-menu name="ContributionSubTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${contribution.description} [${contributionId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                                <label style="h3" text="${uiLabelMap.AccountingViewPermissionError}"/>
+                            </widgets>
+                            <fail-widgets>
+                                <include-menu name="ContributionSubTabBar" location="component://cooperativefunds/widget/cooperativefundsMenus.xml"/>
+                                    <container style="leftclear">
+                                        <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${contribution.description} [${contributionId}]  ${${extraFunctionName}}"/>
+                                    </container>
+                            </fail-widgets>
+                        </section>
+                        <decorator-section-include name="body"/>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>   
+    
+    <screen name="CommonLoanRequestDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="headerItem" value="loanRequests"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanRequestTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <condition><not><if-empty field="parameters.loanRequestId"/></not></condition>
+                                    <widgets>
+                                        <include-menu name="LoanRequestSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${loanRequest.description} [${loanRequestId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CommonLoanDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                <set field="headerItem" value="loans"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <condition><not><if-empty field="parameters.loanId"/></not></condition>
+                                    <widgets>
+                                        <include-menu name="LoanSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${loan.description} [${loanId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CommonLoanDisbursementDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+                <entity-one entity-name="LoanDisbursement" value-field="loanDisbursement"/>
+                <set field="headerItem" value="loanDisbursements"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <condition><not><if-empty field="parameters.loanDisbursementId"/></not></condition>
+                                    <widgets>
+                                        <include-menu name="LoanDisbursementSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${loanDisbursement.description} [${loanDisbursementId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CommonLoanPaymentPlanDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="loanPaymentPlanId" from-field="parameters.loanPaymentPlanId"/>
+                <entity-one entity-name="LoanPaymentPlan" value-field="loanPaymentPlan"/>
+                <set field="headerItem" value="loanPaymentPlans"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <condition><not><if-empty field="parameters.loanPaymentPlanId"/></not></condition>
+                                    <widgets>
+                                        <include-menu name="LoanPaymentPlanSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: [${loanPaymentPlanId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+               
+    <screen name="CommonLoanPayoffDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="loanPayoffId" from-field="parameters.loanPayoffId"/>
+                <entity-one entity-name="LoanPayoff" value-field="loanPayoff"/>
+                <set field="headerItem" value="loanPayoffs"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    <condition><not><if-empty field="parameters.loanPayoffId"/></not></condition>
+                                    <widgets>
+                                        <include-menu name="LoanPayoffSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: ${loanPayoff.description} [${loanPayoffId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+           
+    <screen name="CommonLoanRepaymentDecorator">
+        <section>
+            <actions>
+                <property-map resource="AccountingUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="ProductUiLabels" map-name="uiLabelMap" global="true"/>
+                <property-map resource="cooperativefundsUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+            
+                <entity-one entity-name="LoanRepayment" value-field="loanRepayment"/>
+                <set field="headerItem" value="loanRepayments"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="main-decorator" location="${parameters.mainDecoratorLocation}">
+                    <decorator-section name="pre-body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <include-menu name="LoanTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <if-service-permission service-name="acctgInvoicePermissionCheck" main-action="VIEW"/>
+                            </condition>
+                            <widgets>
+                                <section>
+                                    
+                                    <widgets>
+                                        <include-menu name="LoanRepaymentSubTabBar" location="component://cooperativefunds/widget/loans/LoanMenus.xml"/>
+                                        <container style="leftclear">
+                                            <label style="h1" text="${uiLabelMap[labelTitleProperty]} ${uiLabelMap.CommonFor}: LoanRepayment: [${loanRepaymentId}]  ${${extraFunctionName}}"/>
+                                        </container>
+                                    </widgets>
+                                </section>
+                                <decorator-section-include name="body"/>
+                            </widgets>
+                            <fail-widgets>
+                                <label style="h3">${uiLabelMap.AccountingViewPermissionError}</label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+   
+    <screen name="FindLoanRequests">
+       	<section>
+       		<actions></actions>
+       		<widgets>
+       			<decorator-screen
+       				name="CommonLoanRequestDecorator">
+       				<decorator-section name="body">
+       					<section>
+       						<widgets>
+       							<decorator-screen name="FindScreenDecorator"
+       								location="component://common/widget/CommonScreens.xml">
+       								<decorator-section name="menu-bar">
+       									<container style="button-bar">
+       										<include-menu location="component://cooperativefunds/widget/loans/LoanMenus.xml"
+       											name="LoanRequestSubTabBar"/>
+       									</container>
+       								</decorator-section>
+       								<decorator-section name="search-options">
+       									<section>
+                                            <condition>
+                                                <if-compare field="displayAdvancedSearch" operator="equals" value="true"/>
+                                            </condition>
+                                            <widgets>
+                                                <include-form name="FindLoanRequests" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                            </widgets>
+                                            <fail-widgets>
+                                                <include-form name="QuickFindLoanRequests" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                            </fail-widgets>
+                                        </section>
+       								</decorator-section>
+       								<decorator-section name="search-results">
+       									<include-form location="component://cooperativefunds/widget/loans/LoanForms.xml"
+       										name="ListLoanRequests">
+       									</include-form>
+       								</decorator-section>
+       							</decorator-screen>
+       						</widgets>
+       					</section>
+       				</decorator-section>
+       			</decorator-screen>
+       		</widgets>
+       	</section>
+    </screen>
+
+    <screen name="FindLoans">
+       	<section>
+       		<actions></actions>
+       		<widgets>
+       			<decorator-screen
+       				name="CommonLoanDecorator">
+       				<decorator-section name="body">
+       					<section>
+       						<widgets>
+       							<decorator-screen name="FindScreenDecorator"
+       								location="component://common/widget/CommonScreens.xml">
+       								<decorator-section name="menu-bar">
+       									<container style="button-bar">
+       										<include-menu location="component://cooperativefunds/widget/loans/LoanMenus.xml"
+       											name="LoanSubTabBar"/>
+       									</container>
+       								</decorator-section>
+       								<decorator-section name="search-options">
+       									<section>
+                                            <condition>
+                                                <if-compare field="displayAdvancedSearch" operator="equals" value="true"/>
+                                            </condition>
+                                            <widgets>
+                                                <include-form name="FindLoans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                            </widgets>
+                                            <fail-widgets>
+                                                <include-form name="QuickFindLoans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                            </fail-widgets>
+                                        </section>
+       								</decorator-section>
+       								<decorator-section name="search-results">
+       									<include-form location="component://cooperativefunds/widget/loans/LoanForms.xml"
+       										name="ListLoans">
+       									</include-form>
+       								</decorator-section>
+       							</decorator-screen>
+       						</widgets>
+       					</section>
+       				</decorator-section>
+       			</decorator-screen>
+       		</widgets>
+       	</section>
+    </screen>    
+    <screen name="Loans">
+        <section>
+            <actions>
+                <property-map resource="PartyUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="partyId" from-field="parameters.partyId" default-value="${userLogin.partyId}"/>
+                <entity-and entity-name="LoanRequest" list="loanRequests">
+                    <field-map field-name="partyId" from-field="partyId"/>
+                    <order-by field-name="loanRequestId"/>
+                </entity-and>
+            </actions>
+            <widgets>
+            	<screenlet title="${uiLabelMap.CooperativeLoans}" collapsible="false" navigation-menu-name="PartyLoansMenu">          	
+                    <include-form name="loanRequestsList" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+               		<include-menu
+                     	location="component://cooperativefunds/widget/loans/LoanMenus.xml"
+                     	name="PartyLoansMenu"/>
+                </screenlet>
+            </widgets>
+        </section>
+    </screen>
+    <screenlet title="${uiLabelMap.AccountingMainPage}">
+                            <platform-specific><html><html-template location="component://accounting/webapp/accounting/main.ftl"/></html></platform-specific>
+                        </screenlet>
+    <screen name="NewLoanRequest">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeNewLoanRequest"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+                
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonLoanRequestDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsNewLoanRequest}">
+                                    <include-form name="NewLoanRequest" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CreatePayslipContent">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeNewLoanRequest"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonLoanRequestDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativePayslipContent}">
+                                    <include-form name="CreatePayslipContent" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+
+    <screen name="CreatePensionStmtContent">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeNewLoanRequest"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonLoanRequestDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativePensionStmtContent}">
+                                    <include-form name="CreatePensionStmtContent" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="EditLoanRequestContents">
+        <section>
+            <actions>
+                <set field="titleProperty" value="PageTitleListContent"/>
+                <set field="headerItem" value="find"/>
+         Name and Last Name, and one Submit button.       <set field="tabButtonItem" value="LoaRequestContents"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="contentId" from-field="parameters.contentId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Content" value-field="content"/>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonLoanRequestDecorator">
+                    <decorator-section name="body">
+                        <screenlet title="${uiLabelMap.PageTitleListContent}">
+                            <container>
+                                <link target="editLoanRequestContents" text="${uiLabelMap.CommonCreateNew}" style="smallSubmit">
+                                    <parameter param-name="loanRequestId"/>
+                                </link>
+                            </container>
+                            <include-form name="ListLoanRequestContents" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                        </screenlet>
+                        <screenlet title="${uiLabelMap.PageTitleAddLoanRequestContent}">
+                            <include-form name="AddLoanRequestContent" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                        </screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>    
+    
+    <screen name="EditLoanRequest">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeEditLoanRequest"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                
+                <set field="entityName" value="ContentAssocDataResourceViewFrom"/>
+                                
+                <service service-name="urlEncodeArgs" result-map="result">
+                    <field-map from-field="requestParameters" field-name="mapIn"/>
+                </service>
+                <set field="viewIndex" from-field="requestParameters.VIEW_INDEX" type="Integer" default-value="0"/>
+                <set field="viewSize" from-field="requestParameters.VIEW_SIZE" type="Integer" default-value="20"/>
+                <set field="currentCMSMenuItemName" value="contentfind" to-scope="user"/>
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+         Name and Last Name, and one Submit button.   
+            <widgets>
+                <decorator-screen name="CommonLoanRequestDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativeEditLoanRequest}">
+                                    <include-form name="EditLoanRequest" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="ViewLoanTerms">
+        <section>
+            <actions>
+            	<entity-one value-field="contentAssocDataResourceViewFrom" entity-name="ContentAssocDataResourceViewFrom">
+            		<field-map field-name="contentId" from-field="parameters.contentId"/>
+            	</entity-one>
+                
+                <set field="titleProperty" value="ContentCMSEditPage"/>
+                <set field="entityOperation" value="_UPDATE"/>
+                <set field="targetOperation" value="CONTENT_UPDATE|CONTENT_CREATE|CONTENT_CREATE_SUB"/>
+                <set field="requiredRoles" value="OWNER|BLOG_AUTHOR|BLOG_EDITOR|BLOG_ADMIN|BLOG_PUBLISHER"/>
+                
+                <set field="contentPurposeTypeId" value="ARTICLE"/>
+                <set field="MASTER_contentId" from-field="parameters.MASTER_contentId" default-value="${parameters.contentId}"/>
+                <set field="MASTER_drDataResourceId" from-field="parameters.MASTER_drDataResourceId" default-value="${parameters.drDataResourceId}"/>
+                <set field="MASTER_caContentIdTo" from-field="parameters.MASTER_caContentIdTo" default-value="${parameters.caContentIdTo}"/>
+                <set field="MASTER_caContentId" from-field="parameters.MASTER_caContentId" default-value="${parameters.caContentIdFrom}"/>
+                <set field="MASTER_caContentAssocTypeId" from-field="parameters.MASTER_caContentAssocTypeId" default-value="${parameters.caContentAssocTypeId}"/>
+                <set field="MASTER_caMapKey" from-field="parameters.MASTER_caMapKey" default-value="${parameters.caMapKey}"/>
+                <set field="MASTER_caFromDate" from-field="parameters.MASTER_caFromDate" default-value="${parameters.caFromDate}" type="Timestamp"/>
+                <set field="MASTER_caThruDate" from-field="parameters.MASTER_caThruDate" default-value="${parameters.caThruDate}" type="Timestamp"/>
+
+                <set field="contentId" from-field="MASTER_contentId"/>
+                <set field="drDataResourceId" from-field="MASTER_drDataResourceId"/>
+                <set field="caContentIdTo" from-field="MASTER_caContentIdTo"/>
+                <set field="caContentId" from-field="MASTER_caContentId"/>
+                <set field="caContentAssocTypeId" from-field="MASTER_caContentAssocTypeId"/>
+                <set field="caFromDate" from-field="MASTER_caFromDate"/>
+                <set field="caThruDate" from-field="MASTER_caThruDate"/>
+                <set field="caMapKey" from-field="MASTER_caMapKey"/>
+
+                <script location="component://content/webapp/content/WEB-INF/actions/cms/CmsEditAddPrep.groovy"/>
+                <set field="currentCMSMenuItemName" value="EditAddContent" to-scope="user"/>
+                <set field="enableEdit" value="true"/>
+            </actions>
+            <widgets>
+            	<decorator-screen name="CommonLoanRequestDecorator">
+                <!-- decorator-screen name="contentDecorator" location="${parameters.cmsDecoratorLocation}"-->
+                    <decorator-section name="body">
+                        <screenlet title="${uiLabelMap.ContentViewPage}">
+                            <content content-id="${contentId}" enable-edit-name="notfound"  edit-request="EditAddSubContent?MASTER_caMapKey=${MASTER_caMapKey}&amp;MASTER_contentId=${MASTER_contentId}&amp;MASTER_caContentIdTo=${MASTER_caContentIdTo}&amp;MASTER_caContentAssocTypeId=${MASTER_caContentAssocTypeId}&amp;MASTER_caFromDate=${MASTER_caFromDate}&amp;MASTER_caThruDate=${MASTER_caThruDate}&amp;MASTER_drDataResourceId=${MASTER_drDataResourceId}&amp;caContentIdTo=${caContentIdTo}"/>
+                        </screenlet>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="EditLoan">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeEditLoan"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                                
+                <set field="currentCMSMenuItemName" value="contentfind" to-scope="user"/>
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativeEditLoan}">
+                                    <include-form name="EditLoan" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+	<screen name="LoanOverview">
+        <section>
+            <actions>
+                <property-map resource="PartyUiLabels" map-name="uiLabelMap" global="true"/>
+                <set field="titleProperty" value="PageTitleLoanOverview"/>
+                <set field="tabButtonItem" value="loanOverview"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                <entity-and entity-name="LoanStatus" list="loanStatus">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                    <order-by field-name="statusDate"/>
+                </entity-and>
+                <entity-and entity-name="LoanPaymentPlan" list="loanPaymentPlans">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                <entity-and entity-name="LoanDisbursement" list="loanDisbursements">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                <entity-and entity-name="LoanPayoff" list="loanPayoffs">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                <entity-and entity-name="LoanRepaymentLine" list="loanRepaymentLoans">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                <entity-and entity-name="Agreement" list="loanAgreements">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+            </actions>
+            <widgets>
+                <decorator-screen name="CommonLoanDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loan"/></not>
+                            </condition>
+                            <widgets>
+	                           	<section>
+		                            <condition>
+		                                <if-compare field="loan.statusId" operator="equals" value="LOAN_CRTD"/>
+		                            </condition>
+		                            <widgets>
+		                                <screenlet title="${uiLabelMap.CooperativefundsLoanHeader}">
+		                                    <link target="editLoan" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+		                                        <parameter param-name="loanId"/>
+		                                    </link>
+		                                    <include-form name="loanHeader" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+		                                </screenlet>
+		                                <container style="lefthalf">
+		                                    <screenlet title="${uiLabelMap.CommonStatus}" navigation-form-name="ListLoanStatus">
+		                                        <include-form name="ListLoanStatus" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+		                                    </screenlet>
+		                                    <screenlet title="${uiLabelMap.CooperativefundsLoanAgreements}">
+			                                    <link target="loanAgreements" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanAgreements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayments}">
+			                                    <link target="loanRepayments" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanRepaymentLoans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+		                                </container>
+		                                <container style="righthalf">
+		                                	<screenlet title="${uiLabelMap.CooperativefundsLoanDisbursements}">
+			                                    <link target="loanDisbursement" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanDisbursements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlans}">
+			                                    <link target="loanPaymentPlans" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanPaymentPlans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoffs}">
+			                                    <link target="loanPayoffs" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanPayoffs" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                            
+		                                </container>
+		                                <container style="clear"/>
+		                            </widgets>
+		                            <fail-widgets>
+										<screenlet title="${uiLabelMap.CooperativefundsLoanHeader}">
+		                                    <link target="editLoan" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+		                                        <parameter param-name="loanId"/>
+		                                    </link>
+		                                    <include-form name="loanHeader" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+		                                </screenlet>
+		                                <container style="lefthalf">
+		                                    <screenlet title="${uiLabelMap.CommonStatus}" navigation-form-name="ListLoanStatus">
+		                                        <include-form name="ListLoanStatus" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+		                                    </screenlet>
+		                                    <screenlet title="${uiLabelMap.CooperativefundsLoanAgreements}">
+			                                    <link target="loanAgreements" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanAgreements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayments}">
+			                                    <link target="loanRepayments" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanRepaymentLoans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+		                                </container>
+		                                <container style="righthalf">
+		                                	<screenlet title="${uiLabelMap.CooperativefundsLoanDisbursements}"  collapsible="false" navigation-menu-name="LoanDisbursementMenu">
+			                                    <link target="loanDisbursement" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanDisbursements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                	<include-menu
+							                     	location="component://cooperativefunds/widget/loans/LoanMenus.xml"
+							                     	name="LoanDisbursementMenu"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlans}">
+			                                    <link target="loanPaymentPlans" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanPaymentPlans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                </screenlet>
+			                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoffs}" collapsible="false" navigation-menu-name="LoanPayoffMenu">
+			                                    <link target="loanPayoffs" text="${uiLabelMap.CommonUpdate}" style="buttontext">
+			                                        <parameter param-name="loanId"/>
+			                                    </link>
+			                                    <include-form name="loanPayoffs" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+			                                	<include-menu
+							                     	location="component://cooperativefunds/widget/loans/LoanMenus.xml"
+							                     	name="LoanPayoffMenu"/>
+			                                </screenlet>
+			                            
+		                                </container>
+		                                <container style="clear"/>
+		                            </fail-widgets>
+                                </section>
+                            </widgets>
+                            <fail-widgets>
+                                <label text="${uiLabelMap.CooperativefundsLoanDoesNotExists}"></label>
+                            </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>  
+    
+    <screen name="NewLoanDisbursement">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanDisbursement"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                
+                <entity-and entity-name="LoanDisbursement" list="loanDisbursements">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                             
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanDisbursementDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loan"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanDisbursement}">
+                                    <include-form name="NewLoanDisbursement" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanDisbursements}">          	
+				                    <include-form name="loanDisbursements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+    <screen name="EditLoanDisbursement">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeEditLoanDisbursement"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <set field="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                <entity-one entity-name="LoanDisbursement" value-field="loanDisbursement"/>
+                
+                <entity-and entity-name="LoanDisbursement" list="loanDisbursements">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                             
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanDisbursementDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loanDisbursement"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanDisbursement}">
+                                    <include-form name="EditLoanDisbursement" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanDisbursements}">          	
+				                    <include-form name="loanDisbursements" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+							</fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+    
+    <screen name="NewLoanPaymentPlan">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanPaymentPlan"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                
+                <entity-and entity-name="LoanPaymentPlan" list="loanPaymentPlans">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                             
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanPaymentPlanDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loan"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlan}">
+                                    <include-form name="NewLoanPaymentPlan" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlans}">          	
+				                    <include-form name="loanPaymentPlans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+    <screen name="EditLoanPaymentPlan">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeEditLoanPaymentPlan"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <set field="loanDisbursementId" from-field="parameters.loanDisbursementId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                <entity-one entity-name="LoanPaymentPlan" value-field="loanPaymentPlan"/>
+                
+                <entity-and entity-name="LoanPaymentPlan" list="loanPaymentPlans">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                                                          
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanPaymentPlanDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loanPaymentPlan"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlan}">
+                                    <include-form name="EditLoanPaymentPlan" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPaymentPlans}">          	
+				                    <include-form name="loanPaymentPlans" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="NewLoanPayoff">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanPayoff"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                
+                <entity-and entity-name="LoanPayoff" list="loanPayoffs">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>
+                             
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanPayoffDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loan"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoff}">
+                                    <include-form name="NewLoanPayoff" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoffs}">          	
+				                    <include-form name="loanPayoffs" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>  
+    
+	<screen name="EditLoanPayoff">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativeEditLoanPayoff"/>
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <set field="loanPayoffId" from-field="parameters.loanPayoffId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>
+                <entity-one entity-name="LoanPayoff" value-field="loanPayoff"/>
+                
+                <entity-and entity-name="LoanPayoff" list="loanPayoffs">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and>    
+                                                    
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanPayoffDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <condition>
+                                <not><if-empty field="loanPayoff"/></not>
+                            </condition>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoff}">
+                                    <include-form name="EditLoanPayoff" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanPayoffs}">          	
+				                    <include-form name="loanPayoffs" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="NewLoanRepayment_v1">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>
+                
+                <!-- entity-and entity-name="LoanRepaymentLine" list="LoanRepayments">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and-->  
+                
+                <!-- service service-name="calculateLoanRepayment" result-map="loanRepayments" auto-field-map="true"/-->
+                
+                <!-- 
+                set field="loanRepaymentList" from-field="loanRepayments.calculatedLoanRepaymentList" type="List"/>
+                <set field="totalPrincipalAmount" type="BigDecimal" from-field="loanRepayments.totalPrincipalAmount"/>
+                <set field="totalInterestAmount" type="BigDecimal" from-field="loanRepayments.totalInterestAmount"/>
+                <set field="totalRepaymentAmount" type="BigDecimal" from-field="loanRepayments.totalRepaymentAmount"/
+                -->
+               
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                    <include-form name="NewLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">          	
+				                    <include-form name="loanRepaymentLines" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+				                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+		                            <platform-specific><html><html-template location="component://cooperativefunds/webapp/loans/loanSummary.ftl"/></html></platform-specific>
+		                        </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+
+    <screen name="NewLoanRepayment">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>  
+                <set field="loanRequestId" from-field="parameters.loanRequestId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <set field="loanPayoffId" from-field="parameters.loanPayoffId"/>
+                <entity-one entity-name="LoanRequest" value-field="loanRequest"/>
+                <entity-one entity-name="Loan" value-field="loan"/>           
+                <entity-one entity-name="LoanRepayment" value-field="loanRepayment"/>
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                    <include-form name="NewLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+        
+    <screen name="EditLoanRepayment_1">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>
+                <set field="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+                <set field="loanRepayment" from-field="parameters.loanRepayment"/>
+                
+                <!-- entity-and entity-name="LoanRepaymentLine" list="LoanRepayments">
+                    <field-map from-field="parameters.loanId" field-name="loanId"/>
+                </entity-and-->  
+                
+                <!-- <service service-name="calculateLoanRepayment" result-map="loanRepayments" auto-field-map="true"/>-->
+                <set field="loanRepaymentList" from-field="parameters.loanRepaymentLines" type="List"/>
+                <set field="totalPrincipalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="totalInterestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="totalRepaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="partyId" type="String" from-field="parameters.partyId"/>
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>
+            
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                	<container><label>${loanRepayment.repaymentAmount}</label></container>
+                                	<container><label>${parameters.partyId}</label></container>
+                                	<container><label>${parameters.loanRepaymentId}</label></container>
+                                	<container><label text="${parameters.allParams}"></label></container>
+                                	<container><label text="${parameters.loanRepayment}"></label></container>
+                                	<container><label text="${parameters.loanRepaymentLines}"></label></container>
+                                    <include-form name="NewLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">          	
+				                    <include-form name="loanRepaymentLines" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+				                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+		                            <platform-specific><html><html-template location="component://cooperativefunds/webapp/loans/loanSummary.ftl"/></html></platform-specific>
+		                        </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+
+    <screen name="EditLoanRepayment">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>
+                
+                <set field="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+                <set field="calculatedLoanRepayment" from-field="parameters.calculatedLoanRepayment"/>
+ 
+                <entity-one entity-name="LoanRepayment" value-field="loanRepayment"/>
+                
+                <!-- <service service-name="calculateLoanRepayment" result-map="loanRepayments" auto-field-map="true"/>-->
+                <set field="loanRepaymentList" from-field="parameters.calculatedLoanRepaymentLines" type="List"/>
+                <set field="totalPrincipalAmount" type="BigDecimal" from-field="calculatedLoanRepayment.principalAmount"/>
+                <set field="totalInterestAmount" type="BigDecimal" from-field="calculatedLoanRepayment.interestAmount"/>
+                <set field="totalRepaymentAmount" type="BigDecimal" from-field="calculatedLoanRepayment.repaymentAmount"/>
+                <set field="repaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="principalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="interestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="repaymentDate" type="Timestamp" from-field="loanRepayment.repaymentDate"/>
+                <set field="partyId" type="String" from-field="loanRepayment.partyId"/>
+                <set field="statusId" type="String" from-field="loanRepayment.statusId"/>
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>     
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                	<container><label>${loanRepayment.repaymentAmount}</label></container>
+                                	<container><label>${parameters.partyId}</label></container>
+                                	<container><label>${parameters.loanRepaymentId}</label></container>
+                                	<container><label text="parameters.allParams: ${parameters.allParams}"></label></container>
+                                	<container><label text="loanRepaymentId: ${loanRepaymentId}"></label></container>
+                                	<container><label text="parameters.loanRepaymentId: ${parameters.loanRepaymentId}"></label></container>
+                                	<container><label text="parameters.loanRepayment: ${parameters.loanRepayment}"></label></container>
+									<container><label text="parameters.calculatedLoanRepayment: ${parameters.calculatedLoanRepayment}"></label></container>
+                                	<container><label text="parameters.loanRepaymentLines: ${parameters.loanRepaymentLines}"></label></container>
+                                    <include-form name="NewLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">          	
+				                    <include-form name="loanRepaymentLines" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+				                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+		                            <platform-specific><html><html-template location="component://cooperativefunds/webapp/loans/loanSummary.ftl"/></html></platform-specific>
+		                        </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen>
+    
+    <screen name="EditLoanRepaymentAndLines_v1">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>
+                
+                <set field="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+                
+                <entity-one entity-name="LoanRepayment" value-field="loanRepayment"/>
+                
+                <entity-and entity-name="LoanRepaymentLine" list="loanRepaymentLines">
+                    <field-map field-name="loanRepaymentId" from-field="loanRepaymentId"/>
+                    <order-by field-name="loanRepaymentId"/>
+                </entity-and>
+                
+                <!-- <service service-name="calculateLoanRepayment" result-map="loanRepayments" auto-field-map="true"/>-->
+                <set field="loanRepaymentList" from-field="loanRepaymentLines" type="List"/>
+                <set field="totalPrincipalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="totalInterestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="totalRepaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="repaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="principalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="interestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="repaymentDate" type="Timestamp" from-field="loanRepayment.repaymentDate"/>
+                <set field="partyId" type="String" from-field="loanRepayment.partyId"/>
+                <set field="statusId" type="String" from-field="loanRepayment.statusId"/>
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>     
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                	<container><label>${loanRepayment.repaymentAmount}</label></container>
+                                	<container><label>${parameters.partyId}</label></container>
+                                	<container><label>${parameters.loanRepaymentId}</label></container>
+                                	<container><label text="parameters.allParams: ${parameters.allParams}"></label></container>
+                                	<container><label text="parameters.loanRepayment: ${parameters.loanRepayment}"></label></container>
+									<container><label text="parameters.calculatedLoanRepayment: ${parameters.calculatedLoanRepayment}"></label></container>
+                                	<container><label text="parameters.loanRepaymentLines: ${parameters.loanRepaymentLines}"></label></container>
+                                    <include-form name="DisplayLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">          	
+				                    <include-form name="loanRepaymentLinesDisplay" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+				                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+		                            <platform-specific><html><html-template location="component://cooperativefunds/webapp/loans/loanSummary.ftl"/></html></platform-specific>
+		                        </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+    
+    <screen name="EditLoanRepaymentAndLines">
+        <section>
+            <actions>
+                <set field="titleProperty" value="CooperativefundsNewLoanRepayment"/>
+                
+                <set field="loanRepaymentId" from-field="parameters.loanRepaymentId"/>
+                <set field="loanId" from-field="parameters.loanId"/>
+                <entity-one entity-name="LoanRepayment" value-field="loanRepayment"/>
+                
+                <entity-and entity-name="LoanRepaymentLine" list="loanRepaymentLines">
+                    <field-map field-name="loanRepaymentId" from-field="loanRepaymentId"/>
+                    <order-by field-name="loanId"/>
+                </entity-and>
+                
+                <!-- <service service-name="calculateLoanRepayment" result-map="loanRepayments" auto-field-map="true"/>-->
+                <set field="loanRepaymentList" from-field="loanRepaymentLines" type="List"/>
+                <set field="totalPrincipalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="totalInterestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="totalRepaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="repaymentAmount" type="BigDecimal" from-field="loanRepayment.repaymentAmount"/>
+                <set field="principalAmount" type="BigDecimal" from-field="loanRepayment.principalAmount"/>
+                <set field="interestAmount" type="BigDecimal" from-field="loanRepayment.interestAmount"/>
+                <set field="repaymentDate" type="Timestamp" from-field="loanRepayment.repaymentDate"/>
+                <set field="partyId" type="String" from-field="loanRepayment.partyId"/>
+                <set field="statusId" type="String" from-field="loanRepayment.statusId"/>
+                
+                <property-to-field field="defaultCurrencyUomId" resource="general" property="currency.uom.id.default" default="NGN"/>
+            </actions>     
+            <widgets>
+                <decorator-screen name="CommonLoanRepaymentDecorator">
+                    <decorator-section name="body">
+                        <section>
+                            <widgets>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+                                	<container><label>${loanRepayment.repaymentAmount}</label></container>
+                                	<container><label>${parameters.partyId}</label></container>
+                                	<container><label>${parameters.loanRepaymentId}</label></container>
+                                	<container><label text="parameters.allParams: ${parameters.allParams}"></label></container>
+                                	<container><label text="parameters.loanRepayment: ${parameters.loanRepayment}"></label></container>
+									<container><label text="parameters.calculatedLoanRepayment: ${parameters.calculatedLoanRepayment}"></label></container>
+                                	<container><label text="parameters.loanRepaymentLines: ${parameters.loanRepaymentLines}"></label></container>
+                                    <include-form name="DisplayLoanRepayment" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+                                </screenlet>
+                                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">          	
+				                    <include-form name="loanRepaymentLinesDisplay" location="component://cooperativefunds/widget/loans/LoanForms.xml"/>
+				                </screenlet>
+				                <screenlet title="${uiLabelMap.CooperativefundsLoanRepayment}">
+		                            <platform-specific><html><html-template location="component://cooperativefunds/webapp/loans/loanSummary.ftl"/></html></platform-specific>
+		                        </screenlet>
+                            </widgets>
+		                    <fail-widgets>
+		                    </fail-widgets>
+                        </section>
+                    </decorator-section>
+                </decorator-screen>
+            </widgets>
+        </section>
+    </screen> 
+</screens>
+

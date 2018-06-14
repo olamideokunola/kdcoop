@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ActivationPolicy: lazy
+Built-By: integration
+Bundle-Name: UML Designer Discovery UI
+Created-By: Apache Maven
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Require-Bundle: org.eclipse.core.runtime,org.eclipse.ui,org.eclipse.am
+ algam.discovery.ui,org.eclipse.core.net,org.eclipse.ui.intro
+Bundle-Vendor: Obeo Network
+Build-Jdk: 1.6.0_26
+Bundle-Version: 5.0.0.201505291234
+Bundle-ManifestVersion: 2
+Bundle-Activator: org.obeonetwork.dsl.uml2.discovery.UmlDiscoveryActiv
+ ator
+Bundle-SymbolicName: org.obeonetwork.dsl.uml2.discovery;singleton:=tru
+ e
+Archiver-Version: Plexus Archiver
+

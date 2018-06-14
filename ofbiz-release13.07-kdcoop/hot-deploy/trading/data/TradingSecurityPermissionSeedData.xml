@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity-engine-xml>
+    <SecurityPermission description="View operations in the Trading Component." permissionId="ORDERMGR_VIEW"/>
+    <SecurityPermission description="Create operations in the Trading Component." permissionId="ORDERMGR_CREATE"/>
+    <SecurityPermission description="Update operations in the Trading Component." permissionId="ORDERMGR_UPDATE"/>
+    <SecurityPermission description="Delete operations in the Trading Component." permissionId="ORDERMGR_DELETE"/>
+    <SecurityPermission description="ALL operations in the Trading Component." permissionId="ORDERMGR_ADMIN"/>
+
+    <SecurityGroupPermission groupId="SUPER" permissionId="ORDERMGR_ADMIN"/>
+
+</entity-engine-xml>

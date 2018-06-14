@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<simple-methods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="http://ofbiz.apache.org/dtds/simple-methods-v2.xsd">
+        
+    <simple-method method-name="createContributionPaymentBatch" short-description="Create a Payment Group for Coorperative Contribution Payments">
+        <if>
+            <condition>
+                <and>
+                    <not><if-has-permission permission="ACCOUNTING" action="_CREATE"/></not>
+                </and>
+            </condition>
+            <then>
+                <add-error>
+                    <fail-property resource="AccountingUiLabels" property="AccountingCreatePaymentPermissionError"/>
+                </add-error>
+            </then>
+        </if>
+        <check-errors/>
+
+        <make-value entity-name="PaymentGroup" value-field="paymentGroup"/>
+        <if-empty field="parameters.paymentGroupId">
+            <sequenced-id sequence-name="PaymentGroup" field="paymentGroup.paymentGroupId"/>
+            <else>
+                <set field="paymentGroup.paymentGroupId" from-field="parameters.paymentGroupId"/>
+            </else>
+        </if-empty>
+        <field-to-result field="paymentGroup.paymentGroupId" result-name="paymentGroupId"/>
+
+        <set field="paymentGroup.paymentGroupTypeId" value="BATCH_PAYMENT"/>
+
+        <set field="paymentGroup.paymentGroupName" from-field="parameters.paymentGroupName"/>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																														        
+        <set field="paymentGroup.statusId" value="PMTGRP_INCPL"/>
+        
+        <set field="paymentGroup.partyId" from-field="userLogin.partyId"/>
+        
+        <set field="paymentGroup.batchCreationDate" from-field="parameters.batchCreationDate"/>
+        
+        <set field="paymentGroup.defaultCurrency" from-field="parameters.defaultCurrency"/>
+        
+        <set field="paymentGroup.totalAmount" from-field="parameters.totalAmount"/>
+
+        <create-value value-field="paymentGroup"/>
+    </simple-method>
+
+ 	<simple-method method-name="createContributionPaymentInPaymentBatch" short-description="Create a Payment and associate with Payment Batch in PaymentGroup Entity">
+		<!--1. Create new Payment and associate with Party (partyIdFrom) new FinAccountTrans  -->
+        <!--2. Associate Payment with Fund and current PaymentGroup  -->
+        <!--  -->
+        
+        <!--1. Create new Payment and associate with Party (partyIdFrom) new FinAccountTrans  -->
+        	<!-- Get parameters for creation of Payment record -->
+        	
+			<set-service-fields service-name="createPaymentAndFinAccountTrans" map="parameters" to-map="createPaymentMap"/>
+	        
+	        <call-service service-name="createPaymentAndFinAccountTrans" in-map-name="createPaymentMap">
+	            <result-to-field result-name="paymentId"/>
+	            <result-to-field result-name="finAccountTransId"/>
+	        </call-service>
+	        
+
+		<!--2. Associate Payment with Fund and current PaymentGroup  -->
+	        <if-not-empty field="parameters.fundId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="paymentId"/>
+            	</entity-one>
+            	<set field="payment.fundId" from-field="parameters.fundId"/>
+            	<set field="payment.finAccountTransId" from-field="finAccountTransId"/>
+	        </if-not-empty>		
+	        <if-not-empty field="parameters.paymentGroupId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="paymentId"/>
+            	</entity-one>
+            	<set field="payment.paymentGroupId" from-field="parameters.paymentGroupId"/>
+	        </if-not-empty>	
+	        <field-to-result field="paymentId"/>
+	        <field-to-result field="parameters.paymentGroupId" result-name="paymentGroupId"/>
+    </simple-method>    
+
+ 	<simple-method method-name="updatePaymentBatchStatus" short-description="Update Status of Payment Batch in PaymentGroup Entity">
+		<!--1. Get current PaymentGroup record in PaymentGroup Entity  -->
+	        <if-not-empty field="parameters.statusId">
+	            <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                	<field-map field-name="paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	</entity-one>
+        <!--2. Update statusId for record of PaymentGroup Entity  -->
+        		<if-compare-field field="" map-name="" operator="" to-field-name="">
+					
+        			<else>
+            			<set field="paymentGroup.statusId" from-field="parameters.statusId"/>
+            		</else>
+            	</if-compare-field>
+	        </if-not-empty>
+	        <store-value value-field="paymentGroup"/>
+        	<field-to-result field="statusId"/>
+        	<log level="info" message="OLAMIDE:-parameters.statusId:${parameters.statusId}"></log>
+        	<log level="info" message="OLAMIDE:-paymentGroup.statusId:${paymentGroup.statusId}"></log>
+    </simple-method>  
+
+ 	<simple-method method-name="updateContributionBatch" short-description="Update Payment Batch attributes in PaymentGroup Entity">
+		<!--1. Get current PaymentGroup record in PaymentGroup Entity  -->
+	        <if-not-empty field="parameters.paymentGroupId">
+	            <entity-one entity-name="PaymentGroup" value-field="paymentGroup">
+                	<field-map field-name="paymentGroupId" from-field="parameters.paymentGroupId"/>
+            	</entity-one>
+        <!--2. Update all attributes for record of PaymentGroup Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="paymentGroup.statusId" from-field="parameters.statusId"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.paymentGroupName">
+            		<set field="paymentGroup.paymentGroupName" from-field="parameters.paymentGroupName"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="paymentGroup"/>
+	</simple-method>      
+
+ 	<simple-method method-name="updateContributionPayment" short-description="Update Payment attributes in Payment Entity">
+		<!--1. Get current Payment record in Payment Entity  -->
+	        <if-not-empty field="parameters.paymentId">
+	            <entity-one entity-name="Payment" value-field="payment">
+                	<field-map field-name="paymentId" from-field="parameters.paymentId"/>
+            	</entity-one>
+        <!--2. Update all attributes for record of Payment Entity  -->
+        		<if-not-empty field="parameters.statusId">
+            		<set field="payment.statusId" from-field="parameters.statusId"/>
+            		<set field="payment.amount" from-field="parameters.amount"/>
+            	</if-not-empty>
+            	<if-not-empty field="parameters.paymentGroupName">
+            		<set field="paymentGroup.paymentGroupName" from-field="parameters.paymentGroupName"/>
+            	</if-not-empty>
+	        </if-not-empty>
+	        <store-value value-field="payment"/>
+	</simple-method>      
+</simple-methods>
